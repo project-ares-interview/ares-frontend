@@ -1,4 +1,7 @@
-import { Text, View } from "react-native";
+import { Link } from "expo-router";
+import { View } from "react-native";
+
+import { Text } from "@rneui/themed";
 
 export default function Index() {
   return (
@@ -7,9 +10,14 @@ export default function Index() {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
+        gap: 8,
       }}
     >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
+      <Text style={{ fontSize: 64, fontWeight: "bold" }}>
+        Hello React Native
+      </Text>
+
+      <Link href="/example">Go to Example</Link>
     </View>
   );
 }
