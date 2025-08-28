@@ -1,4 +1,5 @@
-import { Button, Card, Header, Icon, Text } from "@rneui/themed";
+import { Button, Card, Icon, Text } from "@rneui/themed";
+import { useTranslation } from "react-i18next";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
 
 const users = [
@@ -31,19 +32,14 @@ const users = [
 ];
 
 export default function Index() {
+  const { t } = useTranslation();
+
   return (
     <>
-      <Header
-        centerComponent={{
-          text: "Hello React Native",
-          style: { fontSize: 16, fontWeight: "bold", color: "#fff" },
-        }}
-      />
-
       <ScrollView>
         <View style={styles.container}>
           <Card>
-            <Card.Title>CARD WITH DIVIDER</Card.Title>
+            <Card.Title>{t("card.first")}</Card.Title>
             <Card.Divider />
             {users.map((u, i) => {
               return (
@@ -59,7 +55,7 @@ export default function Index() {
             })}
           </Card>
           <Card containerStyle={{ marginTop: 15 }}>
-            <Card.Title>FONTS</Card.Title>
+            <Card.Title>{t("card.second")}</Card.Title>
             <Card.Divider />
             <Text style={styles.fonts} h1>
               h1 Heading
@@ -76,7 +72,7 @@ export default function Index() {
             <Text style={styles.fonts}>Normal Text</Text>
           </Card>
           <Card>
-            <Card.Title>HELLO WORLD</Card.Title>
+            <Card.Title>{t("card.third")}</Card.Title>
             <Card.Divider />
             <Card.Image
               style={{ padding: 0 }}

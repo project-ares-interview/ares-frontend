@@ -2,8 +2,11 @@ import { Link } from "expo-router";
 import { View } from "react-native";
 
 import { Text } from "@rneui/themed";
+import { useTranslation } from "react-i18next";
 
 export default function Index() {
+  const { t } = useTranslation();
+
   return (
     <View
       style={{
@@ -14,7 +17,7 @@ export default function Index() {
       }}
     >
       <Text style={{ fontSize: 64, fontWeight: "bold" }}>
-        Hello React Native
+        {t("welcome")}
       </Text>
 
       <Link href="/example">Go to Example</Link>
