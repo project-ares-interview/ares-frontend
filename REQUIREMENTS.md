@@ -89,15 +89,11 @@ cd ares-frontend
 
 #### 설치 방법
 
-`yarn`은 `mise`를 통해 설치하고 관리합니다. 프로젝트 루트 디렉토리의 `mise.toml` 파일에 다음과 같이 `yarn`이 명시되어 있습니다.
+터미널에서 아래 명령어를 실행하여 `corepack`을 설치합합니다. 이 명령어는 한 번만 실행하면 됩니다.
 
-```toml
-[tools]
-node = "24.7.0"
-yarn = "latest"
+```bash
+npm install -g corepack
 ```
-
-따라서 별도의 설치 명령어는 필요하지 않으며, 다음 "3. 프로젝트 설정" 단계에서 `mise install` 명령어를 실행하면 `mise`가 `node`와 `yarn`을 자동으로 감지하여 명시된 버전을 설치해 줍니다.
 
 ---
 
