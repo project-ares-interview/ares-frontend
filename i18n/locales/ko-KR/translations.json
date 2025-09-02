@@ -1,8 +1,25 @@
 {
-    "card": {
-        "first": "카드와 분할선",
-        "second": "폰트",
-        "third": "안녕 세계"
+    "components": {
+        "footer": {
+            "navigation": {
+                "privacy": "개인정보처리방침",
+                "terms": "이용약관"
+            }
+        },
+        "header": {
+            "navigation": {
+                "cover_letter": "자기소개서",
+                "home": "홈",
+                "interview": "가상 면접",
+                "resume": "이력서",
+                "sign_in": "로그인",
+                "sign_out": "로그아웃"
+            }
+        }
     },
-    "welcome": "안녕 리액트 네이티브"
+    "pages": {
+        "index": {
+            "welcome": "안녕 리액트 네이티브"
+        },
+    }
 }
