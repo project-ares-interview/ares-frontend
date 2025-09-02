@@ -17,6 +17,37 @@
             }
         }
     },
+    "errors": {
+        "birth": {
+            "invalid": "Invalid date format. Please use YYYY-MM-DD.",
+            "required": "Date of birth is required."
+        },
+        "confirm_password": {
+            "mismatch": "Passwords do not match.",
+            "required": "Password confirmation is required."
+        },
+        "email": {
+            "invalid": "Invalid email format.",
+            "required": "Email is required."
+        },
+        "gender": {
+            "required": "Gender is required."
+        },
+        "name": {
+            "required": "Name is required."
+        },
+        "password": {
+            "min_length": "Password must be at least 8 characters.",
+            "required": "Password is required.",
+            "special_char": "Password must contain at least one special character."
+        },
+        "phone_number": {
+            "required": "Phone number is required."
+        },
+        "terms": {
+            "required": "You must agree to the terms of service."
+        }
+    },
     "pages": {
         "index": {
             "welcome": "Hello React Native"
@@ -27,6 +58,24 @@
             "sign_in": "Sign In",
             "sign_up": "Sign Up with Email",
             "sign_up_notice": "Don't have an account?"
+        },
+        "sign_up": {
+            "birth": "Date of Birth",
+            "confirm_password": "Confirm Password",
+            "day": "Day",
+            "email": "Email",
+            "gender": "Gender",
+            "gender_female": "Female",
+            "gender_male": "Male",
+            "month": "Month",
+            "name": "Name",
+            "password": "Password",
+            "phone_number": "Phone Number(01012345678)",
+            "sign_up_button": "Sign Up",
+            "terms_agreement": "I agree to the ",
+            "terms_of_service": "Terms of Service",
+            "title": "Create Account",
+            "year": "Year"
         }
     }
 }
