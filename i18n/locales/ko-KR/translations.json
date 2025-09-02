@@ -17,6 +17,37 @@
             }
         }
     },
+    "errors": {
+        "birth": {
+            "invalid": "유효하지 않은 날짜 형식입니다. YYYY-MM-DD 형식으로 입력해주세요.",
+            "required": "생년월일을 입력해주세요."
+        },
+        "confirm_password": {
+            "mismatch": "비밀번호가 일치하지 않습니다.",
+            "required": "검증용 비밀번호를 입력해주세요."
+        },
+        "email": {
+            "invalid": "유효한 이메일 형식이 아닙니다.",
+            "required": "이메일을 입력해주세요."
+        },
+        "gender": {
+            "required": "성별을 선택해주세요."
+        },
+        "name": {
+            "required": "이름을 입력해주세요."
+        },
+        "password": {
+            "min_length": "비밀번호는 8자 이상이어야 합니다.",
+            "required": "비밀번호를 입력해주세요.",
+            "special_char": "비밀번호에는 특수문자가 하나 이상 포함되어야 합니다."
+        },
+        "phone_number": {
+            "required": "전화번호를 입력해주세요."
+        },
+        "terms": {
+            "required": "이용약관에 동의해야 합니다."
+        }
+    },
     "pages": {
         "index": {
             "welcome": "안녕 리액트 네이티브"
@@ -26,7 +57,25 @@
             "password": "비밀번호",
             "sign_in": "로그인",
             "sign_up": "이메일로 회원가입",
-            "sign_up_notice": "사용 중인 계정이 없습니까?"
+            "sign_up_notice": "계정이 없으신가요?"
+        },
+        "sign_up": {
+            "birth": "생년월일",
+            "confirm_password": "비밀번호 확인",
+            "day": "일",
+            "email": "이메일",
+            "gender": "성별",
+            "gender_female": "여성",
+            "gender_male": "남성",
+            "month": "월",
+            "name": "이름",
+            "password": "비밀번호",
+            "phone_number": "전화번호 (01012345678)",
+            "sign_up_button": "회원가입",
+            "terms_agreement": "이용약관 동의",
+            "terms_of_service": "이용약관",
+            "title": "회원가입",
+            "year": "년"
         }
     }
 }

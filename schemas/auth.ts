@@ -3,15 +3,48 @@ import { z } from "zod";
 export const signInSchema = z.object({
   email: z
     .string()
-    .min(1, { message: "이메일을 입력해주세요." })
-    .email({ message: "유효한 이메일 형식이 아닙니다." }),
+    .min(1, { message: "errors.email.required" })
+    .email({ message: "errors.email.invalid" }),
   password: z
     .string()
-    .min(1, { message: "비밀번호를 입력해주세요." })
-    .min(8, { message: "비밀번호는 8자 이상이어야 합니다." })
+    .min(1, { message: "errors.password.required" })
+    .min(8, { message: "errors.password.min_length" })
     .regex(/[^a-zA-Z0-9]/, {
-      message: "비밀번호에는 특수문자가 하나 이상 포함되어야 합니다.",
+      message: "errors.password.special_char",
     }),
 });
 
 export type SignInSchema = z.infer<typeof signInSchema>;
+
+export const signUpSchema = z
+  .object({
+    email: z
+      .string()
+      .min(1, { message: "errors.email.required" })
+      .email({ message: "errors.email.invalid" }),
+    password: z
+      .string()
+      .min(1, { message: "errors.password.required" })
+      .min(8, { message: "errors.password.min_length" })
+      .regex(/[^a-zA-Z0-9]/, {
+        message: "errors.password.special_char",
+      }),
+    confirmPassword: z
+      .string()
+      .min(1, { message: "errors.confirm_password.required" }),
+    name: z.string().min(1, { message: "errors.name.required" }),
+    gender: z.string().min(1, { message: "errors.gender.required" }),
+    birth: z.string().min(1, { message: "errors.birth.required" }),
+    phoneNumber: z
+      .string()
+      .min(1, { message: "errors.phone_number.required" }),
+    terms: z.boolean().refine((val) => val, {
+      message: "errors.terms.required",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "errors.confirm_password.mismatch",
+    path: ["confirmPassword"],
+  });
+
+export type SignUpSchema = z.infer<typeof signUpSchema>;
