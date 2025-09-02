@@ -21,5 +21,12 @@
         "index": {
             "welcome": "Hello React Native"
         },
+        "sign_in": {
+            "email": "Email",
+            "password": "Password",
+            "sign_in": "Sign In",
+            "sign_up": "Sign Up with Email",
+            "sign_up_notice": "Don't have an account?"
+        }
     }
 }

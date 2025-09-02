@@ -21,5 +21,12 @@
         "index": {
             "welcome": "안녕 리액트 네이티브"
         },
+        "sign_in": {
+            "email": "이메일",
+            "password": "비밀번호",
+            "sign_in": "로그인",
+            "sign_up": "이메일로 회원가입",
+            "sign_up_notice": "사용 중인 계정이 없습니까?"
+        }
     }
 }
