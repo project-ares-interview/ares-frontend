@@ -1,8 +1,25 @@
 {
-    "card": {
-        "first": "CARD WITH DIVIDER",
-        "second": "FONTS",
-        "third": "HELLO WORLD"
+    "components": {
+        "footer": {
+            "navigation": {
+                "privacy": "Privacy",
+                "terms": "Terms"
+            }
+        },
+        "header": {
+            "navigation": {
+                "cover_letter": "Cover Letter",
+                "home": "Home",
+                "interview": "Interview",
+                "resume": "Resume",
+                "sign_in": "Sign In",
+                "sign_out": "Sign Out"
+            }
+        }
     },
-    "welcome": "Hello React Native"
+    "pages": {
+        "index": {
+            "welcome": "Hello React Native"
+        },
+    }
 }
