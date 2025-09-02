@@ -1,0 +1,102 @@
+import { Button, Text } from "@rneui/themed";
+import { Image } from "expo-image";
+import { Href, Link } from "expo-router";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { StyleSheet, View } from "react-native";
+
+interface DesktopHeaderProps {
+  showNav?: boolean;
+}
+
+export default function DesktopHeader({ showNav = true }: DesktopHeaderProps) {
+  const { t } = useTranslation();
+
+  const NAV_ITEMS = [
+    { title: t("components.header.navigation.cover_letter"), href: "/cover_letter" as Href },
+    { title: t("components.header.navigation.resume"), href: "/resume" as Href },
+    { title: t("components.header.navigation.interview"), href: "/interview" as Href },
+  ];
+
+  return (
+    <View style={[styles.headerContainer, styles.desktopHeaderContainer]}>
+      <View style={styles.leftSection}>
+        <Link href={"/" as Href} style={styles.logoContainer}>
+          <Image
+            source={require("@/assets/images/react-logo.png")}
+            style={styles.logo}
+          />
+          <Text h4 style={styles.heading}>
+            Project
+          </Text>
+        </Link>
+        {showNav && (
+          <View style={styles.desktopNav}>
+            {NAV_ITEMS.map((item, index) => (
+              <Link key={index} href={item.href as Href} asChild>
+                <Button
+                  title={item.title}
+                  type="clear"
+                  titleStyle={styles.desktopNavLink}
+                />
+              </Link>
+            ))}
+          </View>
+        )}
+      </View>
+      {showNav && (
+        <Link href={"/sign-in" as Href} asChild>
+          <Button
+            title={t("components.header.navigation.sign_in")}
+            buttonStyle={styles.loginButton}
+          />
+        </Link>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  headerContainer: {
+    width: "100%",
+    paddingVertical: 10,
+    borderBottomWidth: 0,
+  },
+  desktopHeaderContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    backgroundColor: "#1C1C1E",
+  },
+  leftSection: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  logoContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  logo: {
+    width: 30,
+    height: 30,
+    marginRight: 8,
+  },
+  heading: {
+    color: "white",
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  desktopNav: {
+    flexDirection: "row",
+    marginLeft: 24,
+  },
+  desktopNavLink: {
+    color: "#fff",
+    marginHorizontal: 15,
+  },
+  loginButton: {
+    backgroundColor: "#3A3A3C",
+  },
+});
