@@ -1,27 +1,28 @@
+import { useSignUp } from "@/hooks/useSignUp";
+import { useAuthStore } from "@/stores/authStore";
 import DateTimePicker, {
-    type DateTimePickerEvent,
+  type DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
 import {
-    Button,
-    ButtonGroup,
-    CheckBox,
-    Icon,
-    Input,
-    Text,
+  Button,
+  ButtonGroup,
+  CheckBox,
+  Icon,
+  Input,
+  Text,
 } from "@rneui/themed";
-import { Href, useRouter } from "expo-router";
-import React, { useState } from "react";
+import { Href, useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import { Controller } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    View,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
 } from "react-native";
-import { useSignUp } from "../hooks/useSignUp";
 
 const getDaysInMonth = (year: number, month: number) => {
   return new Date(year, month, 0).getDate();
@@ -119,9 +120,21 @@ function WebDatePicker({
 
 export default function SignUp() {
   const { t } = useTranslation();
-  const { control, errors, submit, isValid } = useSignUp();
+  const { control, errors, submit, isValid, socialSignUpData } = useSignUp();
   const [isTermsLinkHovered, setTermsLinkHovered] = useState(false);
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const clearSocialSignUpData = useAuthStore(
+    (state) => state.setSocialSignUpData,
+  );
+
+  useEffect(() => {
+    // Clear social sign up data if not coming from social login flow
+    if (params.social !== "true") {
+      clearSocialSignUpData(null);
+    }
+  }, [params.social, clearSocialSignUpData]);
+
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   return (
@@ -133,56 +146,81 @@ export default function SignUp() {
         {t("pages.sign_up.title")}
       </Text>
 
-      <Controller
-        control={control}
-        name="email"
-        render={({ field: { onChange, onBlur, value } }) => (
-          <Input
-            placeholder={t("pages.sign_up.email")}
-            leftIcon={<Icon name="email" type="material-community" />}
-            value={value}
-            onBlur={onBlur}
-            onChangeText={onChange}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            errorMessage={errors.email && t(errors.email.message as any)}
-          />
-        )}
-      />
+      {socialSignUpData && (
+        <Text style={styles.socialInfoText}>
+          {`Continue with your ${
+            socialSignUpData.provider.charAt(0).toUpperCase() +
+            socialSignUpData.provider.slice(1)
+          } account.`}
+        </Text>
+      )}
 
-      <Controller
-        control={control}
-        name="password"
-        render={({ field: { onChange, onBlur, value } }) => (
-          <Input
-            placeholder={t("pages.sign_up.password")}
-            leftIcon={<Icon name="lock" type="material-community" />}
-            value={value}
-            onBlur={onBlur}
-            onChangeText={onChange}
-            secureTextEntry
-            errorMessage={errors.password && t(errors.password.message as any)}
-          />
-        )}
-      />
+      {socialSignUpData ? (
+        <Input
+          label={t("pages.sign_up.email")}
+          value={socialSignUpData.email}
+          disabled
+          leftIcon={<Icon name="email" type="material-community" />}
+        />
+      ) : (
+        <Controller
+          control={control}
+          name="email"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              placeholder={t("pages.sign_up.email")}
+              leftIcon={<Icon name="email" type="material-community" />}
+              value={value}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              errorMessage={errors.email && t(errors.email.message as any)}
+            />
+          )}
+        />
+      )}
 
-      <Controller
-        control={control}
-        name="confirmPassword"
-        render={({ field: { onChange, onBlur, value } }) => (
-          <Input
-            placeholder={t("pages.sign_up.confirm_password")}
-            leftIcon={<Icon name="lock-check" type="material-community" />}
-            value={value}
-            onBlur={onBlur}
-            onChangeText={onChange}
-            secureTextEntry
-            errorMessage={
-              errors.confirmPassword && t(errors.confirmPassword.message as any)
-            }
+      {!socialSignUpData && (
+        <>
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                placeholder={t("pages.sign_up.password")}
+                leftIcon={<Icon name="lock" type="material-community" />}
+                value={value}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                secureTextEntry
+                errorMessage={
+                  errors.password && t(errors.password.message as any)
+                }
+              />
+            )}
           />
-        )}
-      />
+
+          <Controller
+            control={control}
+            name="confirmPassword"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                placeholder={t("pages.sign_up.confirm_password")}
+                leftIcon={<Icon name="lock-check" type="material-community" />}
+                value={value}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                secureTextEntry
+                errorMessage={
+                  errors.confirmPassword &&
+                  t(errors.confirmPassword.message as any)
+                }
+              />
+            )}
+          />
+        </>
+      )}
 
       <Controller
         control={control}
@@ -430,5 +468,11 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     marginHorizontal: 2,
+  },
+  socialInfoText: {
+    textAlign: "center",
+    marginBottom: 20,
+    fontSize: 16,
+    color: "#6E6E72",
   },
 });
