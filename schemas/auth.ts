@@ -16,12 +16,26 @@ export const signInSchema = z.object({
 
 export type SignInSchema = z.infer<typeof signInSchema>;
 
-export const signUpSchema = z
-  .object({
-    email: z
-      .string()
-      .min(1, { message: "errors.email.required" })
-      .email({ message: "errors.email.invalid" }),
+const baseSignUpSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: "errors.email.required" })
+    .email({ message: "errors.email.invalid" }),
+  name: z.string().min(1, { message: "errors.name.required" }),
+  gender: z.string().min(1, { message: "errors.gender.required" }),
+  birth: z.string().min(1, { message: "errors.birth.required" }),
+  phoneNumber: z
+    .string()
+    .min(1, { message: "errors.phone_number.required" }),
+  terms: z.boolean().refine((val) => val, {
+    message: "errors.terms.required",
+  }),
+});
+
+export const socialSignUpSchema = baseSignUpSchema;
+
+export const emailSignUpSchema = baseSignUpSchema
+  .extend({
     password: z
       .string()
       .min(1, { message: "errors.password.required" })
@@ -32,19 +46,11 @@ export const signUpSchema = z
     confirmPassword: z
       .string()
       .min(1, { message: "errors.confirm_password.required" }),
-    name: z.string().min(1, { message: "errors.name.required" }),
-    gender: z.string().min(1, { message: "errors.gender.required" }),
-    birth: z.string().min(1, { message: "errors.birth.required" }),
-    phoneNumber: z
-      .string()
-      .min(1, { message: "errors.phone_number.required" }),
-    terms: z.boolean().refine((val) => val, {
-      message: "errors.terms.required",
-    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "errors.confirm_password.mismatch",
     path: ["confirmPassword"],
   });
 
-export type SignUpSchema = z.infer<typeof signUpSchema>;
+export type SignUpSchema = z.infer<typeof socialSignUpSchema> &
+  Partial<z.infer<typeof emailSignUpSchema>>;
