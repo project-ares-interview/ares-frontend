@@ -4,6 +4,8 @@ import { Href, Link } from "expo-router";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
+import { useAuth } from "../../hooks/useAuth";
+import { useAuthStore } from "../../stores/authStore";
 
 interface DesktopHeaderProps {
   showNav?: boolean;
@@ -11,11 +13,26 @@ interface DesktopHeaderProps {
 
 export default function DesktopHeader({ showNav = true }: DesktopHeaderProps) {
   const { t } = useTranslation();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+  };
 
   const NAV_ITEMS = [
-    { title: t("components.header.navigation.cover_letter"), href: "/cover_letter" as Href },
-    { title: t("components.header.navigation.resume"), href: "/resume" as Href },
-    { title: t("components.header.navigation.interview"), href: "/interview" as Href },
+    {
+      title: t("components.header.navigation.cover_letter"),
+      href: "/cover_letter" as Href,
+    },
+    {
+      title: t("components.header.navigation.resume"),
+      href: "/resume" as Href,
+    },
+    {
+      title: t("components.header.navigation.interview"),
+      href: "/interview" as Href,
+    },
   ];
 
   return (
@@ -44,14 +61,21 @@ export default function DesktopHeader({ showNav = true }: DesktopHeaderProps) {
           </View>
         )}
       </View>
-      {showNav && (
-        <Link href={"/sign-in" as Href} asChild>
+      {showNav &&
+        (isAuthenticated ? (
           <Button
-            title={t("components.header.navigation.sign_in")}
+            title={t("components.header.navigation.sign_out")}
+            onPress={handleLogout}
             buttonStyle={styles.loginButton}
           />
-        </Link>
-      )}
+        ) : (
+          <Link href={"/(auth)/sign-in" as Href} asChild>
+            <Button
+              title={t("components.header.navigation.sign_in")}
+              buttonStyle={styles.loginButton}
+            />
+          </Link>
+        ))}
     </View>
   );
 }

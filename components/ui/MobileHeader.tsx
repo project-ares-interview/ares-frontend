@@ -10,6 +10,8 @@ import { Href, Link, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
+import { useAuth } from "../../hooks/useAuth";
+import { useAuthStore } from "../../stores/authStore";
 
 interface MobileHeaderProps {
   showNav?: boolean;
@@ -21,16 +23,32 @@ export default function MobileHeader({
   showBackButton = false,
 }: MobileHeaderProps) {
   const { t } = useTranslation();
-  
-  const NAV_ITEMS = [
-    { title: t("components.header.navigation.home"), href: "/" as Href },
-    { title: t("components.header.navigation.cover_letter"), href: "/cover_letter" as Href },
-    { title: t("components.header.navigation.resume"), href: "/resume" as Href },
-    { title: t("components.header.navigation.interview"), href: "/interview" as Href },
-  ];
-
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { logout } = useAuth();
   const router = useRouter();
   const [isMenuVisible, setMenuVisible] = useState(false);
+
+  const handleLogout = async () => {
+    toggleMenu();
+    await logout();
+    router.replace("/");
+  };
+
+  const NAV_ITEMS = [
+    { title: t("components.header.navigation.home"), href: "/" as Href },
+    {
+      title: t("components.header.navigation.cover_letter"),
+      href: "/cover_letter" as Href,
+    },
+    {
+      title: t("components.header.navigation.resume"),
+      href: "/resume" as Href,
+    },
+    {
+      title: t("components.header.navigation.interview"),
+      href: "/interview" as Href,
+    },
+  ];
 
   const toggleMenu = () => {
     setMenuVisible(!isMenuVisible);
@@ -113,15 +131,25 @@ export default function MobileHeader({
                 />
               </Link>
             ))}
-            <Link href={"/sign-in" as Href} asChild>
+            {isAuthenticated ? (
               <Button
-                title={t("components.header.navigation.sign_in")}
-                onPress={toggleMenu}
+                title={t("components.header.navigation.sign_out")}
+                onPress={handleLogout}
                 type="clear"
                 titleStyle={styles.overlayMenuText}
                 containerStyle={styles.overlayMenuItem}
               />
-            </Link>
+            ) : (
+              <Link href={"/sign-in" as Href} asChild>
+                <Button
+                  title={t("components.header.navigation.sign_in")}
+                  onPress={toggleMenu}
+                  type="clear"
+                  titleStyle={styles.overlayMenuText}
+                  containerStyle={styles.overlayMenuItem}
+                />
+              </Link>
+            )}
           </View>
         </Overlay>
       )}
