@@ -11,6 +11,29 @@ import {
 } from "react-native";
 import { Career, ExperienceType } from "../../services/profileService";
 import { useProfileStore } from "../../stores/profileStore";
+import {
+  formatYearMonthDay,
+  getDayOptions,
+  getMonthOptions,
+  getYearOptions,
+  parseYearMonthDayString,
+} from "../../utils/dateUtils";
+
+// 날짜 표시용 헬퍼 함수 (YYYY-MM-DD 형태로 포맷된 값)
+const getDisplayDate = (dateString: string) => {
+  if (!dateString) return "";
+  try {
+    // 이미 YYYY-MM-DD 형태이면 그대로 반환
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      return dateString;
+    }
+    // Date 객체로 변환 가능하면 포맷팅
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? dateString : formatYearMonthDay(date);
+  } catch {
+    return dateString;
+  }
+};
 
 const CareerForm = ({
   career,
@@ -27,8 +50,31 @@ const CareerForm = ({
     career?.experience_type ?? "experienced",
   );
   const [isAttending, setIsAttending] = useState(career?.is_attending ?? false);
-  const [startDate, setStartDate] = useState(career?.start_date ?? "");
-  const [endDate, setEndDate] = useState(career?.end_date ?? "");
+  // 입사일 년/월/일 상태
+  const startDateParsed = career?.start_date 
+    ? parseYearMonthDayString(getDisplayDate(career.start_date))
+    : null;
+  const [startYear, setStartYear] = useState(startDateParsed?.year ?? "");
+  const [startMonth, setStartMonth] = useState(startDateParsed?.month ?? "");
+  const [startDay, setStartDay] = useState(startDateParsed?.day ?? "");
+
+  // 퇴사일 년/월/일 상태
+  const endDateParsed = career?.end_date 
+    ? parseYearMonthDayString(getDisplayDate(career.end_date))
+    : null;
+  const [endYear, setEndYear] = useState(endDateParsed?.year ?? "");
+  const [endMonth, setEndMonth] = useState(endDateParsed?.month ?? "");
+  const [endDay, setEndDay] = useState(endDateParsed?.day ?? "");
+
+  // 옵션 배열
+  const yearOptions = getYearOptions();
+  const monthOptions = getMonthOptions();
+  const startDayOptions = startYear && startMonth 
+    ? getDayOptions(parseInt(startYear), parseInt(startMonth))
+    : [];
+  const endDayOptions = endYear && endMonth 
+    ? getDayOptions(parseInt(endYear), parseInt(endMonth))
+    : [];
   const [department, setDepartment] = useState(career?.department ?? "");
   const [responsibilities, setResponsibilities] = useState(
     career?.responsibilities ?? "",
@@ -39,16 +85,18 @@ const CareerForm = ({
 
   useEffect(() => {
     if (isAttending) {
-      setEndDate("");
+      setEndYear("");
+      setEndMonth("");
+      setEndDay("");
       setReasonForLeaving("");
     }
   }, [isAttending]);
 
   useEffect(() => {
-    if (endDate.trim() === "") {
+    if (!endYear || !endMonth || !endDay) {
       setReasonForLeaving("");
     }
-  }, [endDate]);
+  }, [endYear, endMonth, endDay]);
 
   const experienceTypeOptions: { label: string; value: ExperienceType }[] = [
     {
@@ -62,15 +110,32 @@ const CareerForm = ({
   ];
 
   const handleSave = () => {
+    // 필수 필드 검증
+    if (!startYear || !startMonth || !startDay) {
+      alert(t("errors.date.required"));
+      return;
+    }
+
+    if (!isAttending && (!endYear || !endMonth || !endDay)) {
+      alert(t("errors.date.required"));
+      return;
+    }
+
+    // YYYY-MM-DD 형식으로 조합
+    const startDateString = `${startYear}-${startMonth}-${startDay}`;
+    const endDateString = (!isAttending && endYear && endMonth && endDay) 
+      ? `${endYear}-${endMonth}-${endDay}` 
+      : null;
+
     onSave({
       company_name: companyName,
       experience_type: experienceType,
       is_attending: isAttending,
-      start_date: startDate,
-      end_date: isAttending ? undefined : endDate,
-      department,
-      responsibilities,
-      reason_for_leaving: reasonForLeaving,
+      start_date: startDateString,
+      end_date: endDateString || undefined,
+      department: department || undefined,
+      responsibilities: responsibilities || undefined,
+      reason_for_leaving: (!isAttending && endDateString && reasonForLeaving) ? reasonForLeaving : undefined,
     });
   };
 
@@ -88,6 +153,7 @@ const CareerForm = ({
       <Picker
         selectedValue={experienceType}
         onValueChange={(itemValue) => setExperienceType(itemValue)}
+        style={styles.picker}
       >
         {experienceTypeOptions.map((opt) => (
           <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
@@ -99,21 +165,82 @@ const CareerForm = ({
         onPress={() => setIsAttending(!isAttending)}
         containerStyle={styles.inputContainer}
       />
-      <Input
-        label={t("profile.career.start_date")}
-        placeholder="YYYY-MM-DD"
-        value={startDate}
-        onChangeText={setStartDate}
-        containerStyle={styles.inputContainer}
-      />
+      {/* 입사일 선택 */}
+      <Text style={styles.pickerLabel}>
+        {t("profile.career.start_date")}
+      </Text>
+      <View style={styles.datePickerContainer}>
+        <Picker
+          selectedValue={startYear}
+          onValueChange={(itemValue) => setStartYear(itemValue)}
+          style={styles.datePicker}
+        >
+          <Picker.Item label="년도 선택" value="" />
+          {yearOptions.map((opt) => (
+            <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+          ))}
+        </Picker>
+        <Picker
+          selectedValue={startMonth}
+          onValueChange={(itemValue) => setStartMonth(itemValue)}
+          style={styles.datePicker}
+        >
+          <Picker.Item label="월 선택" value="" />
+          {monthOptions.map((opt) => (
+            <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+          ))}
+        </Picker>
+        <Picker
+          selectedValue={startDay}
+          onValueChange={(itemValue) => setStartDay(itemValue)}
+          style={styles.datePicker}
+        >
+          <Picker.Item label="일 선택" value="" />
+          {startDayOptions.map((opt) => (
+            <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+          ))}
+        </Picker>
+      </View>
+
+      {/* 퇴사일 선택 (재직중이 아닌 경우에만) */}
       {!isAttending && (
-        <Input
-          label={t("profile.career.end_date")}
-          placeholder="YYYY-MM-DD"
-          value={endDate}
-          onChangeText={setEndDate}
-          containerStyle={styles.inputContainer}
-        />
+        <>
+          <Text style={styles.pickerLabel}>
+            {t("profile.career.end_date")}
+          </Text>
+          <View style={styles.datePickerContainer}>
+            <Picker
+              selectedValue={endYear}
+              onValueChange={(itemValue) => setEndYear(itemValue)}
+              style={styles.datePicker}
+            >
+              <Picker.Item label="년도 선택" value="" />
+              {yearOptions.map((opt) => (
+                <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+              ))}
+            </Picker>
+            <Picker
+              selectedValue={endMonth}
+              onValueChange={(itemValue) => setEndMonth(itemValue)}
+              style={styles.datePicker}
+            >
+              <Picker.Item label="월 선택" value="" />
+              {monthOptions.map((opt) => (
+                <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+              ))}
+            </Picker>
+            <Picker
+              selectedValue={endDay}
+              onValueChange={(itemValue) => setEndDay(itemValue)}
+              style={styles.datePicker}
+            >
+              <Picker.Item label="일 선택" value="" />
+              {endDayOptions.map((opt) => (
+                <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+              ))}
+            </Picker>
+          </View>
+        </>
       )}
       <Input
         label={t("profile.career.department")}
@@ -128,7 +255,7 @@ const CareerForm = ({
         multiline
         containerStyle={styles.inputContainer}
       />
-      {!isAttending && endDate.trim() !== "" && (
+      {!isAttending && endYear && endMonth && endDay && (
         <Input
           label={t("profile.career.reason_for_leaving")}
           value={reasonForLeaving}
@@ -142,7 +269,7 @@ const CareerForm = ({
         <Button
           title={t("common.save")}
           onPress={handleSave}
-          disabled={!companyName.trim() || !startDate.trim()}
+          disabled={!companyName.trim() || !startYear || !startMonth || !startDay}
           containerStyle={styles.formButton}
         />
         <Button
@@ -200,10 +327,10 @@ const CareerSection = () => {
               <Text style={styles.itemTextBold}>{c.company_name}</Text>
               <Text>{c.department}</Text>
               <Text>
-                {c.start_date} ~{" "}
+                {getDisplayDate(c.start_date)} ~{" "}
                 {c.is_attending
                   ? t("profile.career.is_attending_true")
-                  : c.end_date}
+                  : getDisplayDate(c.end_date || "")}
               </Text>
             </View>
             <View style={styles.buttonGroup}>
@@ -269,6 +396,19 @@ const styles = StyleSheet.create({
     color: "#86939e",
     marginLeft: 10,
     marginTop: 8,
+  },
+  picker: {
+    marginVertical: 8,
+    marginHorizontal: 10,
+  },
+  datePickerContainer: {
+    flexDirection: "row",
+    marginVertical: 8,
+    marginHorizontal: 10,
+    gap: 8,
+  },
+  datePicker: {
+    flex: 1,
   },
   formButtonGroup: {
     flexDirection: "row",
