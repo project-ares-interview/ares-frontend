@@ -54,6 +54,7 @@ const DisabilityForm = ({
       <Picker
         selectedValue={severity}
         onValueChange={(itemValue) => setSeverity(itemValue)}
+        style={styles.picker}
       >
         {severityOptions.map((opt) => (
           <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
@@ -203,7 +204,12 @@ const styles = StyleSheet.create({
   formButton: {
     flex: 1,
     marginHorizontal: 8,
-  }
+  },
+  picker: {
+    marginHorizontal: 10,
+    borderWidth: 1,
+    borderRadius: 5,
+  },
 });
 
 export default DisabilitySection;
