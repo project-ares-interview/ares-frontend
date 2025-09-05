@@ -3,18 +3,46 @@ import { Button, Card, Icon, Input, Text } from "@rneui/themed";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-    ActivityIndicator,
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import {
-    Education,
-    EducationStatus,
-    SchoolType,
+  Education,
+  EducationStatus,
+  SchoolType,
 } from "../../services/profileService";
 import { useProfileStore } from "../../stores/profileStore";
+import {
+  convertYearMonthToYearMonthDay,
+  formatYearMonth,
+  getMonthOptions,
+  getYearOptions,
+  parseYearMonthString,
+} from "../../utils/dateUtils";
+
+// 날짜 표시용 헬퍼 함수 (YYYY-MM 형태로 포맷된 값)
+const getDisplayDate = (dateString: string) => {
+  if (!dateString) return "";
+  try {
+    // 이미 YYYY-MM 형태이면 그대로 반환
+    if (/^\d{4}-\d{2}$/.test(dateString)) {
+      return dateString;
+    }
+    // YYYY-MM-DD 형태라면 YYYY-MM으로 변환
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      const [year, month] = dateString.split('-');
+      return `${year}-${month}`;
+    }
+    // Date 객체로 변환 가능하면 포맷팅
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? dateString : formatYearMonth(date);
+  } catch {
+    return dateString;
+  }
+};
 
 const EducationForm = ({
   education,
@@ -35,12 +63,24 @@ const EducationForm = ({
   const [status, setStatus] = useState<EducationStatus>(
     education?.status ?? "attending",
   );
-  const [admissionDate, setAdmissionDate] = useState(
-    education?.admission_date ?? "",
-  );
-  const [graduationDate, setGraduationDate] = useState(
-    education?.graduation_date ?? "",
-  );
+
+  // 입학일 년/월 상태
+  const admissionDateParsed = education?.admission_date 
+    ? parseYearMonthString(getDisplayDate(education.admission_date))
+    : null;
+  const [admissionYear, setAdmissionYear] = useState(admissionDateParsed?.year ?? "");
+  const [admissionMonth, setAdmissionMonth] = useState(admissionDateParsed?.month ?? "");
+
+  // 졸업일 년/월 상태
+  const graduationDateParsed = education?.graduation_date 
+    ? parseYearMonthString(getDisplayDate(education.graduation_date))
+    : null;
+  const [graduationYear, setGraduationYear] = useState(graduationDateParsed?.year ?? "");
+  const [graduationMonth, setGraduationMonth] = useState(graduationDateParsed?.month ?? "");
+
+  // 옵션 배열
+  const yearOptions = getYearOptions();
+  const monthOptions = getMonthOptions();
 
   useEffect(() => {
     if (schoolType === "high_school") {
@@ -50,7 +90,8 @@ const EducationForm = ({
 
   useEffect(() => {
     if (status === "attending") {
-      setGraduationDate("");
+      setGraduationYear("");
+      setGraduationMonth("");
     }
   }, [status]);
 
@@ -97,13 +138,36 @@ const EducationForm = ({
   ];
 
   const handleSave = () => {
+    // 필수 필드 검증
+    if (!admissionYear || !admissionMonth) {
+      alert(t("errors.date.required"));
+      return;
+    }
+
+    if (status !== "attending" && (!graduationYear || !graduationMonth)) {
+      alert(t("errors.date.required"));
+      return;
+    }
+
+    // YYYY-MM 형식으로 조합
+    const admissionDateString = `${admissionYear}-${admissionMonth}`;
+    const graduationDateString = (status !== "attending" && graduationYear && graduationMonth) 
+      ? `${graduationYear}-${graduationMonth}` 
+      : null;
+
+    // API 요청을 위해 YYYY-MM을 YYYY-MM-DD로 변환
+    const admissionDateFormatted = convertYearMonthToYearMonthDay(admissionDateString);
+    const graduationDateFormatted = graduationDateString 
+      ? convertYearMonthToYearMonthDay(graduationDateString) 
+      : null;
+
     onSave({
       school_type: schoolType,
       school_name: schoolName,
-      major,
+      major: schoolType === "high_school" ? undefined : major,
       status,
-      admission_date: admissionDate,
-      graduation_date: graduationDate,
+      admission_date: admissionDateFormatted!,
+      graduation_date: graduationDateFormatted || undefined,
     });
   };
 
@@ -115,6 +179,7 @@ const EducationForm = ({
       <Picker
         selectedValue={schoolType}
         onValueChange={(itemValue) => setSchoolType(itemValue)}
+        style={styles.picker}
       >
         {schoolTypeOptions.map((opt) => (
           <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
@@ -140,34 +205,76 @@ const EducationForm = ({
       <Picker
         selectedValue={status}
         onValueChange={(itemValue) => setStatus(itemValue)}
+        style={styles.picker}
       >
         {statusOptions.map((opt) => (
           <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
         ))}
       </Picker>
 
-      <Input
-        label={t("profile.education.admission_date")}
-        placeholder="YYYY-MM"
-        value={admissionDate}
-        onChangeText={setAdmissionDate}
-        containerStyle={styles.inputContainer}
-      />
+      {/* 입학일 선택 */}
+      <Text style={styles.pickerLabel}>
+        {t("profile.education.admission_date")}
+      </Text>
+      <View style={styles.datePickerContainer}>
+        <Picker
+          selectedValue={admissionYear}
+          onValueChange={(itemValue) => setAdmissionYear(itemValue)}
+          style={styles.datePicker}
+        >
+          <Picker.Item label="년도 선택" value="" />
+          {yearOptions.map((opt) => (
+            <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+          ))}
+        </Picker>
+        <Picker
+          selectedValue={admissionMonth}
+          onValueChange={(itemValue) => setAdmissionMonth(itemValue)}
+          style={styles.datePicker}
+        >
+          <Picker.Item label="월 선택" value="" />
+          {monthOptions.map((opt) => (
+            <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+          ))}
+        </Picker>
+      </View>
+
+      {/* 졸업일 선택 (재학중이 아닌 경우에만) */}
       {status !== "attending" && (
-        <Input
-          label={t("profile.education.graduation_date")}
-          placeholder="YYYY-MM"
-          value={graduationDate}
-          onChangeText={setGraduationDate}
-          containerStyle={styles.inputContainer}
-        />
+        <>
+          <Text style={styles.pickerLabel}>
+            {t("profile.education.graduation_date")}
+          </Text>
+          <View style={styles.datePickerContainer}>
+            <Picker
+              selectedValue={graduationYear}
+              onValueChange={(itemValue) => setGraduationYear(itemValue)}
+              style={styles.datePicker}
+            >
+              <Picker.Item label="년도 선택" value="" />
+              {yearOptions.map((opt) => (
+                <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+              ))}
+            </Picker>
+            <Picker
+              selectedValue={graduationMonth}
+              onValueChange={(itemValue) => setGraduationMonth(itemValue)}
+              style={styles.datePicker}
+            >
+              <Picker.Item label="월 선택" value="" />
+              {monthOptions.map((opt) => (
+                <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+              ))}
+            </Picker>
+          </View>
+        </>
       )}
 
       <View style={styles.formButtonGroup}>
         <Button
           title={t("common.save")}
           onPress={handleSave}
-          disabled={!schoolName.trim() || !admissionDate.trim()}
+          disabled={!schoolName.trim() || !admissionYear || !admissionMonth}
           containerStyle={styles.formButton}
         />
         <Button
@@ -229,9 +336,10 @@ const EducationSection = () => {
             <View>
               <Text style={styles.itemTextBold}>{edu.school_name}</Text>
               <Text>{edu.major}</Text>
-              <Text>
-                {edu.admission_date} ~ {edu.graduation_date}
-              </Text>
+                              <Text>
+                  {getDisplayDate(edu.admission_date)} ~{" "}
+                  {edu.graduation_date ? getDisplayDate(edu.graduation_date) : ""}
+                </Text>
             </View>
             <View style={styles.buttonGroup}>
               <TouchableOpacity onPress={() => setEditingEducationId(edu.id)}>
@@ -297,6 +405,10 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginTop: 8,
   },
+  picker: {
+    marginVertical: 8,
+    marginHorizontal: 10,
+  },
   formButtonGroup: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -305,6 +417,15 @@ const styles = StyleSheet.create({
   formButton: {
     flex: 1,
     marginHorizontal: 8,
+  },
+  datePickerContainer: {
+    flexDirection: "row",
+    marginVertical: 8,
+    marginHorizontal: 10,
+    gap: 8,
+  },
+  datePicker: {
+    flex: 1,
   },
 });
 
