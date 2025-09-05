@@ -1,8 +1,9 @@
+import { useAuth } from "@/hooks/useAuth";
 import { useGoogleSignIn } from "@/hooks/useGoogleSignIn";
 import { useSignIn } from "@/hooks/useSignIn";
 import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 import { Button, Icon, Input, Text as RNEText } from "@rneui/themed";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import React from "react";
 import { Controller } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -12,19 +13,55 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
+
+const GoogleSignInButtonWeb = () => {
+  const router = useRouter();
+  const { googleSignIn } = useAuth();
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const result = await googleSignIn({
+          access_token: tokenResponse.access_token,
+        });
+        if (result.newUser) {
+          router.replace({
+            pathname: "/sign-up",
+            params: { social: "true" },
+          });
+        } else {
+          router.replace("/");
+        }
+      } catch (error) {
+        console.error("Google sign in failed:", error);
+      }
+    },
+    onError: () => console.log("Login Failed"),
+  });
+
+  return (
+    <View style={styles.googleButtonContainer}>
+      <TouchableOpacity
+        style={styles.socialButton}
+        onPress={() => googleLogin()}
+      >
+        <Icon
+          name="google"
+          type="antdesign"
+          color="#DB4437"
+          containerStyle={{ pointerEvents: "none" }}
+        />
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 function SignInForm() {
   const { t } = useTranslation();
   const { control, errors, submit, isValid } = useSignIn();
-  const { isReady, promptMobileAsync, handleGoogleSignIn } = useGoogleSignIn();
-
-  const googleLogin = useGoogleLogin({
-    onSuccess: (tokenResponse) =>
-      handleGoogleSignIn(tokenResponse.access_token),
-    onError: () => console.log("Login Failed"),
-  });
+  const { isReady, promptAsync } = useGoogleSignIn();
 
   return (
     <ScrollView
@@ -93,29 +130,17 @@ function SignInForm() {
       </View>
 
       {Platform.OS === "web" ? (
+        <GoogleSignInButtonWeb />
+      ) : (
         <View style={styles.googleButtonContainer}>
           <TouchableOpacity
             style={styles.socialButton}
-            onPress={() => googleLogin()}
+            onPress={() => promptAsync()}
+            disabled={!isReady}
           >
-            <Icon
-              name="google"
-              type="antdesign"
-              color="#DB4437"
-              containerStyle={{ pointerEvents: "none" }}
-            />
+            <Icon name="google" type="antdesign" color="#DB4437" />
           </TouchableOpacity>
         </View>
-      ) : (
-        <Button
-          title="Sign in with Google"
-          onPress={() => promptMobileAsync()}
-          disabled={!isReady}
-          icon={
-            <Icon name="google" type="antdesign" style={{ marginRight: 10 }} />
-          }
-          containerStyle={styles.buttonContainer}
-        />
       )}
     </ScrollView>
   );

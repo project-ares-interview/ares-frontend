@@ -16,6 +16,12 @@
     "experiments": {
       "typedRoutes": true
     },
+    "extra": {
+      "eas": {
+        "projectId": "44683aa4-2007-47de-9879-8141a53b23ef"
+      },
+      "router": {}
+    },
     "icon": "./assets/images/icon.png",
     "ios": {
       "supportsTablet": true
@@ -44,7 +50,7 @@
         }
       ]
     ],
-    "scheme": "aresfrontend",
+    "scheme": "app",
     "slug": "ares",
     "userInterfaceStyle": "automatic",
     "version": "1.0.0",

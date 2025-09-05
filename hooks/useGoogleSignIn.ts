@@ -1,7 +1,12 @@
+import * as AuthSession from "expo-auth-session";
 import { useAuthRequest } from "expo-auth-session/providers/google";
 import { useRouter } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import { useEffect } from "react";
+import { Platform } from "react-native";
 import { useAuth } from "./useAuth";
+
+WebBrowser.maybeCompleteAuthSession();
 
 export function useGoogleSignIn() {
   const router = useRouter();
@@ -11,6 +16,12 @@ export function useGoogleSignIn() {
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    ...(Platform.OS !== "web" && {
+      redirectUri: AuthSession.makeRedirectUri({
+        scheme: "app",
+        path: "sign-in",
+      }),
+    }),
   });
 
   useEffect(() => {
@@ -21,7 +32,10 @@ export function useGoogleSignIn() {
             access_token: response.authentication!.accessToken,
           });
           if (result.newUser) {
-            router.replace({ pathname: "/sign-up", params: { social: "true" } });
+            router.replace({
+              pathname: "/sign-up",
+              params: { social: "true" },
+            });
           } else {
             router.replace("/");
           }
@@ -34,28 +48,8 @@ export function useGoogleSignIn() {
     handleResponse();
   }, [response, router]);
 
-  const handleGoogleSignIn = async (accessToken: string) => {
-    try {
-      const result = await googleSignIn({
-        access_token: accessToken,
-      });
-      if (result.newUser) {
-        router.replace({ pathname: "/sign-up", params: { social: "true" } });
-      } else {
-        router.replace("/");
-      }
-    } catch (error) {
-      console.error("Google sign in failed:", error);
-    }
-  };
-
-  const promptMobileAsync = () => {
-    promptAsync();
-  };
-
   return {
     isReady: !!request,
-    promptMobileAsync,
-    handleGoogleSignIn,
+    promptAsync,
   };
 }

@@ -43,6 +43,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       stateUpdate.refresh = refresh;
     }
     set(stateUpdate);
+    alert(Platform.OS + " // " + access + " // " + refresh);
 
     if (Platform.OS !== "web") {
       if (refresh) {
