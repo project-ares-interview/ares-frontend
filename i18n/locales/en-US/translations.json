@@ -1,4 +1,11 @@
 {
+    "common": {
+        "add": "Add",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "save": "Save"
+    },
     "components": {
         "footer": {
             "navigation": {
@@ -27,6 +34,10 @@
             "mismatch": "Passwords do not match.",
             "required": "Password confirmation is required."
         },
+        "date": {
+            "invalid_format": "Please enter a valid date format.",
+            "required": "Please select a date."
+        },
         "email": {
             "invalid": "Invalid email format.",
             "required": "Email is required."
@@ -48,13 +59,6 @@
         "terms": {
             "required": "You must agree to the terms of service."
         }
-    },
-    "common": {
-        "add": "Add",
-        "cancel": "Cancel",
-        "delete": "Delete",
-        "edit": "Edit",
-        "save": "Save"
     },
     "pages": {
         "index": {
@@ -87,20 +91,25 @@
         }
     },
     "profile": {
-        "military": {
-            "no_data": "No military service information registered.",
-            "status": {
-                "exempted": "Exempted",
-                "not_served": "Not Served",
-                "served": "Served",
-                "serving": "Serving"
+        "career": {
+            "add_button": "Add Career",
+            "add_title": "Add Career",
+            "company_name": "Company Name",
+            "department": "Department",
+            "edit_title": "Edit Career",
+            "end_date": "End Date (YYYY-MM-DD)",
+            "experience_type": "Experience Type",
+            "experience_type_options": {
+                "experienced": "Experienced",
+                "newcomer": "Newcomer"
             },
-            "title": "Military Service"
-        },
-        "patriot": {
-            "no_data": "No patriot information registered.",
-            "patriot_code": "Patriot Code",
-            "title": "Patriot Information"
+            "is_attending": "Currently employed",
+            "is_attending_true": "Present",
+            "no_data": "No career information registered.",
+            "reason_for_leaving": "Reason for Leaving",
+            "responsibilities": "Responsibilities",
+            "start_date": "Start Date (YYYY-MM-DD)",
+            "title": "Career"
         },
         "disability": {
             "add_button": "Add Disability",
@@ -141,26 +150,6 @@
             },
             "title": "Education"
         },
-        "career": {
-            "add_button": "Add Career",
-            "add_title": "Add Career",
-            "company_name": "Company Name",
-            "department": "Department",
-            "edit_title": "Edit Career",
-            "end_date": "End Date (YYYY-MM-DD)",
-            "experience_type": "Experience Type",
-            "experience_type_options": {
-                "experienced": "Experienced",
-                "newcomer": "Newcomer"
-            },
-            "is_attending": "Currently employed",
-            "is_attending_true": "Present",
-            "no_data": "No career information registered.",
-            "reason_for_leaving": "Reason for Leaving",
-            "responsibilities": "Responsibilities",
-            "start_date": "Start Date (YYYY-MM-DD)",
-            "title": "Career"
-        },
         "job_interest": {
             "add_button": "Add Job Interest",
             "add_title": "Add Job Interest",
@@ -168,6 +157,21 @@
             "job_title": "Job Title",
             "no_data": "No job interests registered.",
             "title": "Job Interests"
+        },
+        "military": {
+            "no_data": "No military service information registered.",
+            "status": {
+                "exempted": "Exempted",
+                "not_served": "Not Served",
+                "served": "Served",
+                "serving": "Serving"
+            },
+            "title": "Military Service"
+        },
+        "patriot": {
+            "no_data": "No patriot information registered.",
+            "patriot_code": "Patriot Code",
+            "title": "Patriot Information"
         }
     }
 }
