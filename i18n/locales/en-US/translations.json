@@ -11,6 +11,7 @@
                 "cover_letter": "Cover Letter",
                 "home": "Home",
                 "interview": "Interview",
+                "my_page": "My Page",
                 "resume": "Resume",
                 "sign_in": "Sign In",
                 "sign_out": "Sign Out"
@@ -48,6 +49,13 @@
             "required": "You must agree to the terms of service."
         }
     },
+    "common": {
+        "add": "Add",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "save": "Save"
+    },
     "pages": {
         "index": {
             "welcome": "Hello React Native"
@@ -76,6 +84,90 @@
             "terms_of_service": "Terms of Service",
             "title": "Create Account",
             "year": "Year"
+        }
+    },
+    "profile": {
+        "military": {
+            "no_data": "No military service information registered.",
+            "status": {
+                "exempted": "Exempted",
+                "not_served": "Not Served",
+                "served": "Served",
+                "serving": "Serving"
+            },
+            "title": "Military Service"
+        },
+        "patriot": {
+            "no_data": "No patriot information registered.",
+            "patriot_code": "Patriot Code",
+            "title": "Patriot Information"
+        },
+        "disability": {
+            "add_button": "Add Disability",
+            "add_title": "Add Disability Information",
+            "disability_type": "Disability Type",
+            "edit_title": "Edit Disability Information",
+            "no_data": "No disability information registered.",
+            "severity": {
+                "mild": "Mild",
+                "severe": "Severe",
+                "title": "Severity"
+            },
+            "title": "Disability Information"
+        },
+        "education": {
+            "add_button": "Add Education",
+            "add_title": "Add Education",
+            "admission_date": "Admission Date (YYYY-MM)",
+            "edit_title": "Edit Education",
+            "graduation_date": "Graduation Date (YYYY-MM)",
+            "major": "Major",
+            "no_data": "No education information registered.",
+            "school_name": "School Name",
+            "school_type": "School Type",
+            "school_type_options": {
+                "doctorate": "Doctorate",
+                "high_school": "High School",
+                "junior_college": "Junior College",
+                "master": "Master",
+                "university": "University"
+            },
+            "status": "Status",
+            "status_options": {
+                "attending": "Attending",
+                "completed": "Completed",
+                "dropout": "Dropout",
+                "graduated": "Graduated"
+            },
+            "title": "Education"
+        },
+        "career": {
+            "add_button": "Add Career",
+            "add_title": "Add Career",
+            "company_name": "Company Name",
+            "department": "Department",
+            "edit_title": "Edit Career",
+            "end_date": "End Date (YYYY-MM-DD)",
+            "experience_type": "Experience Type",
+            "experience_type_options": {
+                "experienced": "Experienced",
+                "newcomer": "Newcomer"
+            },
+            "is_attending": "Currently employed",
+            "is_attending_true": "Present",
+            "no_data": "No career information registered.",
+            "reason_for_leaving": "Reason for Leaving",
+            "responsibilities": "Responsibilities",
+            "start_date": "Start Date (YYYY-MM-DD)",
+            "title": "Career"
+        },
+        "job_interest": {
+            "add_button": "Add Job Interest",
+            "add_title": "Add Job Interest",
+            "edit_title": "Edit Job Interest",
+            "job_title": "Job Title",
+            "no_data": "No job interests registered.",
+            "title": "Job Interests"
         }
     }
 }
