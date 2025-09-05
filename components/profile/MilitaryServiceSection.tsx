@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import {
-    MilitaryServiceStatus,
-    Omit,
+  MilitaryService,
+  MilitaryServiceStatus,
 } from "../../services/profileService";
 import { useProfileStore } from "../../stores/profileStore";
 
@@ -82,10 +82,11 @@ const MilitaryServiceSection = () => {
       <Card.Title>{t("profile.military.title")}</Card.Title>
       <Card.Divider />
       {isEditing ? (
-        <View>
+        <View style={{ marginBottom: 8 }}>
           <Picker
             selectedValue={selectedStatus}
             onValueChange={(itemValue) => setSelectedStatus(itemValue)}
+            style={styles.picker}
           >
             {statusOptions.map((opt) => (
               <Picker.Item
@@ -144,6 +145,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     marginTop: 16,
+  },
+  picker: {
+    marginVertical: 8,
+    marginHorizontal: 10,
   },
 });
 
