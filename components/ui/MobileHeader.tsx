@@ -54,6 +54,14 @@ export default function MobileHeader({
     setMenuVisible(!isMenuVisible);
   };
 
+  const AUTH_NAV_ITEMS = [
+    {
+      title: t("components.header.navigation.my_page"),
+      href: "/(protected)/my-page" as Href,
+      onPress: toggleMenu,
+    },
+  ];
+
   const renderLeftComponent = () => {
     if (showBackButton) {
       return (
@@ -132,13 +140,26 @@ export default function MobileHeader({
               </Link>
             ))}
             {isAuthenticated ? (
-              <Button
-                title={t("components.header.navigation.sign_out")}
-                onPress={handleLogout}
-                type="clear"
-                titleStyle={styles.overlayMenuText}
-                containerStyle={styles.overlayMenuItem}
-              />
+              <>
+                {AUTH_NAV_ITEMS.map((item, index) => (
+                  <Link key={index} href={item.href as Href} asChild>
+                    <Button
+                      title={item.title}
+                      onPress={item.onPress}
+                      type="clear"
+                      titleStyle={styles.overlayMenuText}
+                      containerStyle={styles.overlayMenuItem}
+                    />
+                  </Link>
+                ))}
+                <Button
+                  title={t("components.header.navigation.sign_out")}
+                  onPress={handleLogout}
+                  type="clear"
+                  titleStyle={styles.overlayMenuText}
+                  containerStyle={styles.overlayMenuItem}
+                />
+              </>
             ) : (
               <Link href={"/sign-in" as Href} asChild>
                 <Button

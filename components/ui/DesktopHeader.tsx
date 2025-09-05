@@ -63,11 +63,20 @@ export default function DesktopHeader({ showNav = true }: DesktopHeaderProps) {
       </View>
       {showNav &&
         (isAuthenticated ? (
-          <Button
-            title={t("components.header.navigation.sign_out")}
-            onPress={handleLogout}
-            buttonStyle={styles.loginButton}
-          />
+          <View style={styles.rightAuthSection}>
+            <Link href={"/(protected)/my-page" as Href} asChild>
+              <Button
+                title={t("components.header.navigation.my_page")}
+                type="clear"
+                titleStyle={styles.desktopNavLink}
+              />
+            </Link>
+            <Button
+              title={t("components.header.navigation.sign_out")}
+              onPress={handleLogout}
+              buttonStyle={styles.loginButton}
+            />
+          </View>
         ) : (
           <Link href={"/(auth)/sign-in" as Href} asChild>
             <Button
@@ -99,6 +108,10 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  rightAuthSection: {
     flexDirection: "row",
     alignItems: "center",
   },
