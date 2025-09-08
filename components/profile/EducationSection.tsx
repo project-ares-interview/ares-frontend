@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import {
+  DegreeType,
   Education,
   EducationStatus,
   SchoolType,
@@ -60,6 +61,7 @@ const EducationForm = ({
   );
   const [schoolName, setSchoolName] = useState(education?.school_name ?? "");
   const [major, setMajor] = useState(education?.major ?? "");
+  const [degree, setDegree] = useState<DegreeType | "">(education?.degree ?? "");
   const [status, setStatus] = useState<EducationStatus>(
     education?.status ?? "attending",
   );
@@ -83,8 +85,9 @@ const EducationForm = ({
   const monthOptions = getMonthOptions();
 
   useEffect(() => {
-    if (schoolType === "high_school") {
+    if (["elementary_school", "middle_school", "high_school"].includes(schoolType)) {
       setMajor("");
+      setDegree("");
     }
   }, [schoolType]);
 
@@ -97,6 +100,14 @@ const EducationForm = ({
 
   const schoolTypeOptions: { label: string; value: SchoolType }[] = [
     {
+      label: t("profile.education.school_type_options.elementary_school"),
+      value: "elementary_school",
+    },
+    {
+      label: t("profile.education.school_type_options.middle_school"),
+      value: "middle_school",
+    },
+    {
       label: t("profile.education.school_type_options.high_school"),
       value: "high_school",
     },
@@ -108,12 +119,17 @@ const EducationForm = ({
       label: t("profile.education.school_type_options.university"),
       value: "university",
     },
+  ];
+
+  const degreeOptions: { label: string; value: DegreeType }[] = [
     {
-      label: t("profile.education.school_type_options.master"),
-      value: "master",
+      label: t("profile.education.degree_options.associate"),
+      value: "associate",
     },
+    { label: t("profile.education.degree_options.bachelor"), value: "bachelor" },
+    { label: t("profile.education.degree_options.master"), value: "master" },
     {
-      label: t("profile.education.school_type_options.doctorate"),
+      label: t("profile.education.degree_options.doctorate"),
       value: "doctorate",
     },
   ];
@@ -164,12 +180,25 @@ const EducationForm = ({
     onSave({
       school_type: schoolType,
       school_name: schoolName,
-      major: schoolType === "high_school" ? undefined : major,
+      major: ["elementary_school", "middle_school", "high_school"].includes(schoolType)
+        ? undefined
+        : major,
+      degree: ["elementary_school", "middle_school", "high_school"].includes(
+        schoolType,
+      )
+        ? undefined
+        : degree || undefined,
       status,
       admission_date: admissionDateFormatted!,
       graduation_date: graduationDateFormatted || undefined,
     });
   };
+
+  const showMajorAndDegree = ![
+    "elementary_school",
+    "middle_school",
+    "high_school",
+  ].includes(schoolType);
 
   return (
     <ScrollView style={styles.formContainer}>
@@ -190,15 +219,41 @@ const EducationForm = ({
         label={t("profile.education.school_name")}
         value={schoolName}
         onChangeText={setSchoolName}
+        placeholder={t("profile.education.school_name_placeholder")}
+        placeholderTextColor="#aaa"
         containerStyle={styles.inputContainer}
       />
-      {schoolType !== "high_school" && (
-        <Input
-          label={t("profile.education.major")}
-          value={major}
-          onChangeText={setMajor}
-          containerStyle={styles.inputContainer}
-        />
+      {showMajorAndDegree && (
+        <>
+          <Input
+            label={t("profile.education.major")}
+            value={major}
+            onChangeText={setMajor}
+            placeholder={t("profile.education.major_placeholder")}
+            placeholderTextColor="#aaa"
+            containerStyle={styles.inputContainer}
+          />
+          <Text style={styles.pickerLabel}>
+            {t("profile.education.degree")}
+          </Text>
+          <Picker
+            selectedValue={degree}
+            onValueChange={(itemValue) => setDegree(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item
+              label={t("profile.education.degree_placeholder")}
+              value=""
+            />
+            {degreeOptions.map((opt) => (
+              <Picker.Item
+                key={opt.value}
+                label={opt.label}
+                value={opt.value}
+              />
+            ))}
+          </Picker>
+        </>
       )}
 
       <Text style={styles.pickerLabel}>{t("profile.education.status")}</Text>
@@ -222,7 +277,7 @@ const EducationForm = ({
           onValueChange={(itemValue) => setAdmissionYear(itemValue)}
           style={styles.datePicker}
         >
-          <Picker.Item label="년도 선택" value="" />
+          <Picker.Item label={t("common.select_year")} value="" />
           {yearOptions.map((opt) => (
             <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
           ))}
@@ -232,7 +287,7 @@ const EducationForm = ({
           onValueChange={(itemValue) => setAdmissionMonth(itemValue)}
           style={styles.datePicker}
         >
-          <Picker.Item label="월 선택" value="" />
+          <Picker.Item label={t("common.select_month")} value="" />
           {monthOptions.map((opt) => (
             <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
           ))}
@@ -251,7 +306,7 @@ const EducationForm = ({
               onValueChange={(itemValue) => setGraduationYear(itemValue)}
               style={styles.datePicker}
             >
-              <Picker.Item label="년도 선택" value="" />
+              <Picker.Item label={t("common.select_year")} value="" />
               {yearOptions.map((opt) => (
                 <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
               ))}
@@ -261,7 +316,7 @@ const EducationForm = ({
               onValueChange={(itemValue) => setGraduationMonth(itemValue)}
               style={styles.datePicker}
             >
-              <Picker.Item label="월 선택" value="" />
+              <Picker.Item label={t("common.select_month")} value="" />
               {monthOptions.map((opt) => (
                 <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
               ))}
@@ -335,11 +390,13 @@ const EducationSection = () => {
           <View key={edu.id} style={styles.itemContainer}>
             <View>
               <Text style={styles.itemTextBold}>{edu.school_name}</Text>
-              <Text>{edu.major}</Text>
-                              <Text>
-                  {getDisplayDate(edu.admission_date)} ~{" "}
-                  {edu.graduation_date ? getDisplayDate(edu.graduation_date) : ""}
-                </Text>
+              <Text>
+                {edu.major} {edu.degree && `(${t(`profile.education.degree_options.${edu.degree}`)})`}
+              </Text>
+              <Text>
+                {getDisplayDate(edu.admission_date)} ~{" "}
+                {edu.graduation_date ? getDisplayDate(edu.graduation_date) : ""}
+              </Text>
             </View>
             <View style={styles.buttonGroup}>
               <TouchableOpacity onPress={() => setEditingEducationId(edu.id)}>

@@ -27,18 +27,21 @@ export interface Disability {
 }
 
 export type SchoolType =
+  | "elementary_school"
+  | "middle_school"
   | "high_school"
   | "junior_college"
-  | "university"
-  | "master"
-  | "doctorate";
+  | "university";
 export type EducationStatus = "attending" | "graduated" | "completed" | "dropout";
+
+export type DegreeType = "associate" | "bachelor" | "master" | "doctorate";
 
 export interface Education {
   id: number;
   school_type: SchoolType;
   school_name: string;
-  major?: string;
+  major?: string | null;
+  degree?: DegreeType | null;
   status: EducationStatus;
   admission_date: string; // YYYY-MM
   graduation_date?: string; // YYYY-MM
@@ -56,6 +59,7 @@ export interface Career {
   department?: string;
   responsibilities?: string;
   reason_for_leaving?: string;
+  task: string;
 }
 
 export interface JobInterest {

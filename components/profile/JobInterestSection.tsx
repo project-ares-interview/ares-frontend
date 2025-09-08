@@ -32,6 +32,8 @@ const JobInterestForm = ({
         label={t("profile.job_interest.job_title")}
         value={jobTitle}
         onChangeText={setJobTitle}
+        placeholder={t("profile.job_interest.job_title_placeholder")}
+        placeholderTextColor="#aaa"
         containerStyle={styles.inputContainer}
       />
       <View style={styles.formButtonGroup}>
