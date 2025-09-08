@@ -2,9 +2,14 @@
     "common": {
         "add": "Add",
         "cancel": "Cancel",
+        "create": "Create",
         "delete": "Delete",
         "edit": "Edit",
-        "save": "Save"
+        "error": "Error",
+        "save": "Save",
+        "select_day": "Select Day",
+        "select_month": "Select Month",
+        "select_year": "Select Year"
     },
     "components": {
         "footer": {
@@ -64,6 +69,9 @@
         "index": {
             "welcome": "Hello React Native"
         },
+        "my_page": {
+            "title": "My Page"
+        },
         "sign_in": {
             "email": "Email",
             "password": "Password",
@@ -95,7 +103,9 @@
             "add_button": "Add Career",
             "add_title": "Add Career",
             "company_name": "Company Name",
+            "company_name_placeholder": "Enter company name",
             "department": "Department",
+            "department_placeholder": "Enter department name",
             "edit_title": "Edit Career",
             "end_date": "End Date (YYYY-MM-DD)",
             "experience_type": "Experience Type",
@@ -107,14 +117,19 @@
             "is_attending_true": "Present",
             "no_data": "No career information registered.",
             "reason_for_leaving": "Reason for Leaving",
-            "responsibilities": "Responsibilities",
+            "reason_for_leaving_placeholder": "Enter reason for leaving",
+            "responsibilities": "Position/Title",
+            "responsibilities_placeholder": "Enter your position or title",
             "start_date": "Start Date (YYYY-MM-DD)",
+            "task": "Tasks",
+            "task_placeholder": "Enter main tasks",
             "title": "Career"
         },
         "disability": {
             "add_button": "Add Disability",
             "add_title": "Add Disability Information",
             "disability_type": "Disability Type",
+            "disability_type_placeholder": "Enter disability type",
             "edit_title": "Edit Disability Information",
             "no_data": "No disability information registered.",
             "severity": {
@@ -128,18 +143,28 @@
             "add_button": "Add Education",
             "add_title": "Add Education",
             "admission_date": "Admission Date (YYYY-MM)",
+            "degree": "Degree",
+            "degree_options": {
+                "associate": "Associate",
+                "bachelor": "Bachelor",
+                "master": "Master",
+                "doctorate": "Doctorate"
+            },
+            "degree_placeholder": "Select Degree",
             "edit_title": "Edit Education",
             "graduation_date": "Graduation Date (YYYY-MM)",
             "major": "Major",
+            "major_placeholder": "Enter major",
             "no_data": "No education information registered.",
             "school_name": "School Name",
+            "school_name_placeholder": "Enter school name",
             "school_type": "School Type",
             "school_type_options": {
-                "doctorate": "Doctorate",
+                "elementary_school": "Elementary School",
+                "middle_school": "Middle School",
                 "high_school": "High School",
-                "junior_college": "Junior College",
-                "master": "Master",
-                "university": "University"
+                "junior_college": "Junior College (2-3 years)",
+                "university": "University (4 years)"
             },
             "status": "Status",
             "status_options": {
@@ -155,6 +180,7 @@
             "add_title": "Add Job Interest",
             "edit_title": "Edit Job Interest",
             "job_title": "Job Title",
+            "job_title_placeholder": "Enter interested job title",
             "no_data": "No job interests registered.",
             "title": "Job Interests"
         },
@@ -171,7 +197,121 @@
         "patriot": {
             "no_data": "No patriot information registered.",
             "patriot_code": "Patriot Code",
+            "patriot_code_placeholder": "Enter patriot code",
             "title": "Patriot Information"
+        }
+    },
+    "resume": {
+        "award": {
+            "date_awarded": "Date Awarded",
+            "issuer": "Issuer",
+            "issuer_placeholder": "Enter issuer name",
+            "no_data": "No awards/certifications registered.",
+            "section_title": "Awards/Certifications",
+            "title": "Award/Certification Name",
+            "title_placeholder": "Enter award or certification name"
+        },
+        "back_to_list": "Back to Resume List",
+        "career": {
+            "company_name": "Company Name",
+            "company_name_placeholder": "Enter company name",
+            "department": "Department",
+            "department_placeholder": "Enter department name",
+            "end_date": "End Date",
+            "experience_type": "Experience Type",
+            "experience_type_options": {
+                "experienced": "Experienced",
+                "newcomer": "Newcomer"
+            },
+            "is_current": "Currently working here",
+            "no_data": "No career history registered.",
+            "reason_for_leaving": "Reason for Leaving",
+            "reason_for_leaving_placeholder": "Enter reason for leaving",
+            "responsibilities": "Position/Title",
+            "responsibilities_placeholder": "Enter your position or title",
+            "section_title": "Career",
+            "start_date": "Start Date",
+            "task": "Tasks",
+            "task_placeholder": "Enter main tasks"
+        },
+        "delete_confirm": {
+            "message": "Are you sure you want to delete this?",
+            "title": "Confirm Deletion"
+        },
+        "education": {
+            "admission_date": "Admission Date",
+            "degree": "Degree",
+            "degree_options": {
+                "associate": "Associate",
+                "bachelor": "Bachelor",
+                "doctorate": "Doctorate",
+                "master": "Master"
+            },
+            "degree_placeholder": "Select Degree",
+            "graduation_date": "Graduation Date",
+            "major": "Major",
+            "major_placeholder": "Enter major",
+            "no_data": "No education history registered.",
+            "school_name": "School Name",
+            "school_name_placeholder": "Enter school name",
+            "school_type": "School Type",
+            "school_type_options": {
+                "elementary_school": "Elementary School",
+                "high_school": "High School",
+                "junior_college": "Junior College (2-3 years)",
+                "middle_school": "Middle School",
+                "university": "University (4 years)"
+            },
+            "section_title": "Education",
+            "status": "Graduation Status",
+            "status_options": {
+                "attending": "Attending",
+                "completed": "Completed",
+                "dropout": "Dropout",
+                "graduated": "Graduated"
+            }
+        },
+        "language": {
+            "language": "Language",
+            "language_placeholder": "e.g., English",
+            "no_data": "No foreign language skills registered.",
+            "proficiency": "Proficiency",
+            "proficiency_placeholder": "e.g., Native speaker",
+            "section_title": "Languages"
+        },
+        "link": {
+            "no_data": "No links registered.",
+            "section_title": "Links",
+            "title": "Link Title",
+            "title_placeholder": "e.g., GitHub, Portfolio",
+            "url": "URL",
+            "url_placeholder": "https://..."
+        },
+        "list": {
+            "add_button": "Create New Resume",
+            "delete_confirm": {
+                "message": "Are you sure you want to delete this resume?",
+                "title": "Delete Resume"
+            },
+            "last_updated": "Last Updated",
+            "new_title_placeholder": "New Resume Title",
+            "no_data": "No resumes created yet.",
+            "page_title": "Manage Resumes",
+            "title_placeholder": "Resume Title",
+            "title_required_alert": "Please enter a resume title."
+        }
+    },
+    "cover_letter": {
+        "page_title": "Cover Letter Management",
+        "add_button": "Create New Cover Letter",
+        "no_data": "No cover letters created yet.",
+        "created_date": "Date Created",
+        "form": {
+            "title": "Title",
+            "title_placeholder": "Enter cover letter title",
+            "content": "Content",
+            "content_placeholder": "Enter cover letter content",
+            "saving": "Saving..."
         }
     }
 }
