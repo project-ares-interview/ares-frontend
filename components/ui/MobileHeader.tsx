@@ -1,9 +1,9 @@
 import {
-  Button,
-  Icon,
-  Overlay,
-  Header as RNEHeader,
-  Text,
+    Button,
+    Icon,
+    Overlay,
+    Header as RNEHeader,
+    Text,
 } from "@rneui/themed";
 import { Image } from "expo-image";
 import { Href, Link, useRouter } from "expo-router";
@@ -38,11 +38,11 @@ export default function MobileHeader({
     { title: t("components.header.navigation.home"), href: "/" as Href },
     {
       title: t("components.header.navigation.cover_letter"),
-      href: "/cover_letter" as Href,
+      href: "/cover-letter" as Href,
     },
     {
       title: t("components.header.navigation.resume"),
-      href: "/resume" as Href,
+      href: "/resumes" as Href,
     },
     {
       title: t("components.header.navigation.interview"),
@@ -99,7 +99,9 @@ export default function MobileHeader({
                 source={require("@/assets/images/react-logo.png")}
                 style={styles.logo}
               />
-              <Text style={styles.heading}>Project</Text>
+              <Text style={styles.heading}>
+                {t("components.header.navigation.home")}
+              </Text>
             </View>
           </Link>
         }
