@@ -13,6 +13,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { showConfirmation } from "../../utils/alert";
 
 const CoverLetterPage = () => {
   const { t } = useTranslation();
@@ -53,7 +54,13 @@ const CoverLetterPage = () => {
   };
 
   const handleDelete = (id: number) => {
-    deleteCoverLetter(id);
+    showConfirmation({
+      title: t("cover_letter.delete_confirm.title"),
+      message: t("cover_letter.delete_confirm.message"),
+      onConfirm: () => deleteCoverLetter(id),
+      confirmText: t("common.delete"),
+      cancelText: t("common.cancel"),
+    });
   };
 
   if (isLoading && coverLetters.length === 0) {

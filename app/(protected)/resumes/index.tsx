@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   Pressable,
   ScrollView,
@@ -14,6 +13,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { showConfirmation } from "../../../utils/alert";
 
 const ResumesPage = () => {
   const router = useRouter();
@@ -35,10 +35,6 @@ const ResumesPage = () => {
   }, [fetchResumes]);
 
   const handleCreate = async () => {
-    if (newResumeTitle.trim() === "") {
-      Alert.alert(t("common.error"), t("resume.list.title_required_alert"));
-      return;
-    }
     const newResume = await createResume({ title: newResumeTitle });
     if (newResume) {
       router.push(`/(protected)/resumes/${newResume.id}`);
@@ -48,19 +44,13 @@ const ResumesPage = () => {
   };
 
   const handleDelete = (id: number) => {
-    Alert.alert(
-      t("resume.list.delete_confirm.title"),
-      t("resume.list.delete_confirm.message"),
-      [
-        { text: t("common.cancel"), style: "cancel" },
-        {
-          text: t("common.delete"),
-          onPress: () => deleteResume(id),
-          style: "destructive",
-        },
-      ],
-      { cancelable: true },
-    );
+    showConfirmation({
+      title: t("resume.list.delete_confirm.title"),
+      message: t("resume.list.delete_confirm.message"),
+      onConfirm: () => deleteResume(id),
+      confirmText: t("common.delete"),
+      cancelText: t("common.cancel"),
+    });
   };
 
   if (isLoading && resumes.length === 0) {
