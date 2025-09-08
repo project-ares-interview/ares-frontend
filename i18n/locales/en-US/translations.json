@@ -312,6 +312,10 @@
             "content": "Content",
             "content_placeholder": "Enter cover letter content",
             "saving": "Saving..."
+        },
+        "delete_confirm": {
+            "title": "Delete Cover Letter",
+            "message": "Are you sure you want to delete this cover letter?"
         }
     }
 }

@@ -1,5 +1,6 @@
 import { Award } from "@/schemas/resume";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 interface AwardCardProps {
@@ -9,6 +10,7 @@ interface AwardCardProps {
 }
 
 const AwardCard: React.FC<AwardCardProps> = ({ award, onEdit, onDelete }) => {
+  const { t } = useTranslation();
   return (
     <View style={styles.card}>
       <View style={styles.content}>
@@ -20,13 +22,13 @@ const AwardCard: React.FC<AwardCardProps> = ({ award, onEdit, onDelete }) => {
       </View>
       <View style={styles.actions}>
         <Pressable style={[styles.button, styles.editButton]} onPress={onEdit}>
-          <Text style={styles.buttonText}>수정</Text>
+          <Text style={styles.buttonText}>{t("common.edit")}</Text>
         </Pressable>
         <Pressable
           style={[styles.button, styles.deleteButton]}
           onPress={onDelete}
         >
-          <Text style={styles.buttonText}>삭제</Text>
+          <Text style={styles.buttonText}>{t("common.delete")}</Text>
         </Pressable>
       </View>
     </View>
