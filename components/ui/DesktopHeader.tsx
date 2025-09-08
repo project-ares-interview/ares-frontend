@@ -23,11 +23,11 @@ export default function DesktopHeader({ showNav = true }: DesktopHeaderProps) {
   const NAV_ITEMS = [
     {
       title: t("components.header.navigation.cover_letter"),
-      href: "/cover_letter" as Href,
+      href: "/cover-letter" as Href,
     },
     {
       title: t("components.header.navigation.resume"),
-      href: "/resume" as Href,
+      href: "/resumes" as Href,
     },
     {
       title: t("components.header.navigation.interview"),
@@ -44,7 +44,7 @@ export default function DesktopHeader({ showNav = true }: DesktopHeaderProps) {
             style={styles.logo}
           />
           <Text h4 style={styles.heading}>
-            Project
+            {t("components.header.navigation.home")}
           </Text>
         </Link>
         {showNav && (
