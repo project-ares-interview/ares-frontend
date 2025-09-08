@@ -1,5 +1,6 @@
 import { Link as LinkType } from "@/schemas/resume";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 
 interface LinkCardProps {
@@ -9,6 +10,7 @@ interface LinkCardProps {
 }
 
 const LinkCard: React.FC<LinkCardProps> = ({ link, onEdit, onDelete }) => {
+  const { t } = useTranslation();
   return (
     <View style={styles.card}>
       <Pressable
@@ -20,13 +22,13 @@ const LinkCard: React.FC<LinkCardProps> = ({ link, onEdit, onDelete }) => {
       </Pressable>
       <View style={styles.actions}>
         <Pressable style={[styles.button, styles.editButton]} onPress={onEdit}>
-          <Text style={styles.buttonText}>수정</Text>
+          <Text style={styles.buttonText}>{t("common.edit")}</Text>
         </Pressable>
         <Pressable
           style={[styles.button, styles.deleteButton]}
           onPress={onDelete}
         >
-          <Text style={styles.buttonText}>삭제</Text>
+          <Text style={styles.buttonText}>{t("common.delete")}</Text>
         </Pressable>
       </View>
     </View>

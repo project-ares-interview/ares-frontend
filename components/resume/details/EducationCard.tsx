@@ -1,16 +1,7 @@
-import { Education, SchoolType } from "@/schemas/resume";
+import { Education } from "@/schemas/resume";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-
-const schoolTypeMap: Record<SchoolType, string> = {
-  elementary_school: "초등학교",
-  middle_school: "중학교",
-  high_school: "고등학교",
-  junior_college: "대학교 (2-3년제)",
-  university: "대학교 (4년제)",
-};
-
 
 interface EducationCardProps {
   education: Education;
@@ -27,7 +18,7 @@ const EducationCard: React.FC<EducationCardProps> = ({
   const admissionDate = education.admission_date.substring(0, 7);
   const graduationDate = education.graduation_date
     ? education.graduation_date.substring(0, 7)
-    : "진행중";
+    : t(`resume.education.status_options.${education.status}`);
 
   const showMajorAndDegree = ![
     "elementary_school",
@@ -39,11 +30,14 @@ const EducationCard: React.FC<EducationCardProps> = ({
     <View style={styles.card}>
       <View style={styles.content}>
         <Text style={styles.school}>
-          {education.school_name}
+          {education.school_name} (
+          {t(`resume.education.school_type_options.${education.school_type}`)})
         </Text>
         {showMajorAndDegree && (
           <Text style={styles.major}>
-            {education.major} {education.degree && `(${t(`profile.education.degree_options.${education.degree}`)})`}
+            {education.major}{" "}
+            {education.degree &&
+              `(${t(`resume.education.degree_options.${education.degree}`)})`}
           </Text>
         )}
         <Text style={styles.date}>
@@ -52,13 +46,13 @@ const EducationCard: React.FC<EducationCardProps> = ({
       </View>
       <View style={styles.actions}>
         <Pressable style={[styles.button, styles.editButton]} onPress={onEdit}>
-          <Text style={styles.buttonText}>수정</Text>
+          <Text style={styles.buttonText}>{t("common.edit")}</Text>
         </Pressable>
         <Pressable
           style={[styles.button, styles.deleteButton]}
           onPress={onDelete}
         >
-          <Text style={styles.buttonText}>삭제</Text>
+          <Text style={styles.buttonText}>{t("common.delete")}</Text>
         </Pressable>
       </View>
     </View>
