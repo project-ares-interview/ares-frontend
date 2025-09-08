@@ -61,6 +61,7 @@ const PatriotSection = () => {
             label={t("profile.patriot.patriot_code")}
             value={patriotCode}
             onChangeText={setPatriotCode}
+            placeholder={t("profile.patriot.patriot_code_placeholder")}
           />
           <Button
             title={t("common.save")}

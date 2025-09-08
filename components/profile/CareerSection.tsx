@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   ScrollView,
   StyleSheet,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -79,6 +80,7 @@ const CareerForm = ({
   const [responsibilities, setResponsibilities] = useState(
     career?.responsibilities ?? "",
   );
+  const [task, setTask] = useState(career?.task ?? "");
   const [reasonForLeaving, setReasonForLeaving] = useState(
     career?.reason_for_leaving ?? "",
   );
@@ -135,7 +137,11 @@ const CareerForm = ({
       end_date: endDateString || undefined,
       department: department || undefined,
       responsibilities: responsibilities || undefined,
-      reason_for_leaving: (!isAttending && endDateString && reasonForLeaving) ? reasonForLeaving : undefined,
+      task: task || "",
+      reason_for_leaving:
+        !isAttending && endDateString && reasonForLeaving
+          ? reasonForLeaving
+          : undefined,
     });
   };
 
@@ -145,6 +151,8 @@ const CareerForm = ({
         label={t("profile.career.company_name")}
         value={companyName}
         onChangeText={setCompanyName}
+        placeholder={t("profile.career.company_name_placeholder")}
+        placeholderTextColor="#aaa"
         containerStyle={styles.inputContainer}
       />
       <Text style={styles.pickerLabel}>
@@ -175,7 +183,7 @@ const CareerForm = ({
           onValueChange={(itemValue) => setStartYear(itemValue)}
           style={styles.datePicker}
         >
-          <Picker.Item label="년도 선택" value="" />
+          <Picker.Item label={t("common.select_year")} value="" />
           {yearOptions.map((opt) => (
             <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
           ))}
@@ -185,7 +193,7 @@ const CareerForm = ({
           onValueChange={(itemValue) => setStartMonth(itemValue)}
           style={styles.datePicker}
         >
-          <Picker.Item label="월 선택" value="" />
+          <Picker.Item label={t("common.select_month")} value="" />
           {monthOptions.map((opt) => (
             <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
           ))}
@@ -195,7 +203,7 @@ const CareerForm = ({
           onValueChange={(itemValue) => setStartDay(itemValue)}
           style={styles.datePicker}
         >
-          <Picker.Item label="일 선택" value="" />
+          <Picker.Item label={t("common.select_day")} value="" />
           {startDayOptions.map((opt) => (
             <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
           ))}
@@ -214,7 +222,7 @@ const CareerForm = ({
               onValueChange={(itemValue) => setEndYear(itemValue)}
               style={styles.datePicker}
             >
-              <Picker.Item label="년도 선택" value="" />
+              <Picker.Item label={t("common.select_year")} value="" />
               {yearOptions.map((opt) => (
                 <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
               ))}
@@ -224,7 +232,7 @@ const CareerForm = ({
               onValueChange={(itemValue) => setEndMonth(itemValue)}
               style={styles.datePicker}
             >
-              <Picker.Item label="월 선택" value="" />
+              <Picker.Item label={t("common.select_month")} value="" />
               {monthOptions.map((opt) => (
                 <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
               ))}
@@ -234,7 +242,7 @@ const CareerForm = ({
               onValueChange={(itemValue) => setEndDay(itemValue)}
               style={styles.datePicker}
             >
-              <Picker.Item label="일 선택" value="" />
+              <Picker.Item label={t("common.select_day")} value="" />
               {endDayOptions.map((opt) => (
                 <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
               ))}
@@ -246,23 +254,41 @@ const CareerForm = ({
         label={t("profile.career.department")}
         value={department}
         onChangeText={setDepartment}
+        placeholder={t("profile.career.department_placeholder")}
+        placeholderTextColor="#aaa"
         containerStyle={styles.inputContainer}
       />
       <Input
         label={t("profile.career.responsibilities")}
         value={responsibilities}
         onChangeText={setResponsibilities}
-        multiline
+        placeholder={t("profile.career.responsibilities_placeholder")}
+        placeholderTextColor="#aaa"
         containerStyle={styles.inputContainer}
       />
+      <Text style={styles.inputLabel}>{t("profile.career.task")}</Text>
+      <TextInput
+        value={task}
+        onChangeText={setTask}
+        multiline
+        placeholder={t("profile.career.task_placeholder")}
+        placeholderTextColor="#aaa"
+        style={[styles.input, styles.textArea]}
+      />
       {!isAttending && endYear && endMonth && endDay && (
-        <Input
-          label={t("profile.career.reason_for_leaving")}
-          value={reasonForLeaving}
-          onChangeText={setReasonForLeaving}
-          multiline
-          containerStyle={styles.inputContainer}
-        />
+        <>
+          <Text style={styles.inputLabel}>
+            {t("profile.career.reason_for_leaving")}
+          </Text>
+          <TextInput
+            value={reasonForLeaving}
+            onChangeText={setReasonForLeaving}
+            multiline
+            placeholder={t("profile.career.reason_for_leaving_placeholder")}
+            placeholderTextColor="#aaa"
+            style={[styles.input, styles.textArea]}
+          />
+        </>
       )}
 
       <View style={styles.formButtonGroup}>
@@ -325,7 +351,10 @@ const CareerSection = () => {
           <View key={c.id} style={styles.itemContainer}>
             <View>
               <Text style={styles.itemTextBold}>{c.company_name}</Text>
-              <Text>{c.department}</Text>
+              <Text>
+                {c.department} / {c.responsibilities}
+              </Text>
+              <View style={styles.taskContainer}>{c.task && <Text>{c.task}</Text>}</View>
               <Text>
                 {getDisplayDate(c.start_date)} ~{" "}
                 {c.is_attending
@@ -373,6 +402,9 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     borderRadius: 5,
   },
+  taskContainer: {
+    marginVertical: 16,
+  },
   itemTextBold: {
     fontSize: 16,
     fontWeight: "bold",
@@ -389,6 +421,25 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     marginVertical: 8,
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#86939e",
+    marginLeft: 10,
+    marginBottom: 5,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 5,
+    padding: 10,
+    marginHorizontal: 10,
+    marginBottom: 10,
+  },
+  textArea: {
+    height: 100,
+    textAlignVertical: "top",
   },
   pickerLabel: {
     fontSize: 16,

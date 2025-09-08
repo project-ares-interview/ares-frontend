@@ -3,14 +3,14 @@ import { Button, Card, Icon, Input, Text } from "@rneui/themed";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  StyleSheet,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    StyleSheet,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import {
-  Disability,
-  DisabilitySeverity,
+    Disability,
+    DisabilitySeverity,
 } from "../../services/profileService";
 import { useProfileStore } from "../../stores/profileStore";
 
@@ -46,6 +46,8 @@ const DisabilityForm = ({
         label={t("profile.disability.disability_type")}
         value={disabilityType}
         onChangeText={setDisabilityType}
+        placeholder={t("profile.disability.disability_type_placeholder")}
+        placeholderTextColor="#aaa"
         containerStyle={styles.inputContainer}
       />
       <Text style={styles.pickerLabel}>
@@ -123,9 +125,9 @@ const DisabilitySection = () => {
           <View key={disability.id} style={styles.itemContainer}>
             <View>
               <Text style={styles.itemText}>
-                {`${t(
-                  "profile.disability.disability_type",
-                )}: ${disability.disability_type}`}
+                {`${t("profile.disability.disability_type")}: ${
+                  disability.disability_type
+                }`}
               </Text>
               <Text style={styles.itemText}>
                 {`${t("profile.disability.severity.title")}: ${t(
@@ -134,7 +136,9 @@ const DisabilitySection = () => {
               </Text>
             </View>
             <View style={styles.buttonGroup}>
-              <TouchableOpacity onPress={() => setEditingDisabilityId(disability.id)}>
+              <TouchableOpacity
+                onPress={() => setEditingDisabilityId(disability.id)}
+              >
                 <Icon name="edit" type="material" />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => handleDelete(disability.id)}>
