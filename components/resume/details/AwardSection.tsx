@@ -4,7 +4,8 @@ import { useResumeStore } from "@/stores/resumeStore";
 import { Icon } from "@rneui/themed";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { showConfirmation } from "../../../utils/alert";
 import AwardCard from "./AwardCard";
 import AwardForm from "./AwardForm";
 
@@ -35,25 +36,22 @@ const AwardSection: React.FC<AwardSectionProps> = ({ resumeId, awards }) => {
   };
 
   const handleDelete = async (id: number) => {
-    Alert.alert(
-      t("resume.delete_confirm.title"),
-      t("resume.delete_confirm.message"),
-      [
-        { text: t("common.cancel"), style: "cancel" },
-        {
-          text: t("common.delete"),
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await resumeService.awards.delete(resumeId, id);
-              await fetchFullResume(resumeId);
-            } catch (error) {
-              console.error("Failed to delete award:", error);
-            }
-          },
-        },
-      ],
-    );
+    const onConfirmDelete = async () => {
+      try {
+        await resumeService.awards.delete(resumeId, id);
+        await fetchFullResume(resumeId);
+      } catch (error) {
+        console.error("Failed to delete award:", error);
+      }
+    };
+
+    showConfirmation({
+      title: t("resume.delete_confirm.title"),
+      message: t("resume.delete_confirm.message"),
+      onConfirm: onConfirmDelete,
+      confirmText: t("common.delete"),
+      cancelText: t("common.cancel"),
+    });
   };
 
   const handleAddNew = () => {
