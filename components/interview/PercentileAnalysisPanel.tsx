@@ -17,11 +17,33 @@ const filterOptions: {
     options: string[];
   };
 } = {
-  gender: { name: "성별", options: ["FEMALE", "MALE"] },
+  gender: { name: "성별", options: ["MALE", "FEMALE"] },
   ageRange: { name: "연령대", options: ["-34", "35-44", "45-54", "55-"] },
   occupation: {
     name: "직군",
-    options: ["ARD", "BM", "ICT", "MM", "PS", "RND", "SM"],
+    options: ["ARD", "BM", "PS", "ICT", "RND", "MM", "SM"],
+  },
+};
+
+const filterLabels: { [key: string]: { [key: string]: string } } = {
+  gender: {
+    MALE: "남성",
+    FEMALE: "여성",
+  },
+  ageRange: {
+    "-34": "34세 이하",
+    "35-44": "35~44세",
+    "45-54": "45~54세",
+    "55-": "55세 이상",
+  },
+  occupation: {
+    ARD: "예술, 디자인",
+    BM: "경영, 비지니스",
+    PS: "공공기관",
+    ICT: "ICT",
+    RND: "연구개발",
+    MM: "마케팅",
+    SM: "영업",
   },
 };
 
@@ -161,7 +183,7 @@ export const PercentileAnalysisPanel = ({
                   onPress={() => handleFilterToggle(key, option)}
                 >
                   <Text style={[styles.filterButtonText, isSelected && styles.filterButtonTextSelected]}>
-                    {option}
+                    {filterLabels[key]?.[option] ?? option}
                   </Text>
                 </TouchableOpacity>
               );
