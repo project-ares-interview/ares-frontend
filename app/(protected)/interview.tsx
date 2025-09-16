@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import React from 'react';
-import { Camera } from 'expo-camera';
+import { Camera, CameraType } from 'expo-camera'; // ← 수정된 import
 import { useInterview } from '@/hooks/useInterview';
 import { InterviewControls } from '@/components/interview/InterviewControls';
 import { RealtimeFeedbackPanel } from '@/components/interview/RealtimeFeedbackPanel';
@@ -30,30 +30,32 @@ const InterviewScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>AI 면접 코칭</Text>
-
+      
       <View style={styles.videoContainer}>
-        <Camera style={styles.camera} type={Camera.Type.front} ref={cameraRef} />
+        <Camera
+          style={styles.camera}
+          type={CameraType.front}  // ← 수정된 부분
+          ref={cameraRef}
+        />
       </View>
+
+      <ScrollView style={styles.transcriptionPanel}>
+        <Text style={styles.panelTitle}>실시간 답변</Text>
+        <Text style={styles.transcriptionText}>
+          {transcript || status}
+        </Text>
+      </ScrollView>
 
       <InterviewControls
         isAnalyzing={isAnalyzing}
         onStart={startAnalysis}
-        onFinish={stopAnalysis} // Correct prop name is onFinish
-        startDisabled={!hasPermission || isAnalyzing}
+        onStop={stopAnalysis}
       />
 
-      <ScrollView style={styles.transcriptionPanel}>
-        <Text style={styles.panelTitle}>실시간 답변</Text>
-        <Text style={styles.transcriptionText}>{transcript || status}</Text>
-      </ScrollView>
-
-      <RealtimeFeedbackPanel feedback={realtimeFeedback} />
+      <RealtimeFeedbackPanel data={realtimeFeedback} />
 
       {finalResults.voice && finalResults.video && (
-        <AnalysisResultPanel
-          voiceScores={finalResults.voice} // Correct prop name
-          videoAnalysis={finalResults.video} // Correct prop name
-        />
+        <AnalysisResultPanel results={finalResults} />
       )}
     </View>
   );
