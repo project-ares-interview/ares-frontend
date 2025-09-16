@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ares AI Interview Coach - 최종 분석</title>
+    <style>
+        :root {
+            --bg-main: #f4f7f9;
+            --bg-panel: #ffffff;
+            --primary-color: #2c5282;
+            --secondary-color: #38a169;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --border-color: #e2e8f0;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+        .panel {
+            background-color: var(--bg-panel);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        #localVideo { width: 100%; height: 100%; object-fit: cover; }
+        .controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: #1a365d; }
+        .btn-danger { background-color: #e53e3e; color: white; }
+        .btn-danger:hover { background-color: #c53030; }
+        .btn:disabled { background-color: #cbd5e0; cursor: not-allowed; }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        #transcription {
+            background: #f7fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            min-height: 80px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+        #analysis-status {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 8px;
+            display: none;
+        }
+        .status-pending { background-color: #fefcbf; color: #92400e; }
+        .status-success { background-color: #d1fae5; color: #065f46; }
+
+        .results-container { display: none; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            text-align: left;
+        }
+        th {
+            background-color: #edf2f7;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        td:first-child { font-weight: 500; color: var(--text-secondary); width: 30%; }
+        td:last-child { font-weight: 600; font-size: 1.1rem; }
+
+        .realtime-feedback {
+            position: sticky;
+            top: 20px;
+        }
+        .feedback-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .feedback-item:last-child {
+            border-bottom: none;
+        }
+        .feedback-label {
+            color: var(--text-secondary);
+        }
+        .feedback-value {
+            font-weight: 600;
+        }
+        .volume-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .volume-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--secondary-color);
+            transition: width 0.1s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="layout-grid">
+            <div class="main-content">
+                <div class="panel video-panel">
+                    <h2>AI 면접 코칭</h2>
+                    <div class="video-container">
+                        <video id="localVideo" autoplay playsinline muted></video>
+                    </div>
+                </div>
+                <div class="panel controls-panel">
+                    <div class="controls">
+                        <button id="startBtn" class="btn btn-primary" disabled>분석 시작</button>
+                        <button id="finishBtn" class="btn btn-danger" disabled>분석 종료 및 결과 확인</button>
+                    </div>
+                    <h4>실시간 답변</h4>
+                    <div id="transcription">카메라 및 마이크 권한을 허용해주세요...</div>
+                </div>
+            </div>
+            <div class="side-content">
+                <div class="panel realtime-feedback">
+                    <h2>실시간 피드백</h2>
+                    <div class="feedback-item">
+                        <span class="feedback-label">자세 움직임</span>
+                        <span id="rt-posture" class="feedback-value">대기 중...</span>
+                    </div>
+                    <div class="feedback-item">
+                        <span class="feedback-label">머리 움직임</span>
+                        <span id="rt-head" class="feedback-value">대기 중...</span>
+                    </div>
+                    <div class="feedback-item">
+                        <span class="feedback-label">미소 시간</span>
+                        <span id="rt-smile" class="feedback-value">대기 중...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="analysis-status" class="panel" style="display: none;"></div>
+        <div id="resultsContainer" class="panel results-container">
+            <h2>최종 분석 결과</h2>
+            <div id="results-tables"></div>
+        </div>
+        <div class="panel">
+            <h2>실시간 분석 로그</h2>
+            <pre id="realtime-log" style="background-color: #2d3748; color: #f7fafc; padding: 16px; border-radius: 8px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; word-wrap: break-word;"></pre>
+        </div>
+    </div>
+
+    <script>
+        const elems = {
+            video: document.getElementById('localVideo'),
+            startBtn: document.getElementById('startBtn'),
+            finishBtn: document.getElementById('finishBtn'),
+            transcription: document.getElementById('transcription'),
+            analysisStatus: document.getElementById('analysis-status'),
+            resultsContainer: document.getElementById('resultsContainer'),
+            resultsTables: document.getElementById('results-tables'),
+            logContainer: document.getElementById('realtime-log'),
+            rt: {
+                posture: document.getElementById('rt-posture'),
+                head: document.getElementById('rt-head'),
+                smile: document.getElementById('rt-smile'),
+            }
+        };
+
+        let resultsSocket, audioSocket, videoSocket;
+        let localStream, videoFrameSender;
+        let audioContext, audioProcessor, audioSource;
+        const canvas = document.createElement('canvas');
+
+        let fullTranscript = '';
+        let interimTranscript = '';
+
+        function generateUUID() {
+            return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+        }
+
+        window.addEventListener('load', async () => {
+            await setupMedia();
+            setupWebSockets();
+        });
+
+        function setupWebSockets() {
+            const sessionId = generateUUID();
+            const wsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+            const host = window.location.host;
+
+            resultsSocket = new WebSocket(`${wsScheme}://${host}/ws/interview/results/${sessionId}/`);
+            audioSocket = new WebSocket(`${wsScheme}://${host}/ws/interview/audio/${sessionId}/`);
+            videoSocket = new WebSocket(`${wsScheme}://${host}/ws/interview/video/${sessionId}/`);
+
+            resultsSocket.onmessage = (event) => {
+                const content = JSON.parse(event.data);
+                handleSocketEvent(content.event, content.data);
+            };
+
+            [resultsSocket, audioSocket, videoSocket].forEach(socket => {
+                socket.onopen = () => console.log(`${socket.url} connected.`);
+                socket.onclose = () => console.log(`${socket.url} disconnected.`);
+                socket.onerror = (err) => console.error(`${socket.url} error:`, err);
+            });
+        }
+        
+        function setupMedia() {
+            return navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 }, audio: true })
+                .then(stream => {
+                    localStream = stream;
+                    elems.video.srcObject = stream;
+                    setupAudioRecording(stream);
+                    elems.startBtn.disabled = false;
+                    elems.transcription.textContent = '분석 시작 버튼을 누르면 음성 인식이 시작됩니다.';
+                })
+                .catch(err => {
+                    console.error("getUserMedia error:", err);
+                    elems.transcription.innerHTML = '<strong>카메라/마이크 권한이 필요합니다.</strong><br>브라우저 설정에서 권한을 허용한 후 페이지를 새로고침해주세요.';
+                });
+        }
+
+        function setupAudioRecording(stream) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)(); // 샘플 레이트 지정 제거
+            audioSource = audioContext.createMediaStreamSource(stream);
+            
+            // bufferSize: 4096, inputChannels: 1, outputChannels: 1
+            audioProcessor = audioContext.createScriptProcessor(4096, 1, 1);
+
+            const targetSampleRate = 16000;
+
+            audioProcessor.onaudioprocess = (e) => {
+                if (!audioSocket || audioSocket.readyState !== WebSocket.OPEN) return;
+
+                const inputData = e.inputBuffer.getChannelData(0);
+                const sourceSampleRate = audioContext.sampleRate;
+
+                // 16000Hz로 리샘플링
+                const resampledData = resampleBuffer(inputData, sourceSampleRate, targetSampleRate);
+
+                // Float32Array를 Int16Array (raw PCM)로 변환
+                const int16Data = new Int16Array(resampledData.length);
+                for (let i = 0; i < resampledData.length; i++) {
+                    int16Data[i] = Math.max(-1, Math.min(1, resampledData[i])) * 32767;
+                }
+                
+                // 원본 바이너리 PCM 데이터를 audioSocket으로 전송
+                audioSocket.send(int16Data.buffer);
+            };
+        }
+
+        /**
+         * 오디오 버퍼를 리샘플링하는 함수 (간단한 선형 보간 방식)
+         * @param {Float32Array} inputBuffer - 원본 오디오 데이터
+         * @param {number} sourceSampleRate - 원본 샘플 레이트
+         * @param {number} targetSampleRate - 목표 샘플 레이트
+         * @returns {Float32Array} - 리샘플링된 오디오 데이터
+         */
+        function resampleBuffer(inputBuffer, sourceSampleRate, targetSampleRate) {
+            if (sourceSampleRate === targetSampleRate) {
+                return inputBuffer;
+            }
+            const sampleRateRatio = sourceSampleRate / targetSampleRate;
+            const newLength = Math.round(inputBuffer.length / sampleRateRatio);
+            const result = new Float32Array(newLength);
+            let offsetResult = 0;
+            let offsetBuffer = 0;
+            while (offsetResult < result.length) {
+                const nextOffsetBuffer = Math.round((offsetResult + 1) * sampleRateRatio);
+                let accum = 0, count = 0;
+                for (let i = offsetBuffer; i < nextOffsetBuffer && i < inputBuffer.length; i++) {
+                    accum += inputBuffer[i];
+                    count++;
+                }
+                result[offsetResult] = count > 0 ? accum / count : 0;
+                offsetResult++;
+                offsetBuffer = nextOffsetBuffer;
+            }
+            return result;
+        }
+
+        function sendJsonMessage(socket, event, data) {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ event, data }));
+            }
+        }
+
+        elems.startBtn.addEventListener('click', () => {
+            elems.startBtn.disabled = true;
+            elems.finishBtn.disabled = false;
+            elems.resultsContainer.style.display = 'none';
+            elems.analysisStatus.style.display = 'none';
+
+            fullTranscript = '';
+            interimTranscript = '';
+            elems.transcription.textContent = '답변을 말씀해주세요...';
+            elems.logContainer.textContent = ''; // 로그 초기화
+            resetRealtimeFeedback();
+            
+            // 오디오 처리 시작
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            audioSource.connect(audioProcessor);
+            audioProcessor.connect(audioContext.destination); // 이 라인이 있어야 onaudioprocess가 호출됨
+
+            startSendingVideoFrames(); // 비디오 프레임 전송 시작
+            sendJsonMessage(resultsSocket, 'toggle_analysis', { analyze: true });
+        });
+
+        elems.finishBtn.addEventListener('click', () => {
+            elems.finishBtn.disabled = true;
+            stopSendingVideoFrames(); // 비디오 프레임 전송 중지
+
+            // 오디오 처리 중지
+            if(audioSource) audioSource.disconnect();
+            if(audioProcessor) audioProcessor.disconnect();
+            
+            // 미디어 스트림 중지 (카메라/마이크 끄기)
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+                elems.video.srcObject = null;
+            }
+            
+            sendJsonMessage(resultsSocket, 'finish_analysis_signal', {});
+        });
+
+        function startSendingVideoFrames() {
+            const video = elems.video;
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+
+            videoFrameSender = setInterval(() => {
+                if (videoSocket && videoSocket.readyState === WebSocket.OPEN) {
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    canvas.toBlob(blob => {
+                        if (blob) videoSocket.send(blob);
+                    }, 'image/jpeg', 0.7);
+                }
+            }, 500); // 500ms 간격 (초당 2프레임)
+        }
+
+        function stopSendingVideoFrames() {
+            if (videoFrameSender) {
+                clearInterval(videoFrameSender);
+                videoFrameSender = null;
+            }
+        }
+
+        function handleSocketEvent(eventName, data) {
+            switch (eventName) {
+                case 'speech_update':
+                    if (!data.text) return; // 비어있는 텍스트는 무시
+
+                    if (data.type === 'recognized') {
+                        // 최종 인식된 텍스트는 전체 스크립트에 추가
+                        fullTranscript += data.text + ' ';
+                        interimTranscript = ''; // 중간 텍스트 초기화
+                    } else { // 'recognizing' 등 중간 결과
+                        interimTranscript = data.text;
+                    }
+                    elems.transcription.textContent = fullTranscript + interimTranscript;
+                    logToScreen(`[Speech - ${data.type}] ${data.text}`);
+                    break;
+                case 'realtime_video_update':
+                    updateRealtimeVideoFeedback(data);
+                    logToScreen(`[Video Metrics] ${JSON.stringify(data, null, 2)}`);
+                    break;
+                case 'analysis_pending':
+                    elems.analysisStatus.className = 'panel status-pending';
+                    elems.analysisStatus.textContent = data.message;
+                    elems.analysisStatus.style.display = 'block';
+                    logToScreen(`[System] ${data.message}`);
+                    break;
+                case 'voice_scores_update':
+                case 'video_analysis_update':
+                    logToScreen(`[${eventName}] ${JSON.stringify(data, null, 2)}`);
+                    updateResults(eventName, data);
+                    break;
+                case 'error':
+                    elems.analysisStatus.className = 'panel status-error';
+                    elems.analysisStatus.textContent = `오류: ${data.message}`;
+                    logToScreen(`[Error] ${data.message}`);
+                    break;
+            }
+        }
+
+        let results = {};
+        function updateResults(type, data) {
+            results[type] = data;
+            if (results['voice_scores_update'] && results['video_analysis_update']) {
+                elems.analysisStatus.className = 'panel status-success';
+                elems.analysisStatus.textContent = '분석이 완료되었습니다!';
+                renderResultsTable(results['voice_scores_update'], results['video_analysis_update']);
+                elems.resultsContainer.style.display = 'block';
+                elems.startBtn.disabled = false;
+                results = {}; // Reset for next round
+            }
+        }
+
+        function resetRealtimeFeedback() {
+            elems.rt.posture.textContent = '대기 중...';
+            elems.rt.head.textContent = '대기 중...';
+            elems.rt.smile.textContent = '대기 중...';
+        }
+
+        function updateRealtimeVideoFeedback(data) {
+            if (!data) return;
+            elems.rt.posture.textContent = data.posture_sway;
+            elems.rt.head.textContent = data.nod_count;
+            elems.rt.smile.textContent = data.total_smile_time;
+        }
+
+        function logToScreen(message) {
+            const now = new Date();
+            const timestamp = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            elems.logContainer.innerHTML += `[${timestamp}] ${message}\n\n`;
+            elems.logContainer.scrollTop = elems.logContainer.scrollHeight;
+        }
+
+        function renderResultsTable(voice, video) {
+            const voiceScores = voice ? `
+                <h3>음성 분석</h3>
+                <table>
+                    <tr><th>항목</th><th>점수</th></tr>
+                    <tr><td>자신감</td><td>${voice.confidence_score || 'N/A'}</td></tr>
+                    <tr><td>유창성</td><td>${voice.fluency_score || 'N/A'}</td></tr>
+                    <tr><td>안정성</td><td>${voice.stability_score || 'N/A'}</td></tr>
+                    <tr><td>명료성</td><td>${voice.clarity_score || 'N/A'}</td></tr>
+                    <tr><td>종합점수</td><td>${voice.overall_score || 'N/A'}</td></tr>
+                </table>` : '<p>음성 분석 데이터를 불러오지 못했습니다.</p>';
+
+            const videoScores = video.behavioral_metrics ? `
+                <h3>영상 분석</h3>
+                <table>
+                    <tr><th>항목</th><th>값</th></tr>
+                    <tr><td>자세 안정성</td><td>${video.behavioral_metrics.posture.stability_score.toFixed(1)} 점</td></tr>
+                    <tr><td>머리 안정성</td><td>${video.behavioral_metrics.head_movements.head_stability_score.toFixed(1)} 점</td></tr>
+                    <tr><td>미소 비율</td><td>${video.behavioral_metrics.facial_expressions.smile_percentage.toFixed(1)} %</td></tr>
+                    <tr><td>분당 눈깜빡임</td><td>${video.behavioral_metrics.eye_contact.blink_rate_per_minute.toFixed(1)} 회</td></tr>
+                    <tr><td>분당 손 제스쳐</td><td>${video.behavioral_metrics.hand_gestures.gesture_frequency_per_minute.toFixed(1)} 회</td></tr>
+                </table>` : '<p>영상 분석 데이터를 불러오지 못했습니다.</p>';
+
+            elems.resultsTables.innerHTML = voiceScores + videoScores;
+        }
+
+    </script>
+</body>
+</html>

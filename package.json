@@ -25,6 +25,7 @@
     "@types/axios": "^0.14.4",
     "@types/uuid": "^10.0.0",
     "axios": "^1.11.0",
+    "base-64": "^1.0.0",
     "expo": "~53.0.22",
     "expo-auth-session": "^6.2.1",
     "expo-av": "^16.0.7",

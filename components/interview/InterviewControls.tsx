@@ -1,28 +1,27 @@
 
 import React from 'react';
-import { View, Button, StyleSheet } from 'react-native';
+import { Button, StyleSheet, View } from 'react-native';
 
 type Props = {
   isAnalyzing: boolean;
   onStart: () => void;
-  onFinish: () => void;
-  startDisabled: boolean;
+  onStop: () => void;
 };
 
-export const InterviewControls = ({ isAnalyzing, onStart, onFinish, startDisabled }: Props) => {
+export const InterviewControls = ({ isAnalyzing, onStart, onStop }: Props) => {
   return (
     <View style={styles.container}>
       <View style={styles.buttonWrapper}>
         <Button
           title="분석 시작"
           onPress={onStart}
-          disabled={startDisabled || isAnalyzing}
+          disabled={isAnalyzing}
         />
       </View>
       <View style={styles.buttonWrapper}>
         <Button
           title="분석 종료 및 결과 확인"
-          onPress={onFinish}
+          onPress={onStop}
           disabled={!isAnalyzing}
           color="#e53e3e"
         />

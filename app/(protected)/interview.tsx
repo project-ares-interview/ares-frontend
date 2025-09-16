@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import React from 'react';
-import { Camera, CameraType } from 'expo-camera'; // ← 수정된 import
-import { useInterview } from '@/hooks/useInterview';
+import { AnalysisResultPanel } from '@/components/interview/AnalysisResultPanel';
 import { InterviewControls } from '@/components/interview/InterviewControls';
 import { RealtimeFeedbackPanel } from '@/components/interview/RealtimeFeedbackPanel';
-import { AnalysisResultPanel } from '@/components/interview/AnalysisResultPanel';
+import { useInterview } from '@/hooks/useInterview';
+import { CameraView } from 'expo-camera'; // ← 수정된 import
+import React, { useEffect } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const InterviewScreen = () => {
   const {
@@ -19,6 +19,14 @@ const InterviewScreen = () => {
     stopAnalysis,
   } = useInterview();
 
+  useEffect(() => {
+    if (cameraRef.current) {
+      console.log('✅ CameraView가 성공적으로 연결되었습니다.');
+    } else {
+      console.log('🟡 CameraView가 아직 연결되지 않았습니다.');
+    }
+  }, [cameraRef.current]);
+
   if (!hasPermission) {
     return (
       <View style={styles.container}>
@@ -28,36 +36,37 @@ const InterviewScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.title}>AI 면접 코칭</Text>
       
       <View style={styles.videoContainer}>
-        <Camera
+        <CameraView
           style={styles.camera}
-          type={CameraType.front}  // ← 수정된 부분
           ref={cameraRef}
         />
       </View>
 
-      <ScrollView style={styles.transcriptionPanel}>
-        <Text style={styles.panelTitle}>실시간 답변</Text>
-        <Text style={styles.transcriptionText}>
-          {transcript || status}
-        </Text>
+      <ScrollView>
+        <View style={styles.transcriptionPanel}>
+          <Text style={styles.panelTitle}>실시간 답변</Text>
+          <Text style={styles.transcriptionText}>
+            {transcript || status}
+          </Text>
+        </View>
+
+        <InterviewControls
+          isAnalyzing={isAnalyzing}
+          onStart={startAnalysis}
+          onStop={stopAnalysis}
+        />
+
+        <RealtimeFeedbackPanel feedback={realtimeFeedback} />
+
+        {finalResults.voice && finalResults.video && (
+          <AnalysisResultPanel voiceScores={finalResults.voice} videoAnalysis={finalResults.video} />
+        )}
       </ScrollView>
-
-      <InterviewControls
-        isAnalyzing={isAnalyzing}
-        onStart={startAnalysis}
-        onStop={stopAnalysis}
-      />
-
-      <RealtimeFeedbackPanel data={realtimeFeedback} />
-
-      {finalResults.voice && finalResults.video && (
-        <AnalysisResultPanel results={finalResults} />
-      )}
-    </View>
+    </ScrollView>
   );
 };
 
@@ -92,7 +101,6 @@ const styles = StyleSheet.create({
     padding: 16,
     minHeight: 80,
     marginBottom: 20,
-    flexGrow: 0, // Prevent ScrollView from taking over the flexbox
   },
   panelTitle: {
     fontSize: 18,
