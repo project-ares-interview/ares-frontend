@@ -1,6 +1,7 @@
 import ResumeCard from "@/components/resume/ResumeCard";
 import { useResumeStore } from "@/stores/resumeStore";
-import { useRouter } from "expo-router";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { Link, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -91,11 +92,19 @@ const ResumesPage = () => {
           </View>
         </View>
       ) : (
-        <Pressable style={styles.addButton} onPress={() => setIsCreating(true)}>
-          <Text style={styles.addButtonText}>
-            {t("resume.list.add_button")}
-          </Text>
-        </Pressable>
+        <View style={styles.actionButtonsContainer}>
+          <Pressable style={styles.addButton} onPress={() => setIsCreating(true)}>
+            <Text style={styles.addButtonText}>
+              {t("resume.list.add_button")}
+            </Text>
+          </Pressable>
+          <Link href="/resume-analysis" asChild>
+            <Pressable style={{...styles.addButton, ...styles.aiButton}}>
+              <FontAwesome5 name="magic" size={16} color="white" style={{marginRight: 8}} />
+              <Text style={styles.addButtonText}>AI 이력서 분석</Text>
+            </Pressable>
+          </Link>
+        </View>
       )}
 
       <FlatList
@@ -139,13 +148,24 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 10,
   },
+  actionButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
   addButton: {
     backgroundColor: "#007bff",
     padding: 12,
     borderRadius: 8,
-    marginHorizontal: 16,
-    marginBottom: 16,
     alignItems: "center",
+    flexDirection: "row",
+    flex: 1,
+    justifyContent: "center",
+    marginHorizontal: 8,
+  },
+  aiButton: {
+    backgroundColor: "#5a3e85",
   },
   addButtonText: {
     color: "#fff",
