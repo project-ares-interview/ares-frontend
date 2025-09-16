@@ -24,6 +24,7 @@
                 "home": "홈",
                 "interview": "가상 면접",
                 "my_page": "마이페이지",
+                "pricing": "가격",
                 "resume": "이력서",
                 "sign_in": "로그인",
                 "sign_out": "로그아웃"
@@ -67,7 +68,17 @@
     },
     "pages": {
         "index": {
-            "welcome": "안녕 리액트 네이티브"
+            "title": "AI 면접 연습의 새로운 기준",
+            "subtitle": "실제 면접관처럼 질문하고 분석하는 가장 정교한 AI 면접 연습 서비스",
+            "features": {
+                "title": "주요 기능",
+                "box1_title": "AI 맞춤 질문 생성",
+                "box1_description": "직무 맞춤형",
+                "box2_title": "실시간 분석",
+                "box2_description": "음성과 표정",
+                "box3_title": "STAR 피드백",
+                "box3_description": "상세 답변 분석"
+            }
         },
         "my_page": {
             "title": "마이페이지"
