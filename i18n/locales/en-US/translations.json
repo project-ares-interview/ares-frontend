@@ -24,6 +24,7 @@
                 "home": "Home",
                 "interview": "Interview",
                 "my_page": "My Page",
+                "pricing": "Pricing",
                 "resume": "Resume",
                 "sign_in": "Sign In",
                 "sign_out": "Sign Out"
@@ -67,7 +68,17 @@
     },
     "pages": {
         "index": {
-            "welcome": "Hello React Native"
+            "title": "The new standard for AI interview practice",
+            "subtitle": "The most sophisticated AI interview practice service that asks and analyzes questions like a real interviewer",
+            "features": {
+                "title": "Main Features",
+                "box1_title": "AI-Powered Custom Questions",
+                "box1_description": "Job-specific",
+                "box2_title": "Real-time Analysis",
+                "box2_description": "Voice and facial expression",
+                "box3_title": "STAR Feedback",
+                "box3_description": "Detailed answer analysis"
+            }
         },
         "my_page": {
             "title": "My Page"

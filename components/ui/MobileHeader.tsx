@@ -48,6 +48,10 @@ export default function MobileHeader({
       title: t("components.header.navigation.interview"),
       href: "/interview" as Href,
     },
+    {
+      title: t("components.header.navigation.pricing"),
+      href: "/pricing" as Href,
+    },
   ];
 
   const toggleMenu = () => {

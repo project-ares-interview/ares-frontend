@@ -33,6 +33,10 @@ export default function DesktopHeader({ showNav = true }: DesktopHeaderProps) {
       title: t("components.header.navigation.interview"),
       href: "/interview" as Href,
     },
+    {
+      title: t("components.header.navigation.pricing"),
+      href: "/pricing" as Href,
+    },
   ];
 
   return (
