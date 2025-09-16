@@ -1,5 +1,6 @@
 import { VideoAnalysis, VoiceScores } from '@/components/interview/AnalysisResultPanel';
 import { RealtimeFeedbackData } from '@/components/interview/RealtimeFeedbackPanel';
+import { fetchAIAdviceAPI, fetchPercentilesAPI } from '@/services/api';
 import { decode } from 'base-64';
 import { Audio } from 'expo-av';
 import { Camera, CameraView } from 'expo-camera';
@@ -51,6 +52,12 @@ export const useInterview = () => {
   const [realtimeFeedback, setRealtimeFeedback] = useState<RealtimeFeedbackData | null>(null);
   const [finalResults, setFinalResults] = useState<{ voice: VoiceScores | null; video: VideoAnalysis | null }>({ voice: null, video: null });
   const [localStream, setLocalStream] = useState<MediaStream | null>(null); // State for web's MediaStream
+
+  // --- New states for additional features ---
+  const [aiAdvice, setAiAdvice] = useState<string | null>(null);
+  const [isFetchingAdvice, setIsFetchingAdvice] = useState(false);
+  const [percentileAnalysis, setPercentileAnalysis] = useState<any | null>(null);
+  const [isFetchingPercentiles, setIsFetchingPercentiles] = useState(false);
 
   // --- Refs for both platforms ---
   const cameraRef = useRef<CameraView>(null);
@@ -413,6 +420,8 @@ export const useInterview = () => {
     setTranscript('');
     fullTranscript.current = '';
     setStatus('답변을 말씀해주세요...');
+    setAiAdvice(null);
+    setPercentileAnalysis(null);
 
     const sessionId = uuidv4();
     setupWebSockets(sessionId); // Setup sockets first
@@ -438,6 +447,51 @@ export const useInterview = () => {
     sendJsonMessage(sockets.current.results, 'finish_analysis_signal', {});
   };
 
+  // --- New API-calling functions ---
+  const getAIAdvice = async () => {
+    if (!finalResults.voice || !finalResults.video) return;
+    setIsFetchingAdvice(true);
+    setAiAdvice(null);
+    try {
+      const data = await fetchAIAdviceAPI({
+        voice_analysis: finalResults.voice,
+        video_analysis: finalResults.video,
+      });
+      if (data.status === 'success') {
+        setAiAdvice(data.advice);
+      } else {
+        setAiAdvice(data.fallback_advice || 'AI 조언 생성에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error("Failed to fetch AI advice:", error);
+      setAiAdvice('AI 조언을 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setIsFetchingAdvice(false);
+    }
+  };
+
+  const getPercentileAnalysis = async (filters = {}) => {
+    if (!finalResults.voice) return;
+    setIsFetchingPercentiles(true);
+    try {
+      const data = await fetchPercentilesAPI(finalResults.voice, filters);
+      setPercentileAnalysis(data);
+    } catch (error) {
+      console.error("Failed to fetch percentile analysis:", error);
+      setPercentileAnalysis(null);
+    } finally {
+      setIsFetchingPercentiles(false);
+    }
+  };
+
+  // Effect to fetch data when final results are available
+  useEffect(() => {
+    if (finalResults.voice && finalResults.video) {
+      setStatus('분석이 완료되었습니다!');
+      getPercentileAnalysis(); // Fetch initial percentile data
+    }
+  }, [finalResults]);
+
   return {
     hasPermission,
     isAnalyzing,
@@ -448,5 +502,12 @@ export const useInterview = () => {
     cameraRef,
     startAnalysis,
     stopAnalysis,
+    // New exports
+    aiAdvice,
+    isFetchingAdvice,
+    getAIAdvice,
+    percentileAnalysis,
+    isFetchingPercentiles,
+    getPercentileAnalysis,
   };
 };

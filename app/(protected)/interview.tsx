@@ -1,5 +1,6 @@
 import { AnalysisResultPanel } from '@/components/interview/AnalysisResultPanel';
 import { InterviewControls } from '@/components/interview/InterviewControls';
+import { PercentileAnalysisPanel } from '@/components/interview/PercentileAnalysisPanel';
 import { RealtimeFeedbackPanel } from '@/components/interview/RealtimeFeedbackPanel';
 import { useInterview } from '@/hooks/useInterview';
 import { CameraView } from 'expo-camera'; // ← 수정된 import
@@ -17,6 +18,12 @@ const InterviewScreen = () => {
     cameraRef,
     startAnalysis,
     stopAnalysis,
+    aiAdvice,
+    isFetchingAdvice,
+    getAIAdvice,
+    percentileAnalysis,
+    isFetchingPercentiles,
+    getPercentileAnalysis,
   } = useInterview();
 
   useEffect(() => {
@@ -63,7 +70,21 @@ const InterviewScreen = () => {
         <RealtimeFeedbackPanel feedback={realtimeFeedback} />
 
         {finalResults.voice && finalResults.video && (
-          <AnalysisResultPanel voiceScores={finalResults.voice} videoAnalysis={finalResults.video} />
+          <AnalysisResultPanel 
+            voiceScores={finalResults.voice} 
+            videoAnalysis={finalResults.video}
+            aiAdvice={aiAdvice}
+            isFetchingAdvice={isFetchingAdvice}
+            onGetAIAdvice={getAIAdvice}
+          />
+        )}
+
+        {percentileAnalysis && (
+          <PercentileAnalysisPanel 
+            percentileData={percentileAnalysis}
+            isLoading={isFetchingPercentiles}
+            onUpdateAnalysis={getPercentileAnalysis}
+          />
         )}
       </ScrollView>
     </ScrollView>

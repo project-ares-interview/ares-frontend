@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { Button, StyleSheet, Text, View } from 'react-native';
+import { AIAdvicePanel } from './AIAdvicePanel';
 
 // As defined in the original HTML file
 export type VoiceScores = {
@@ -24,9 +25,12 @@ export type VideoAnalysis = {
 type Props = {
   voiceScores: VoiceScores | null;
   videoAnalysis: VideoAnalysis | null;
+  aiAdvice: string | null;
+  isFetchingAdvice: boolean;
+  onGetAIAdvice: () => void;
 };
 
-export const AnalysisResultPanel = ({ voiceScores, videoAnalysis }: Props) => {
+export const AnalysisResultPanel = ({ voiceScores, videoAnalysis, aiAdvice, isFetchingAdvice, onGetAIAdvice }: Props) => {
   const renderTable = (title: string, data: [string, string | number][]) => (
     <View style={styles.tableContainer}>
       <Text style={styles.title}>{title}</Text>
@@ -87,6 +91,18 @@ export const AnalysisResultPanel = ({ voiceScores, videoAnalysis }: Props) => {
       ) : (
         <Text>영상 분석 데이터가 없습니다.</Text>
       )}
+
+      <View style={styles.adviceButtonContainer}>
+        <Button 
+          title={isFetchingAdvice ? "AI 분석 중..." : "🤖 AI 조언 보기"} 
+          onPress={onGetAIAdvice} 
+          disabled={isFetchingAdvice}
+        />
+      </View>
+
+      {aiAdvice && (
+        <AIAdvicePanel advice={aiAdvice} isLoading={isFetchingAdvice} />
+      )}
     </View>
   );
 };
@@ -126,6 +142,9 @@ const styles = StyleSheet.create({
   value: {
     fontWeight: '600',
     fontSize: 16,
+  },
+  adviceButtonContainer: {
+    marginTop: 20,
   },
 });
 

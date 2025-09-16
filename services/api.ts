@@ -1,3 +1,7 @@
+import {
+  VideoAnalysis,
+  VoiceScores,
+} from "@/components/interview/AnalysisResultPanel";
 import axios from "axios";
 import { Platform } from "react-native";
 import { useAuthStore } from "../stores/authStore";
@@ -53,3 +57,33 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+// --- Analysis API ---
+
+export const fetchAIAdviceAPI = async (payload: {
+  voice_analysis: VoiceScores;
+  video_analysis: VideoAnalysis;
+}) => {
+  const { data } = await api.post("/analysis/advice/", payload);
+  return data;
+};
+
+export const fetchPercentilesAPI = async (
+  scores: VoiceScores,
+  filters: any,
+) => {
+  const params = new URLSearchParams();
+  Object.keys(scores).forEach((key) => {
+    if (key.endsWith("_score")) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      params.append(key, scores[key]);
+    }
+  });
+  Object.keys(filters).forEach((key) => {
+    filters[key].forEach((value: string) => params.append(key, value));
+  });
+
+  const { data } = await api.get(`/analysis/percentiles/?${params.toString()}`);
+  return data;
+};
