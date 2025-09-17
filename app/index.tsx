@@ -1,4 +1,5 @@
 import Footer from "@/components/ui/Footer";
+import { Video } from "expo-av";
 import { Image } from "expo-image";
 import { ScrollView, StyleSheet, View } from "react-native";
 
@@ -11,8 +12,31 @@ export default function Index() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
-        <Text style={{ fontSize: 64, fontWeight: "bold", textAlign: 'center' }}>{t("pages.index.title")}</Text>
-        <Text style={{ fontSize: 24, textAlign: 'center' }}>{t("pages.index.subtitle")}</Text>
+        <View style={styles.videoContainer}>
+          <Video
+            source={require("@/assets/videos/main-background.mp4")}
+            style={styles.video}
+            shouldPlay
+            isLooping
+            isMuted
+            resizeMode="cover"
+          />
+        </View>
+        <View style={styles.videoContainer}>
+          <Video
+            source={require("@/assets/videos/main-background-2.mp4")}
+            style={styles.video}
+            shouldPlay
+            isLooping
+            isMuted
+            resizeMode="cover"
+          />
+        </View>
+        <View style={styles.overlay} />
+        <View style={styles.textOverlay}>
+          <Text style={styles.title}>{t("pages.index.title")}</Text>
+          <Text style={styles.subtitle}>{t("pages.index.subtitle")}</Text>
+        </View>
       </View>
       <View style={styles.featuresSection}>
         <Text style={styles.featuresTitle}>{t("pages.index.features.title")}</Text>
@@ -53,13 +77,42 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
+    height: 800,
+    width: '100%',
+    flexDirection: 'row',
+    position: 'relative',
+    justifyContent: 'flex-start',
+  },
+  videoContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 8,
-    minHeight: 800,
-    paddingVertical: 40,
-    paddingHorizontal: 20,
+    height: '100%',
+    margin: 0,
+    padding: 0,
+  },
+  video: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 2,
+  },
+  textOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 3,
+  },
+  title: {
+    fontSize: 64,
+    fontWeight: "bold",
+    textAlign: 'center',
+    color: 'white',
+  },
+  subtitle: {
+    fontSize: 24,
+    textAlign: 'center',
+    color: 'white',
   },
   featuresSection: {
     paddingVertical: 40,
@@ -86,9 +139,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   featureImage: {
-    width: 100,
-    height: 100,
+    width: 150,
+    height: 150,
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   featureBoxTitle: {
     fontSize: 18,
