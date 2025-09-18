@@ -46,7 +46,7 @@ export default function MobileHeader({
     },
     {
       title: t("components.header.navigation.interview"),
-      href: "/interview" as Href,
+      href: "/interviewstart" as Href,
     },
     {
       title: t("components.header.navigation.pricing"),

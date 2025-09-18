@@ -2,6 +2,7 @@ import { SignInSchema } from "@/schemas/auth";
 import { useRouter } from "expo-router";
 import { authService, type AuthResponse, type GoogleLoginPayload } from "../services/authService";
 import { useAuthStore } from "../stores/authStore";
+import { useInterviewStore } from "@/stores/interviewStore";
 
 export function useAuth() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export function useAuth() {
   const signIn = async (data: SignInSchema) => {
     const authData = await authService.signIn(data);
     if (authData) {
+      useInterviewStore.getState().actions.clearInterviewSettings();
       setTokens(authData.access, authData.refresh);
       setUser(authData.user);
       setAuthenticated(true);
@@ -23,6 +25,7 @@ export function useAuth() {
   };
 
   const googleSignIn = async (data: GoogleLoginPayload) => {
+    useInterviewStore.getState().actions.clearInterviewSettings();
     const response = await authService.googleLogin(data);
     if ("status" in response && response.status === "registration_required") {
       setSocialSignUpData({
@@ -43,6 +46,7 @@ export function useAuth() {
 
   const logout = async () => {
     try {
+      useInterviewStore.getState().actions.clearInterviewSettings();
       await authService.logout();
     } catch (error) {
       console.error("Logout API call failed:", error);
