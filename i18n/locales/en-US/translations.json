@@ -107,6 +107,41 @@
             "terms_of_service": "Terms of Service",
             "title": "Create Account",
             "year": "Year"
+        },
+        "pricing": {
+            "title": "Pricing",
+            "basic": {
+                "title": "Basic",
+                "price": "₩10,000/month",
+                "features": {
+                    "feature1": "10 resume analyses",
+                    "feature2": "10 cover letter generations",
+                    "feature3": "Basic interview simulation"
+                },
+                "buttonText": "Subscribe"
+            },
+            "pro": {
+                "title": "Pro",
+                "price": "₩20,000/month",
+                "features": {
+                    "feature1": "Unlimited resume analyses",
+                    "feature2": "Unlimited cover letter generations",
+                    "feature3": "Advanced interview simulation",
+                    "feature4": "In-depth analysis and feedback"
+                },
+                "buttonText": "Subscribe"
+            },
+            "enterprise": {
+                "title": "Enterprise",
+                "price": "Contact us",
+                "features": {
+                    "feature1": "All features of the Pro plan",
+                    "feature2": "Customized solutions for teams",
+                    "feature3": "Dedicated support",
+                    "feature4": "Corporate system integration"
+                },
+                "buttonText": "Contact Us"
+            }
         }
     },
     "profile": {

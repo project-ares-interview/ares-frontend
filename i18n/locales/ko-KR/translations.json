@@ -107,6 +107,41 @@
             "terms_of_service": "이용약관",
             "title": "회원가입",
             "year": "년"
+        },
+        "pricing": {
+            "title": "요금제",
+            "basic": {
+                "title": "베이직",
+                "price": "월 10,000원",
+                "features": {
+                    "feature1": "이력서 분석 10회",
+                    "feature2": "자기소개서 생성 10회",
+                    "feature3": "기본 면접 시뮬레이션"
+                },
+                "buttonText": "구독하기"
+            },
+            "pro": {
+                "title": "프로",
+                "price": "월 20,000원",
+                "features": {
+                    "feature1": "이력서 분석 무제한",
+                    "feature2": "자기소개서 생성 무제한",
+                    "feature3": "고급 면접 시뮬레이션",
+                    "feature4": "심층 분석 및 피드백"
+                },
+                "buttonText": "구독하기"
+            },
+            "enterprise": {
+                "title": "엔터프라이즈",
+                "price": "별도 문의",
+                "features": {
+                    "feature1": "프로 플랜의 모든 기능",
+                    "feature2": "팀을 위한 맞춤형 솔루션",
+                    "feature3": "전담 지원",
+                    "feature4": "기업 시스템 연동"
+                },
+                "buttonText": "문의하기"
+            }
         }
     },
     "profile": {
