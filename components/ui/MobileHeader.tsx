@@ -1,9 +1,9 @@
 import {
-    Button,
-    Icon,
-    Overlay,
-    Header as RNEHeader,
-    Text,
+  Button,
+  Icon,
+  Overlay,
+  Header as RNEHeader,
+  Text,
 } from "@rneui/themed";
 import { Image } from "expo-image";
 import { Href, Link, useRouter } from "expo-router";
@@ -51,6 +51,10 @@ export default function MobileHeader({
     {
       title: t("components.header.navigation.pricing"),
       href: "/pricing" as Href,
+    },
+    {
+      title: t("components.header.navigation.calendar"),
+      href: "/calendar" as Href,
     },
   ];
 

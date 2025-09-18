@@ -20,6 +20,7 @@
         },
         "header": {
             "navigation": {
+                "calendar": "채용 달력",
                 "cover_letter": "자기소개서",
                 "home": "JAI",
                 "interview": "가상 면접",
@@ -30,6 +31,23 @@
                 "sign_out": "로그아웃"
             }
         }
+    },
+    "cover_letter": {
+        "add_button": "새 자기소개서 작성",
+        "created_date": "작성일",
+        "delete_confirm": {
+            "message": "정말로 이 자기소개서를 삭제하시겠습니까?",
+            "title": "자기소개서 삭제"
+        },
+        "form": {
+            "content": "내용",
+            "content_placeholder": "자기소개서 내용을 입력하세요",
+            "saving": "저장 중...",
+            "title": "제목",
+            "title_placeholder": "자기소개서 제목을 입력하세요"
+        },
+        "no_data": "작성된 자기소개서가 없습니다.",
+        "page_title": "자기소개서 관리"
     },
     "errors": {
         "birth": {
@@ -68,20 +86,55 @@
     },
     "pages": {
         "index": {
-            "title": "AI 면접 연습의 새로운 기준",
-            "subtitle": "실제 면접관처럼 질문하고 분석하는 가장 정교한 AI 면접 연습 서비스",
             "features": {
-                "title": "주요 기능",
-                "box1_title": "AI 맞춤 질문 생성",
                 "box1_description": "직무 맞춤형",
-                "box2_title": "실시간 분석",
+                "box1_title": "AI 맞춤 질문 생성",
                 "box2_description": "음성과 표정",
+                "box2_title": "실시간 분석",
+                "box3_description": "상세 답변 분석",
                 "box3_title": "STAR 피드백",
-                "box3_description": "상세 답변 분석"
-            }
+                "title": "주요 기능"
+            },
+            "subtitle": "실제 면접관처럼 질문하고 분석하는 가장 정교한 AI 면접 연습 서비스",
+            "title": "AI 면접 연습의 새로운 기준"
         },
         "my_page": {
             "title": "마이페이지"
+        },
+        "pricing": {
+            "basic": {
+                "buttonText": "구독하기",
+                "features": {
+                    "feature1": "이력서 분석 10회",
+                    "feature2": "자기소개서 생성 10회",
+                    "feature3": "기본 면접 시뮬레이션"
+                },
+                "price": "월 10,000원",
+                "title": "베이직"
+            },
+            "enterprise": {
+                "buttonText": "문의하기",
+                "features": {
+                    "feature1": "프로 플랜의 모든 기능",
+                    "feature2": "팀을 위한 맞춤형 솔루션",
+                    "feature3": "전담 지원",
+                    "feature4": "기업 시스템 연동"
+                },
+                "price": "별도 문의",
+                "title": "엔터프라이즈"
+            },
+            "pro": {
+                "buttonText": "구독하기",
+                "features": {
+                    "feature1": "이력서 분석 무제한",
+                    "feature2": "자기소개서 생성 무제한",
+                    "feature3": "고급 면접 시뮬레이션",
+                    "feature4": "심층 분석 및 피드백"
+                },
+                "price": "월 20,000원",
+                "title": "프로"
+            },
+            "title": "요금제"
         },
         "sign_in": {
             "email": "이메일",
@@ -107,41 +160,6 @@
             "terms_of_service": "이용약관",
             "title": "회원가입",
             "year": "년"
-        },
-        "pricing": {
-            "title": "요금제",
-            "basic": {
-                "title": "베이직",
-                "price": "월 10,000원",
-                "features": {
-                    "feature1": "이력서 분석 10회",
-                    "feature2": "자기소개서 생성 10회",
-                    "feature3": "기본 면접 시뮬레이션"
-                },
-                "buttonText": "구독하기"
-            },
-            "pro": {
-                "title": "프로",
-                "price": "월 20,000원",
-                "features": {
-                    "feature1": "이력서 분석 무제한",
-                    "feature2": "자기소개서 생성 무제한",
-                    "feature3": "고급 면접 시뮬레이션",
-                    "feature4": "심층 분석 및 피드백"
-                },
-                "buttonText": "구독하기"
-            },
-            "enterprise": {
-                "title": "엔터프라이즈",
-                "price": "별도 문의",
-                "features": {
-                    "feature1": "프로 플랜의 모든 기능",
-                    "feature2": "팀을 위한 맞춤형 솔루션",
-                    "feature3": "전담 지원",
-                    "feature4": "기업 시스템 연동"
-                },
-                "buttonText": "문의하기"
-            }
         }
     },
     "profile": {
@@ -345,23 +363,6 @@
             "page_title": "이력서 관리",
             "title_placeholder": "이력서 제목",
             "title_required_alert": "이력서 제목을 입력해주세요."
-        }
-    },
-    "cover_letter": {
-        "page_title": "자기소개서 관리",
-        "add_button": "새 자기소개서 작성",
-        "no_data": "작성된 자기소개서가 없습니다.",
-        "created_date": "작성일",
-        "form": {
-            "title": "제목",
-            "title_placeholder": "자기소개서 제목을 입력하세요",
-            "content": "내용",
-            "content_placeholder": "자기소개서 내용을 입력하세요",
-            "saving": "저장 중..."
-        },
-        "delete_confirm": {
-            "title": "자기소개서 삭제",
-            "message": "정말로 이 자기소개서를 삭제하시겠습니까?"
         }
     }
 }
