@@ -38,12 +38,15 @@ interface InterviewStateData {
   skills?: string;
   certifications?: string;
   activities?: string;
+  jd_context?: string;
+  resume_context?: string;
 }
 
 interface InterviewState extends InterviewStateData {
   actions: {
     loadInterviewSettings: () => Promise<void>;
-    setInterviewSettings: (settings: InterviewStateData) => void;
+    setInterviewSettings: (settings: Partial<InterviewStateData>) => void;
+    setAnalysisContext: (jd_context: string, resume_context: string) => void;
     clearInterviewSettings: () => void;
   };
 }
@@ -59,6 +62,8 @@ const initialState: InterviewStateData = {
   skills: '',
   certifications: '',
   activities: '',
+  jd_context: '',
+  resume_context: '',
 };
 
 export const useInterviewStore = create<InterviewState>((set, get) => ({
@@ -75,8 +80,14 @@ export const useInterviewStore = create<InterviewState>((set, get) => ({
       }
     },
     setInterviewSettings: (settings) => {
-      set(settings);
-      interviewStorage.setItem(JSON.stringify(settings));
+      set((state) => {
+        const newState = { ...state, ...settings };
+        interviewStorage.setItem(JSON.stringify(newState));
+        return newState;
+      });
+    },
+    setAnalysisContext: (jd_context, resume_context) => {
+      set({ jd_context, resume_context });
     },
     clearInterviewSettings: () => {
       set(initialState);
