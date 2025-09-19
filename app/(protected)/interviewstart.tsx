@@ -1,23 +1,22 @@
+import { AnalysisInput, CompanyData } from '@/schemas/analysis';
+import { InterviewStartRequest } from '@/schemas/interview';
+import { interviewService } from '@/services/interviewService';
+import { resumeService } from '@/services/resumeService';
 import {
-  useInterviewSettings,
-  useInterviewSettingsActions,
-  useInterviewSessionActions,
+  useInterviewSessionStore,
+  useInterviewSettingsStore,
 } from '@/stores/interviewStore';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Card, Input, Text as RNEText } from '@rneui/themed';
+import * as DocumentPicker from 'expo-document-picker';
+import { DocumentPickerAsset } from 'expo-document-picker';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, Text, View, Alert, ActivityIndicator } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { z } from 'zod';
-import * as DocumentPicker from 'expo-document-picker';
-import { DocumentPickerAsset } from 'expo-document-picker';
-import { FontAwesome5 } from '@expo/vector-icons';
-import { resumeService } from '@/services/resumeService';
-import { interviewService } from '@/services/interviewService';
-import { AnalysisInput, CompanyData } from '@/schemas/analysis';
-import { InterviewStartRequest } from '@/schemas/interview';
 
 const interviewSchema = z.object({
   name: z.string().min(1, '이름을 입력해주세요.'),
@@ -35,9 +34,8 @@ type InterviewFormData = z.infer<typeof interviewSchema>;
 
 export default function InterviewStartPage() {
   const { t } = useTranslation();
-  const settings = useInterviewSettings();
-  const { set: setInterviewSettings, setAnalysisContext } = useInterviewSettingsActions();
-  const { start: startInterviewSession } = useInterviewSessionActions();
+  const { setSettings: setInterviewSettings, setAnalysisContext, ...settings } = useInterviewSettingsStore();
+  const { startSession: startInterviewSession } = useInterviewSessionStore();
 
   const [gender, setGender] = useState(settings.gender);
   const [interviewerMode, setInterviewerMode] = useState(settings.interviewer_mode || 'team_lead');

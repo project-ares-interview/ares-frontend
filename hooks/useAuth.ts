@@ -1,8 +1,15 @@
 import { SignInSchema } from "@/schemas/auth";
+import {
+  useInterviewSessionStore,
+  useInterviewSettingsStore,
+} from "@/stores/interviewStore";
 import { useRouter } from "expo-router";
-import { authService, type AuthResponse, type GoogleLoginPayload } from "../services/authService";
+import {
+  authService,
+  type AuthResponse,
+  type GoogleLoginPayload,
+} from "../services/authService";
 import { useAuthStore } from "../stores/authStore";
-import { useInterviewStore } from "@/stores/interviewStore";
 
 export function useAuth() {
   const router = useRouter();
@@ -14,18 +21,21 @@ export function useAuth() {
     logout: clearAuthStore,
   } = useAuthStore();
 
+  const { clearSettings: clearInterviewSettings } = useInterviewSettingsStore();
+  const { clearSession: clearInterviewSession } = useInterviewSessionStore();
+
   const signIn = async (data: SignInSchema) => {
     const authData = await authService.signIn(data);
-    if (authData) {
-      useInterviewStore.getState().actions.clearInterviewSettings();
-      setTokens(authData.access, authData.refresh);
-      setUser(authData.user);
-      setAuthenticated(true);
-    }
+    clearInterviewSettings();
+    clearInterviewSession();
+    setTokens(authData.access, authData.refresh);
+    setUser(authData.user);
+    setAuthenticated(true);
   };
 
   const googleSignIn = async (data: GoogleLoginPayload) => {
-    useInterviewStore.getState().actions.clearInterviewSettings();
+    clearInterviewSettings();
+    clearInterviewSession();
     const response = await authService.googleLogin(data);
     if ("status" in response && response.status === "registration_required") {
       setSocialSignUpData({
@@ -46,12 +56,13 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      useInterviewStore.getState().actions.clearInterviewSettings();
       await authService.logout();
     } catch (error) {
       console.error("Logout API call failed:", error);
     } finally {
       await clearAuthStore();
+      clearInterviewSettings();
+      clearInterviewSession();
       router.replace("/");
     }
   };
