@@ -29,7 +29,7 @@ export default function Footer() {
       title: t("components.footer.navigation.privacy"),
       href: "/privacy" as Href,
     },
-    { title: "FAQ", href: "/faq" as Href },
+    { title: t("pages.faq.title"), href: "/faq" as Href },
   ];
 
   const changeLanguage = async (langCode: string) => {
