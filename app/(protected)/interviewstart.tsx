@@ -2,11 +2,16 @@ import { useInterviewActions, useInterviewSettings } from '@/stores/interviewSto
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Card, Input, Text as RNEText } from '@rneui/themed';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, Alert, ActivityIndicator } from 'react-native';
 import { z } from 'zod';
+import * as DocumentPicker from 'expo-document-picker';
+import { DocumentPickerAsset } from 'expo-document-picker';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { resumeService } from '@/services/resumeService';
+import { AnalysisInput, CompanyData } from '@/schemas/analysis';
 
 const interviewSchema = z.object({
   name: z.string().min(1, '이름을 입력해주세요.'),
@@ -16,18 +21,24 @@ const interviewSchema = z.object({
   skills: z.string().optional(),
   certifications: z.string().optional(),
   activities: z.string().optional(),
+  jd_text: z.string().optional(),
+  resume_text: z.string().optional(),
 });
 
 type InterviewFormData = z.infer<typeof interviewSchema>;
 
 export default function InterviewStartPage() {
   const { t } = useTranslation();
-  const { setInterviewSettings } = useInterviewActions();
+  const { setInterviewSettings, setAnalysisContext } = useInterviewActions();
   const settings = useInterviewSettings();
 
-  const [gender, setGender] = React.useState(settings.gender);
-  const [interviewerMode, setInterviewerMode] = React.useState(settings.interviewer_mode);
-  const [difficulty, setDifficulty] = React.useState(settings.difficulty);
+  const [gender, setGender] = useState(settings.gender);
+  const [interviewerMode, setInterviewerMode] = useState(settings.interviewer_mode);
+  const [difficulty, setDifficulty] = useState(settings.difficulty);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const [jdFile, setJdFile] = useState<DocumentPickerAsset | null>(null);
+  const [resumeFile, setResumeFile] = useState<DocumentPickerAsset | null>(null);
 
   const { control, handleSubmit, formState: { errors, isValid } } = useForm<InterviewFormData>({
     resolver: zodResolver(interviewSchema),
@@ -39,23 +50,79 @@ export default function InterviewStartPage() {
       skills: settings.skills,
       certifications: settings.certifications,
       activities: settings.activities,
+      jd_text: settings.jd_context,
+      resume_text: settings.resume_context,
     },
     mode: 'onChange',
   });
 
-  const onSubmit = (data: InterviewFormData) => {
+  const pickDocument = async (setter: React.Dispatch<React.SetStateAction<DocumentPickerAsset | null>>) => {
+    try {
+      const pickerResult = await DocumentPicker.getDocumentAsync({});
+      if (!pickerResult.canceled) {
+        setter(pickerResult.assets[0]);
+      }
+    } catch (err) {
+      console.error('Error picking document:', err);
+      Alert.alert('Error', 'Failed to pick document.');
+    }
+  };
+
+  const onSubmit = async (data: InterviewFormData) => {
     if (!gender || !interviewerMode || !difficulty) {
-      // 간단한 유효성 검사
-      alert('성별, 면접모드, 난이도를 선택해주세요.');
+      Alert.alert('Validation Error', '성별, 면접모드, 난이도를 선택해주세요.');
       return;
     }
-    setInterviewSettings({ 
-      ...data, 
-      gender, 
-      interviewer_mode: interviewerMode, 
-      difficulty 
-    });
-    router.push('/interview');
+    if (!jdFile && !data.jd_text) {
+      Alert.alert('Validation Error', 'Please provide either a Job Description file or text.');
+      return;
+    }
+    if (!resumeFile && !data.resume_text) {
+      Alert.alert('Validation Error', 'Please provide either a Resume file or text.');
+      return;
+    }
+
+    setIsAnalyzing(true);
+
+    try {
+      const companyData: CompanyData = {
+        name: data.company,
+        job_title: data.job_title,
+        department: data.department,
+      };
+
+      const analysisInput: AnalysisInput = {
+        company: companyData,
+        jd_file: jdFile,
+        jd_text: data.jd_text,
+        resume_file: resumeFile,
+        resume_text: data.resume_text,
+      };
+
+      const response = await resumeService.analyzeResume(analysisInput);
+
+      if (response?.input_contexts?.raw) {
+        setAnalysisContext(
+          response.input_contexts.raw.jd_context,
+          response.input_contexts.raw.resume_context
+        );
+      }
+      
+      setInterviewSettings({ 
+        ...data, 
+        gender, 
+        interviewer_mode: interviewerMode, 
+        difficulty 
+      });
+
+      router.push('/interview');
+
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.error || err.message || 'An unknown error occurred.';
+      Alert.alert('Analysis Error', `Failed to analyze resume. ${errorMessage}`);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const renderSelectButtons = (value: any, setValue: any, options: any[]) => (
@@ -71,6 +138,23 @@ export default function InterviewStartPage() {
           titleStyle={value === option.value ? styles.selectedButtonText : styles.unselectedButtonText}
         />
       ))}
+    </View>
+  );
+
+  const renderFileInput = (
+    label: string,
+    file: DocumentPickerAsset | null,
+    onPress: () => void
+  ) => (
+    <View style={styles.fileInputContainer}>
+      <Text style={styles.label}>{label}</Text>
+      <View style={styles.fileInput}>
+        <Button
+          onPress={onPress}
+          title={file ? file.name : `Select ${label} File`}
+          icon={<FontAwesome5 name="file-upload" size={16} color="white" style={{ marginRight: 8 }} />}
+        />
+      </View>
     </View>
   );
 
@@ -122,14 +206,29 @@ export default function InterviewStartPage() {
         <Controller control={control} name="activities" render={({ field: { onChange, onBlur, value } }) => (
           <Input placeholder="오픈소스 프로젝트 참여" value={value} onBlur={onBlur} onChangeText={onChange} />
         )} />
-
-        <Button
-          title="면접 시작하기"
-          onPress={handleSubmit(onSubmit)}
-          disabled={!isValid || !gender || !interviewerMode || !difficulty}
-          containerStyle={styles.buttonContainer}
-        />
       </Card>
+
+      <Card containerStyle={styles.card}>
+        <Card.Title>Job Description (JD)</Card.Title>
+        <Card.Divider />
+        {renderFileInput('JD', jdFile, () => pickDocument(setJdFile))}
+        <Controller name="jd_text" control={control} render={({ field: { onChange, onBlur, value } }) => <Input label="Or Paste JD Text" placeholder="Paste the job description here..." value={value} onChangeText={onChange} onBlur={onBlur} multiline numberOfLines={6} style={styles.textArea} />} />
+      </Card>
+
+      <Card containerStyle={styles.card}>
+        <Card.Title>Resume</Card.Title>
+        <Card.Divider />
+        {renderFileInput('Resume', resumeFile, () => pickDocument(setResumeFile))}
+        <Controller name="resume_text" control={control} render={({ field: { onChange, onBlur, value } }) => <Input label="Or Paste Resume Text" placeholder="Paste your resume here..." value={value} onChangeText={onChange} onBlur={onBlur} multiline numberOfLines={6} style={styles.textArea} />} />
+      </Card>
+
+      <Button
+        title={isAnalyzing ? "Analyzing..." : "면접 시작하기"}
+        onPress={handleSubmit(onSubmit)}
+        disabled={!isValid || !gender || !interviewerMode || !difficulty || isAnalyzing}
+        containerStyle={styles.buttonContainer}
+        icon={isAnalyzing ? <ActivityIndicator color="white" style={{ marginRight: 8 }} /> : null}
+      />
     </ScrollView>
   );
 }
@@ -144,6 +243,7 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: 8,
+    marginBottom: 16,
   },
   title: {
     marginBottom: 24,
@@ -179,5 +279,23 @@ const styles = StyleSheet.create({
   },
   unselectedButtonText: {
     color: '#000000',
+  },
+  fileInputContainer: {
+    marginBottom: 16,
+    paddingHorizontal: 10,
+  },
+  fileInput: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  textArea: {
+    textAlignVertical: 'top',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4,
+    padding: 8,
+    height: 120,
+    marginTop: 8,
   },
 });
