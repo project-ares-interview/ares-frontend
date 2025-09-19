@@ -107,11 +107,11 @@ export default function InterviewStartPage() {
 
       const analysisResponse = await resumeService.analyzeResume(analysisInput);
 
-      const jd_context = analysisResponse?.input_contexts?.refined?.jd_context;
-      const resume_context = analysisResponse?.input_contexts?.refined?.resume_context;
+      const jd_context = analysisResponse?.input_contexts?.raw?.jd_context;
+      const resume_context = analysisResponse?.input_contexts?.raw?.resume_context;
 
       if (!jd_context || !resume_context) {
-        throw new Error('Failed to get refined context from analysis.');
+        throw new Error('Failed to get raw context from analysis.');
       }
 
       // 2. 면접 시작 요청 (질문 생성)
