@@ -1,4 +1,8 @@
-import { useInterviewActions, useInterviewSettings } from '@/stores/interviewStore';
+import {
+  useInterviewSettings,
+  useInterviewSettingsActions,
+  useInterviewSessionActions,
+} from '@/stores/interviewStore';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Card, Input, Text as RNEText } from '@rneui/themed';
 import { router } from 'expo-router';
@@ -11,7 +15,9 @@ import * as DocumentPicker from 'expo-document-picker';
 import { DocumentPickerAsset } from 'expo-document-picker';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { resumeService } from '@/services/resumeService';
+import { interviewService } from '@/services/interviewService';
 import { AnalysisInput, CompanyData } from '@/schemas/analysis';
+import { InterviewStartRequest } from '@/schemas/interview';
 
 const interviewSchema = z.object({
   name: z.string().min(1, '이름을 입력해주세요.'),
@@ -29,12 +35,13 @@ type InterviewFormData = z.infer<typeof interviewSchema>;
 
 export default function InterviewStartPage() {
   const { t } = useTranslation();
-  const { setInterviewSettings, setAnalysisContext } = useInterviewActions();
   const settings = useInterviewSettings();
+  const { set: setInterviewSettings, setAnalysisContext } = useInterviewSettingsActions();
+  const { start: startInterviewSession } = useInterviewSessionActions();
 
   const [gender, setGender] = useState(settings.gender);
-  const [interviewerMode, setInterviewerMode] = useState(settings.interviewer_mode);
-  const [difficulty, setDifficulty] = useState(settings.difficulty);
+  const [interviewerMode, setInterviewerMode] = useState(settings.interviewer_mode || 'team_lead');
+  const [difficulty, setDifficulty] = useState(settings.difficulty || 'normal');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const [jdFile, setJdFile] = useState<DocumentPickerAsset | null>(null);
@@ -69,8 +76,8 @@ export default function InterviewStartPage() {
   };
 
   const onSubmit = async (data: InterviewFormData) => {
-    if (!gender || !interviewerMode || !difficulty) {
-      Alert.alert('Validation Error', '성별, 면접모드, 난이도를 선택해주세요.');
+    if (!gender) {
+      Alert.alert('Validation Error', '성별을 선택해주세요.');
       return;
     }
     if (!jdFile && !data.jd_text) {
@@ -85,6 +92,7 @@ export default function InterviewStartPage() {
     setIsAnalyzing(true);
 
     try {
+      // 1. 이력서 분석 요청
       const companyData: CompanyData = {
         name: data.company,
         job_title: data.job_title,
@@ -99,27 +107,52 @@ export default function InterviewStartPage() {
         resume_text: data.resume_text,
       };
 
-      const response = await resumeService.analyzeResume(analysisInput);
+      const analysisResponse = await resumeService.analyzeResume(analysisInput);
 
-      if (response?.input_contexts?.raw) {
-        setAnalysisContext(
-          response.input_contexts.raw.jd_context,
-          response.input_contexts.raw.resume_context
-        );
+      const jd_context = analysisResponse?.input_contexts?.refined?.jd_context;
+      const resume_context = analysisResponse?.input_contexts?.refined?.resume_context;
+
+      if (!jd_context || !resume_context) {
+        throw new Error('Failed to get refined context from analysis.');
       }
-      
+
+      // 2. 면접 시작 요청 (질문 생성)
+      const interviewStartPayload: InterviewStartRequest = {
+        jd_context,
+        resume_context,
+        difficulty,
+        interviewer_mode: interviewerMode,
+        meta: {
+          company_name: data.company,
+          job_title: data.job_title,
+          person_name: data.name,
+          division: data.department,
+          skills: data.skills ? data.skills.split(',').map(s => s.trim()) : [],
+        }
+      };
+
+      const interviewResponse = await interviewService.startInterview(interviewStartPayload);
+
+      // 3. 모든 정보 스토어에 저장
+      setAnalysisContext(jd_context, resume_context);
       setInterviewSettings({ 
         ...data, 
         gender, 
         interviewer_mode: interviewerMode, 
         difficulty 
       });
+      startInterviewSession({
+        session_id: interviewResponse.session_id,
+        current_question: interviewResponse.question,
+        turn_label: interviewResponse.turn_label,
+      });
 
-      router.push('/interview');
+      // 4. 면접 페이지로 이동
+      router.push('/(protected)/interview');
 
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || err.message || 'An unknown error occurred.';
-      Alert.alert('Analysis Error', `Failed to analyze resume. ${errorMessage}`);
+      Alert.alert('Error', `Failed to start interview. ${errorMessage}`);
     } finally {
       setIsAnalyzing(false);
     }
@@ -192,7 +225,7 @@ export default function InterviewStartPage() {
           <Input placeholder="개발팀" value={value} onBlur={onBlur} onChangeText={onChange} />
         )} />
 
-        <Text style={styles.label}>특기 (선택)</Text>
+        <Text style={styles.label}>기술 스택 (선택, 쉼표로 구분)</Text>
         <Controller control={control} name="skills" render={({ field: { onChange, onBlur, value } }) => (
           <Input placeholder="React, TypeScript" value={value} onBlur={onBlur} onChangeText={onChange} />
         )} />
@@ -223,9 +256,9 @@ export default function InterviewStartPage() {
       </Card>
 
       <Button
-        title={isAnalyzing ? "Analyzing..." : "면접 시작하기"}
+        title={isAnalyzing ? "Starting Interview..." : "면접 시작하기"}
         onPress={handleSubmit(onSubmit)}
-        disabled={!isValid || !gender || !interviewerMode || !difficulty || isAnalyzing}
+        disabled={!isValid || !gender || isAnalyzing}
         containerStyle={styles.buttonContainer}
         icon={isAnalyzing ? <ActivityIndicator color="white" style={{ marginRight: 8 }} /> : null}
       />
@@ -258,6 +291,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 16,
+    marginBottom: 32, // Add some bottom margin
   },
   selectContainer: {
     flexDirection: 'row',
