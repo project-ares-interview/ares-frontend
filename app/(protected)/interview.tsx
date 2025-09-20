@@ -3,6 +3,7 @@ import { InterviewControls } from '@/components/interview/InterviewControls';
 import { PercentileAnalysisPanel } from '@/components/interview/PercentileAnalysisPanel';
 import { RealtimeFeedbackPanel } from '@/components/interview/RealtimeFeedbackPanel';
 import { useInterview } from '@/hooks/useInterview';
+import { useInterviewSessionStore } from '@/stores/interviewStore';
 import { CameraView } from 'expo-camera'; // ← 수정된 import
 import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -25,6 +26,7 @@ const InterviewScreen = () => {
     isFetchingPercentiles,
     getPercentileAnalysis,
   } = useInterview();
+  const { current_question } = useInterviewSessionStore();
 
   useEffect(() => {
     if (cameraRef.current) {
@@ -54,6 +56,13 @@ const InterviewScreen = () => {
       </View>
 
       <ScrollView>
+        {current_question && (
+          <View style={styles.questionPanel}>
+            <Text style={styles.panelTitle}>질문</Text>
+            <Text style={styles.questionText}>{current_question}</Text>
+          </View>
+        )}
+        
         <View style={styles.transcriptionPanel}>
           <Text style={styles.panelTitle}>실시간 답변</Text>
           <Text style={styles.transcriptionText}>
@@ -132,6 +141,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#2d3748',
+  },
+  questionPanel: {
+    backgroundColor: '#e6f7ff',
+    borderWidth: 1,
+    borderColor: '#91d5ff',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 20,
+  },
+  questionText: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: '#0050b3',
   },
 });
 
