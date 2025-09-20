@@ -1,24 +1,26 @@
 import { AnalysisResultPanel } from '@/components/interview/AnalysisResultPanel';
-import { InterviewControls } from '@/components/interview/InterviewControls';
 import { PercentileAnalysisPanel } from '@/components/interview/PercentileAnalysisPanel';
 import { RealtimeFeedbackPanel } from '@/components/interview/RealtimeFeedbackPanel';
 import { useInterview } from '@/hooks/useInterview';
 import { useInterviewSessionStore } from '@/stores/interviewStore';
-import { CameraView } from 'expo-camera'; // ← 수정된 import
+import { CameraView } from 'expo-camera';
 import React, { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Button, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const InterviewScreen = () => {
   const {
     hasPermission,
-    isAnalyzing,
+    isAnalyzing, // Overall session state
+    isRecording, // Audio recording state
     status,
     transcript,
     realtimeFeedback,
     finalResults,
     cameraRef,
-    startAnalysis,
-    stopAnalysis,
+    startAnalysis, // Starts the whole session
+    stopAnalysis,  // Ends the whole session
+    startRecording,// Starts only audio recording
+    stopRecording, // Stops only audio recording
     aiAdvice,
     isFetchingAdvice,
     getAIAdvice,
@@ -47,7 +49,7 @@ const InterviewScreen = () => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>AI 면접 코칭</Text>
-      
+
       <View style={styles.videoContainer}>
         <CameraView
           style={styles.camera}
@@ -55,26 +57,59 @@ const InterviewScreen = () => {
         />
       </View>
 
+      {/* --- Main Controls --- */}
+      {!isAnalyzing ? (
+        <View style={styles.buttonContainer}>
+          <Button 
+            title="AI 면접 시작"
+            onPress={startAnalysis} 
+            disabled={isAnalyzing}
+          />
+        </View>
+      ) : (
+        <View style={styles.controlsContainer}>
+          <View style={styles.buttonWrapper}>
+            <Button
+              title="답변 시작하기"
+              onPress={startRecording}
+              disabled={isRecording}
+            />
+          </View>
+          <View style={styles.buttonWrapper}>
+            <Button
+              title="답변 끝내기"
+              onPress={stopRecording}
+              disabled={!isRecording}
+              color="#f44336"
+            />
+          </View>
+          <View style={styles.buttonWrapper}>
+            <Button
+              title="면접 종료하기"
+              onPress={stopAnalysis}
+              disabled={!isAnalyzing}
+              color="#4CAF50"
+            />
+          </View>
+        </View>
+      )}
+
       <ScrollView>
-        {current_question && (
+        {isAnalyzing && current_question && (
           <View style={styles.questionPanel}>
             <Text style={styles.panelTitle}>질문</Text>
             <Text style={styles.questionText}>{current_question}</Text>
           </View>
         )}
         
-        <View style={styles.transcriptionPanel}>
-          <Text style={styles.panelTitle}>실시간 답변</Text>
-          <Text style={styles.transcriptionText}>
-            {transcript || status}
-          </Text>
-        </View>
-
-        <InterviewControls
-          isAnalyzing={isAnalyzing}
-          onStart={startAnalysis}
-          onStop={stopAnalysis}
-        />
+        {isAnalyzing && (
+          <View style={styles.transcriptionPanel}>
+            <Text style={styles.panelTitle}>실시간 답변</Text>
+            <Text style={styles.transcriptionText}>
+              {transcript || status}
+            </Text>
+          </View>
+        )}
 
         <RealtimeFeedbackPanel feedback={realtimeFeedback} />
 
@@ -88,7 +123,7 @@ const InterviewScreen = () => {
           />
         )}
 
-        {percentileAnalysis && (
+        {finalResults.voice && percentileAnalysis && (
           <PercentileAnalysisPanel 
             percentileData={percentileAnalysis}
             isLoading={isFetchingPercentiles}
@@ -154,6 +189,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#0050b3',
+  },
+  controlsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 16,
+  },
+  buttonContainer: {
+    marginVertical: 16,
+  },
+  buttonWrapper: {
+    marginHorizontal: 8,
   },
 });
 

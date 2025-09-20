@@ -10,16 +10,8 @@ import { Platform } from 'react-native';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 
-
 const WS_URL = process.env.EXPO_PUBLIC_WS_URL;
 
-/**
- * Resamples the audio buffer to the target sample rate.
- * @param {Float32Array} inputBuffer - The original audio data.
- * @param {number} sourceSampleRate - The original sample rate.
- * @param {number} targetSampleRate - The target sample rate.
- * @returns {Float32Array} - The resampled audio data.
- */
 function resampleBuffer(inputBuffer: Float32Array, sourceSampleRate: number, targetSampleRate: number): Float32Array {
   if (sourceSampleRate === targetSampleRate) {
     return inputBuffer;
@@ -43,53 +35,45 @@ function resampleBuffer(inputBuffer: Float32Array, sourceSampleRate: number, tar
   return result;
 }
 
-
 export const useInterview = () => {
   const [hasPermission, setHasPermission] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false); // Is the overall session active
+  const [isRecording, setIsRecording] = useState(false);   // Is audio being sent
   const [status, setStatus] = useState('카메라 및 마이크 권한을 허용해주세요...');
   const [transcript, setTranscript] = useState('');
   const [realtimeFeedback, setRealtimeFeedback] = useState<RealtimeFeedbackData | null>(null);
   const [finalResults, setFinalResults] = useState<{ voice: VoiceScores | null; video: VideoAnalysis | null }>({ voice: null, video: null });
-  const [localStream, setLocalStream] = useState<MediaStream | null>(null); // State for web's MediaStream
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
 
-  // --- New states for additional features ---
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);
   const [isFetchingAdvice, setIsFetchingAdvice] = useState(false);
   const [percentileAnalysis, setPercentileAnalysis] = useState<any | null>(null);
   const [isFetchingPercentiles, setIsFetchingPercentiles] = useState(false);
 
-  // --- Refs for both platforms ---
   const cameraRef = useRef<CameraView>(null);
-  const sockets = useRef<{
-    results: WebSocket | null;
-    audio: WebSocket | null;
-    video: WebSocket | null;
-  }>({ results: null, audio: null, video: null });
+  const sockets = useRef<{ results: WebSocket | null; audio: WebSocket | null; video: WebSocket | null; }>({ results: null, audio: null, video: null });
   const videoFrameSender = useRef<ReturnType<typeof setInterval> | null>(null);
   const fullTranscript = useRef('');
-  
-  // --- Native-specific refs ---
+  const isRecordingRef = useRef(isRecording);
+
   const audioRecording = useRef<Audio.Recording | null>(null);
   const audioLastReadPosition = useRef(0);
   
-  // --- Web-specific refs ---
-  const webAudio = useRef<{
-    localStream: MediaStream | null;
-    audioContext: AudioContext | null;
-    audioSource: MediaStreamAudioSourceNode | null;
-    audioProcessor: ScriptProcessorNode | null;
-  }>({ localStream: null, audioContext: null, audioSource: null, audioProcessor: null });
+  const webAudio = useRef<{ localStream: MediaStream | null; audioContext: AudioContext | null; audioSource: MediaStreamAudioSourceNode | null; audioProcessor: ScriptProcessorNode | null; }>({ localStream: null, audioContext: null, audioSource: null, audioProcessor: null });
+
+  useEffect(() => {
+    isRecordingRef.current = isRecording;
+  }, [isRecording]);
 
   useEffect(() => {
     const requestPermissions = async () => {
       if (Platform.OS === 'web') {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 }, audio: true });
-          setLocalStream(stream); // Store stream in state to trigger effect
-          webAudio.current.localStream = stream; // Also keep in ref for audio logic
+          setLocalStream(stream);
+          webAudio.current.localStream = stream;
           setHasPermission(true);
-          setStatus('분석 시작 버튼을 누르면 음성 인식이 시작됩니다.');
+          setStatus('AI 면접 시작 버튼을 눌러주세요.');
         } catch (err) {
           console.error("getUserMedia error:", err);
           setStatus('카메라/마이크 권한이 필요합니다. 브라우저 설정을 확인해주세요.');
@@ -99,7 +83,7 @@ export const useInterview = () => {
         const audioPerm = await Audio.requestPermissionsAsync();
         if (status === 'granted' && audioPerm.status === 'granted') {
           setHasPermission(true);
-          setStatus('분석 시작 버튼을 누르면 음성 인식이 시작됩니다.');
+          setStatus('AI 면접 시작 버튼을 눌러주세요.');
           await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
         } else {
           setStatus('카메라/마이크 권한이 필요합니다.');
@@ -109,7 +93,6 @@ export const useInterview = () => {
     requestPermissions();
 
     return () => {
-      // Cleanup function
       if (localStream) {
         localStream.getTracks().forEach(track => track.stop());
       }
@@ -119,9 +102,8 @@ export const useInterview = () => {
         stopRecording_Native(false);
       }
     };
-  }, []); // This effect should run only once on mount
+  }, []);
 
-  // New effect to safely attach the stream to the video element on web
   useEffect(() => {
     if (Platform.OS === 'web' && cameraRef.current && localStream) {
       const videoElement = (cameraRef.current as any).video;
@@ -132,9 +114,8 @@ export const useInterview = () => {
         videoElement.play();
       }
     }
-  }, [localStream]); // Reruns when the localStream state is set
+  }, [localStream]);
 
-  // --- WebSocket Logic (Common) ---
   const setupWebSockets = (sessionId: string) => {
     if (!WS_URL) {
       setStatus('웹소켓 서버 주소가 설정되지 않았습니다.');
@@ -150,30 +131,26 @@ export const useInterview = () => {
 
     sockets.current.results.onmessage = handleSocketEvent;
     
-    sockets.current.results.onopen = () => {
-      sendJsonMessage(sockets.current.results, 'toggle_analysis', { analyze: true });
-    };
-    sockets.current.audio.onopen = () => {
-      // startAudioStreaming(); // This is now handled by the event listener
-    };
-    sockets.current.video.onopen = () => {
-      startSendingVideoFrames();
-    };
+    sockets.current.results.onopen = () => sendJsonMessage(sockets.current.results, 'toggle_analysis', { analyze: true });
+    sockets.current.video.onopen = () => startSendingVideoFrames();
 
     sockets.current.results.onerror = (e: Event) => console.error('Results socket error', (e as any).message);
     sockets.current.audio.onerror = (e: Event) => console.error('Audio socket error', (e as any).message);
     sockets.current.video.onerror = (e: Event) => console.error('Video socket error', (e as any).message);
   };
+
   const closeWebSockets = () => {
     sockets.current.results?.close();
     sockets.current.audio?.close();
     sockets.current.video?.close();
   };
+
   const sendJsonMessage = (socket: WebSocket | null, event: string, data: object) => {
     if (socket && socket.readyState === WebSocket.OPEN) {
       socket.send(JSON.stringify({ event, data }));
     }
   };
+
   const handleSocketEvent = (event: MessageEvent) => {
     const content = JSON.parse(event.data);
     switch (content.event) {
@@ -204,13 +181,10 @@ export const useInterview = () => {
     }
   };
 
-  // --- Video Streaming Logic (Reverted to previous working version) ---
   const startSendingVideoFrames = () => {
     stopSendingVideoFrames();
     videoFrameSender.current = setInterval(async () => {
-      if (!cameraRef.current || sockets.current.video?.readyState !== WebSocket.OPEN) {
-        return;
-      }
+      if (!cameraRef.current || sockets.current.video?.readyState !== WebSocket.OPEN) return;
       try {
         const photo = await cameraRef.current.takePictureAsync({ quality: 0.5 });
         if (photo && photo.uri) {
@@ -231,7 +205,6 @@ export const useInterview = () => {
     }
   };
 
-  // --- Audio Streaming Logic (Platform-specific) ---
   const startAudioProcessing = async () => {
     if (Platform.OS === 'web') {
       startAudioProcessing_Web();
@@ -244,11 +217,10 @@ export const useInterview = () => {
     if (Platform.OS === 'web') {
       stopAudioProcessing_Web();
     } else {
-      await stopRecording_Native(true); // true to send final chunk
+      await stopRecording_Native(true);
     }
   };
 
-  // --- Web Audio Implementation ---
   const startAudioProcessing_Web = () => {
     const stream = webAudio.current.localStream;
     if (!stream) return;
@@ -260,7 +232,7 @@ export const useInterview = () => {
     const targetSampleRate = 16000;
 
     audioProcessor.onaudioprocess = (e) => {
-      if (sockets.current.audio?.readyState !== WebSocket.OPEN) return;
+      if (!isRecordingRef.current || sockets.current.audio?.readyState !== WebSocket.OPEN) return;
       
       const inputData = e.inputBuffer.getChannelData(0);
       const sourceSampleRate = audioContext.sampleRate;
@@ -286,22 +258,17 @@ export const useInterview = () => {
     webAudio.current.audioContext?.close();
   };
 
-  // --- Native Audio Implementation ---
   const startRecording_Native = async () => {
     try {
-      if (audioRecording.current) {
-        await stopRecording_Native(false);
-      }
+      if (audioRecording.current) await stopRecording_Native(false);
       const recording = new Audio.Recording();
       audioLastReadPosition.current = 0;
 
       recording.setOnRecordingStatusUpdate(async (status) => {
-        if (!status.isRecording) return;
+        if (!isRecordingRef.current || !status.isRecording) return;
         
         const uri = status.uri;
-        if (!uri || sockets.current.audio?.readyState !== WebSocket.OPEN) {
-          return;
-        }
+        if (!uri || sockets.current.audio?.readyState !== WebSocket.OPEN) return;
 
         try {
           const fileInfo = await FileSystem.getInfoAsync(uri);
@@ -309,21 +276,12 @@ export const useInterview = () => {
 
           const newBytes = fileInfo.size - audioLastReadPosition.current;
           if (newBytes > 0) {
-            const audioDataChunkBase64 = await FileSystem.readAsStringAsync(uri, {
-              encoding: FileSystem.EncodingType.Base64,
-              position: audioLastReadPosition.current,
-              length: newBytes,
-            });
-            
+            const audioDataChunkBase64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64, position: audioLastReadPosition.current, length: newBytes });
             const binaryString = decode(audioDataChunkBase64);
             const len = binaryString.length;
             const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            const audioBlob = new Blob([bytes]);
-
-            sockets.current.audio.send(audioBlob);
+            for (let i = 0; i < len; i++) { bytes[i] = binaryString.charCodeAt(i); }
+            sockets.current.audio.send(new Blob([bytes]));
             audioLastReadPosition.current = fileInfo.size;
           }
         } catch (e) {
@@ -331,37 +289,9 @@ export const useInterview = () => {
         }
       });
       
-      const recordingOptions = {
-        isMeteringEnabled: true,
-        android: {
-          extension: '.m4a',
-          outputFormat: Audio.AndroidOutputFormat.MPEG_4,
-          audioEncoder: Audio.AndroidAudioEncoder.AAC,
-          sampleRate: 44100,
-          numberOfChannels: 1,
-          bitRate: 128000,
-        },
-        ios: {
-          extension: '.m4a',
-          outputFormat: Audio.IOSOutputFormat.MPEG4AAC,
-          audioQuality: Audio.IOSAudioQuality.HIGH,
-          sampleRate: 44100,
-          numberOfChannels: 1,
-          bitRate: 128000,
-          linearPCMBitDepth: 16,
-          linearPCMIsBigEndian: false,
-          linearPCMIsFloat: false,
-        },
-        web: {
-            mimeType: 'audio/webm',
-            bitsPerSecond: 128000,
-        }
-      };
-
-      await recording.prepareToRecordAsync(recordingOptions);
+      await recording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
       await recording.startAsync();
       audioRecording.current = recording;
-      console.log('✅ [Audio][Native] Recording started.');
     } catch (err) {
       console.error('❌ [Audio][Native] Failed to start recording:', err);
     }
@@ -373,26 +303,16 @@ export const useInterview = () => {
     if (sendFinalChunk) {
       try {
         const status = await audioRecording.current.getStatusAsync();
-        const uri = status.uri;
-
-        if (uri) {
-          const fileInfo = await FileSystem.getInfoAsync(uri);
+        if (status.uri) {
+          const fileInfo = await FileSystem.getInfoAsync(status.uri);
           if (fileInfo.exists && 'size' in fileInfo && fileInfo.size > audioLastReadPosition.current) {
             const finalBytes = fileInfo.size - audioLastReadPosition.current;
-            const finalAudioChunkBase64 = await FileSystem.readAsStringAsync(uri, {
-                encoding: FileSystem.EncodingType.Base64,
-                position: audioLastReadPosition.current,
-                length: finalBytes,
-              });
-              
-              const binaryString = decode(finalAudioChunkBase64);
-              const len = binaryString.length;
-              const bytes = new Uint8Array(len);
-              for (let i = 0; i < len; i++) {
-                  bytes[i] = binaryString.charCodeAt(i);
-              }
-              const finalAudioBlob = new Blob([bytes]);
-              sockets.current.audio.send(finalAudioBlob);
+            const finalAudioChunkBase64 = await FileSystem.readAsStringAsync(status.uri, { encoding: FileSystem.EncodingType.Base64, position: audioLastReadPosition.current, length: finalBytes });
+            const binaryString = decode(finalAudioChunkBase64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) { bytes[i] = binaryString.charCodeAt(i); }
+            sockets.current.audio?.send(new Blob([bytes]));
           }
         }
       } catch (e) {
@@ -401,7 +321,6 @@ export const useInterview = () => {
     }
 
     try {
-      await audioRecording.current.setOnRecordingStatusUpdate(null);
       await audioRecording.current.stopAndUnloadAsync();
     } catch (error) {
       console.error('Error stopping native recording:', error);
@@ -409,7 +328,6 @@ export const useInterview = () => {
     audioRecording.current = null;
   };
 
-  // --- Main Control Functions ---
   const startAnalysis = async () => {
     if (!hasPermission) {
       setStatus('카메라/마이크 권한이 필요합니다.');
@@ -419,44 +337,55 @@ export const useInterview = () => {
     setFinalResults({ voice: null, video: null });
     setTranscript('');
     fullTranscript.current = '';
-    setStatus('답변을 말씀해주세요...');
+    setStatus('면접 세션을 시작합니다...');
     setAiAdvice(null);
     setPercentileAnalysis(null);
 
     const sessionId = uuidv4();
-    setupWebSockets(sessionId); // Setup sockets first
+    setupWebSockets(sessionId);
 
-    // Wait for sockets to open before starting streams
     const waitForSockets = setInterval(() => {
-        if (sockets.current.audio?.readyState === WebSocket.OPEN && 
-            sockets.current.video?.readyState === WebSocket.OPEN) {
+        if (sockets.current.audio?.readyState === WebSocket.OPEN && sockets.current.video?.readyState === WebSocket.OPEN) {
             clearInterval(waitForSockets);
             startSendingVideoFrames();
-            startAudioProcessing();
-            sendJsonMessage(sockets.current.results, 'toggle_analysis', { analyze: true });
+            startAudioProcessing(); // This will now be gated by isRecording
         }
     }, 100);
   };
 
   const stopAnalysis = async () => {
+    if (!isAnalyzing) return;
+    setIsRecording(false);
     setIsAnalyzing(false);
     setStatus('분석을 종료하고 결과를 확인합니다...');
     stopSendingVideoFrames();
     await stopAudioProcessing();
-    
     sendJsonMessage(sockets.current.results, 'finish_analysis_signal', {});
   };
 
-  // --- New API-calling functions ---
+  const startRecording = () => {
+    if (!isAnalyzing) {
+      console.warn("Cannot start recording: analysis session not active.");
+      return;
+    }
+    setIsRecording(true);
+    setStatus('답변을 말씀해주세요...');
+    sendJsonMessage(sockets.current.results, 'recording_started', {});
+  };
+
+  const stopRecording = () => {
+    if (!isRecording) return;
+    setIsRecording(false);
+    setStatus('답변 녹음을 중지했습니다. 다시 시작하려면 답변 시작하기를 누르세요.');
+    sendJsonMessage(sockets.current.results, 'recording_stopped', {});
+  };
+
   const getAIAdvice = async () => {
     if (!finalResults.voice || !finalResults.video) return;
     setIsFetchingAdvice(true);
     setAiAdvice(null);
     try {
-      const data = await fetchAIAdviceAPI({
-        voice_analysis: finalResults.voice,
-        video_analysis: finalResults.video,
-      });
+      const data = await fetchAIAdviceAPI({ voice_analysis: finalResults.voice, video_analysis: finalResults.video });
       if (data.status === 'success') {
         setAiAdvice(data.advice);
       } else {
@@ -484,17 +413,17 @@ export const useInterview = () => {
     }
   };
 
-  // Effect to fetch data when final results are available
   useEffect(() => {
     if (finalResults.voice && finalResults.video) {
       setStatus('분석이 완료되었습니다!');
-      getPercentileAnalysis(); // Fetch initial percentile data
+      getPercentileAnalysis();
     }
   }, [finalResults]);
 
   return {
     hasPermission,
     isAnalyzing,
+    isRecording,
     status,
     transcript,
     realtimeFeedback,
@@ -502,7 +431,8 @@ export const useInterview = () => {
     cameraRef,
     startAnalysis,
     stopAnalysis,
-    // New exports
+    startRecording,
+    stopRecording,
     aiAdvice,
     isFetchingAdvice,
     getAIAdvice,
