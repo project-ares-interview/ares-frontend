@@ -1,3 +1,4 @@
+import { TextAnalysisReportData } from '@/schemas/analysis';
 import { VideoAnalysis, VoiceScores } from '@/components/interview/AnalysisResultPanel';
 import { RealtimeFeedbackData } from '@/components/interview/RealtimeFeedbackPanel';
 import { fetchAIAdviceAPI, fetchPercentilesAPI } from '@/services/api';
@@ -53,6 +54,8 @@ export const useInterview = () => {
   const [isFetchingAdvice, setIsFetchingAdvice] = useState(false);
   const [percentileAnalysis, setPercentileAnalysis] = useState<any | null>(null);
   const [isFetchingPercentiles, setIsFetchingPercentiles] = useState(false);
+  const [textAnalysis, setTextAnalysis] = useState<TextAnalysisReportData | null>(null);
+  const [isFetchingNextQuestion, setIsFetchingNextQuestion] = useState(false);
 
   const cameraRef = useRef<CameraView>(null);
   const sockets = useRef<{ results: WebSocket | null; audio: WebSocket | null; video: WebSocket | null; }>({ results: null, audio: null, video: null });
@@ -178,6 +181,9 @@ export const useInterview = () => {
         break;
       case 'video_analysis_update':
         setFinalResults(prev => ({ ...prev, video: content.data }));
+        break;
+      case 'text_analysis_update':
+        setTextAnalysis(content.data);
         break;
       case 'error':
         setStatus(`오류: ${content.data.message}`);
@@ -349,6 +355,7 @@ export const useInterview = () => {
     setStatus('면접 세션을 시작합니다...');
     setAiAdvice(null);
     setPercentileAnalysis(null);
+    setTextAnalysis(null);
 
     setupWebSockets(session_id);
 
@@ -389,7 +396,8 @@ export const useInterview = () => {
       setStatus("오류: 세션 정보가 없습니다.");
       return;
     }
-  
+
+    setIsFetchingNextQuestion(true);
     setStatus('답변을 제출하고 다음 질문을 기다리는 중...');
     try {
       await interviewService.submitAnswer({
@@ -417,6 +425,8 @@ export const useInterview = () => {
     } catch (error) {
       console.error("Failed to submit answer or get next question:", error);
       setStatus("오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setIsFetchingNextQuestion(false);
     }
   };
 
@@ -487,5 +497,7 @@ export const useInterview = () => {
     percentileAnalysis,
     isFetchingPercentiles,
     getPercentileAnalysis,
+    textAnalysis,
+    isFetchingNextQuestion,
   };
 };
