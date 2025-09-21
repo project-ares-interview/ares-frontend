@@ -26,3 +26,23 @@ export interface InterviewStartResponse {
   difficulty: string;
   interviewer_mode: string;
 }
+
+export interface InterviewAnswerRequest {
+  session_id: string;
+  question: string;
+  answer: string;
+}
+
+export interface InterviewAnswerResponse {
+  message: string;
+}
+
+export interface InterviewNextRequest {
+  session_id: string;
+}
+
+export interface InterviewNextResponse {
+  question: string | null;
+  done: boolean;
+}
+

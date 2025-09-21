@@ -1,6 +1,8 @@
 import { VideoAnalysis, VoiceScores } from '@/components/interview/AnalysisResultPanel';
 import { RealtimeFeedbackData } from '@/components/interview/RealtimeFeedbackPanel';
 import { fetchAIAdviceAPI, fetchPercentilesAPI } from '@/services/api';
+import { interviewService } from '@/services/interviewService';
+import { useInterviewSessionStore } from '@/stores/interviewStore';
 import { decode } from 'base-64';
 import { Audio } from 'expo-av';
 import { Camera, CameraView } from 'expo-camera';
@@ -36,6 +38,8 @@ function resampleBuffer(inputBuffer: Float32Array, sourceSampleRate: number, tar
 }
 
 export const useInterview = () => {
+  const { session_id, current_question, setNextQuestion, endSession } = useInterviewSessionStore();
+
   const [hasPermission, setHasPermission] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false); // Is the overall session active
   const [isRecording, setIsRecording] = useState(false);   // Is audio being sent
@@ -333,6 +337,11 @@ export const useInterview = () => {
       setStatus('카메라/마이크 권한이 필요합니다.');
       return;
     }
+    if (!session_id) {
+      setStatus('오류: 면접 세션이 시작되지 않았습니다. 시작 화면으로 돌아가 다시 시도해주세요.');
+      console.error("startAnalysis called without a session_id.");
+      return;
+    }
     setIsAnalyzing(true);
     setFinalResults({ voice: null, video: null });
     setTranscript('');
@@ -341,14 +350,13 @@ export const useInterview = () => {
     setAiAdvice(null);
     setPercentileAnalysis(null);
 
-    const sessionId = uuidv4();
-    setupWebSockets(sessionId);
+    setupWebSockets(session_id);
 
     const waitForSockets = setInterval(() => {
         if (sockets.current.audio?.readyState === WebSocket.OPEN && sockets.current.video?.readyState === WebSocket.OPEN) {
             clearInterval(waitForSockets);
             startSendingVideoFrames();
-            startAudioProcessing(); // This will now be gated by isRecording
+            startAudioProcessing();
         }
     }, 100);
   };
@@ -368,16 +376,56 @@ export const useInterview = () => {
       console.warn("Cannot start recording: analysis session not active.");
       return;
     }
+    fullTranscript.current = '';
+    setTranscript('');
     setIsRecording(true);
     setStatus('답변을 말씀해주세요...');
     sendJsonMessage(sockets.current.results, 'recording_started', {});
   };
 
-  const stopRecording = () => {
+  const submitAnswerAndGetNextQuestion = async () => {
+    if (!session_id || !current_question) {
+      console.error("Session ID or current question is missing.");
+      setStatus("오류: 세션 정보가 없습니다.");
+      return;
+    }
+  
+    setStatus('답변을 제출하고 다음 질문을 기다리는 중...');
+    try {
+      await interviewService.submitAnswer({
+        session_id: session_id,
+        question: current_question,
+        answer: fullTranscript.current,
+      });
+  
+      const nextQuestionResponse = await interviewService.getNextQuestion({
+        session_id: session_id,
+      });
+  
+      fullTranscript.current = '';
+      setTranscript('');
+  
+      if (nextQuestionResponse.done) {
+        setStatus('모든 질문에 대한 답변이 완료되었습니다. 최종 분석을 시작합니다.');
+        setNextQuestion(null);
+        stopAnalysis(); 
+        endSession();
+      } else {
+        setNextQuestion(nextQuestionResponse.question);
+        setStatus('다음 질문입니다. 답변이 준비되면 답변 시작하기 버튼을 눌러주세요.');
+      }
+    } catch (error) {
+      console.error("Failed to submit answer or get next question:", error);
+      setStatus("오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    }
+  };
+
+  const stopRecording = async () => {
     if (!isRecording) return;
     setIsRecording(false);
-    setStatus('답변 녹음을 중지했습니다. 다시 시작하려면 답변 시작하기를 누르세요.');
+    setStatus('답변 녹음을 중지했습니다.');
     sendJsonMessage(sockets.current.results, 'recording_stopped', {});
+    await submitAnswerAndGetNextQuestion();
   };
 
   const getAIAdvice = async () => {

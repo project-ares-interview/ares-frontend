@@ -121,6 +121,8 @@ interface InterviewSessionData {
 interface InterviewSessionState extends InterviewSessionData {
   loadSession: () => Promise<void>;
   startSession: (sessionData: Partial<InterviewSessionData>) => void;
+  setNextQuestion: (question: string | null) => void;
+  endSession: () => void;
   clearSession: () => void;
 }
 
@@ -130,7 +132,7 @@ const initialSessionState: InterviewSessionData = {
   turn_label: null,
 };
 
-export const useInterviewSessionStore = create<InterviewSessionState>((set) => ({
+export const useInterviewSessionStore = create<InterviewSessionState>((set, get) => ({
   ...initialSessionState,
   loadSession: async () => {
     try {
@@ -151,8 +153,19 @@ export const useInterviewSessionStore = create<InterviewSessionState>((set) => (
         turn_label: newState.turn_label,
       };
       interviewStorage.setItem(INTERVIEW_SESSION_KEY, JSON.stringify(dataToStore));
-      return sessionData;
+      return newState;
     });
+  },
+  setNextQuestion: (question) => {
+    set((state) => {
+      const newState = { ...state, current_question: question };
+      interviewStorage.setItem(INTERVIEW_SESSION_KEY, JSON.stringify(newState));
+      return { current_question: question };
+    });
+  },
+  endSession: () => {
+    set(initialSessionState);
+    interviewStorage.removeItem(INTERVIEW_SESSION_KEY);
   },
   clearSession: () => {
     set(initialSessionState);
