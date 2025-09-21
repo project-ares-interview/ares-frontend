@@ -1,6 +1,8 @@
 import { AnalysisResultPanel } from '@/components/interview/AnalysisResultPanel';
 import { PercentileAnalysisPanel } from '@/components/interview/PercentileAnalysisPanel';
 import { RealtimeFeedbackPanel } from '@/components/interview/RealtimeFeedbackPanel';
+import { TextAnalysisReport } from '@/components/interview/TextAnalysisReport';
+import { TextAnalysisLoading } from '@/components/interview/TextAnalysisLoading';
 import { useInterview } from '@/hooks/useInterview';
 import { useInterviewSessionStore } from '@/stores/interviewStore';
 import { CameraView } from 'expo-camera';
@@ -27,6 +29,8 @@ const InterviewScreen = () => {
     percentileAnalysis,
     isFetchingPercentiles,
     getPercentileAnalysis,
+    textAnalysis,
+    isFetchingNextQuestion,
   } = useInterview();
   const { current_question } = useInterviewSessionStore();
 
@@ -72,7 +76,7 @@ const InterviewScreen = () => {
             <Button
               title="답변 시작하기"
               onPress={startRecording}
-              disabled={isRecording}
+              disabled={isRecording || !current_question || isFetchingNextQuestion}
             />
           </View>
           <View style={styles.buttonWrapper}>
@@ -95,10 +99,14 @@ const InterviewScreen = () => {
       )}
 
       <ScrollView>
-        {isAnalyzing && current_question && (
+        {(isAnalyzing && (current_question || isFetchingNextQuestion)) && (
           <View style={styles.questionPanel}>
             <Text style={styles.panelTitle}>질문</Text>
-            <Text style={styles.questionText}>{current_question}</Text>
+            <Text style={styles.questionText}>
+              {isFetchingNextQuestion
+                ? "다음 질문을 생성중입니다. 잠시만 기다려주세요..."
+                : current_question}
+            </Text>
           </View>
         )}
         
@@ -130,6 +138,12 @@ const InterviewScreen = () => {
             onUpdateAnalysis={getPercentileAnalysis}
           />
         )}
+
+        {/* Show loading indicator if analysis is done but text report is not yet ready */}
+        {!isAnalyzing && finalResults.voice && !textAnalysis && <TextAnalysisLoading />}
+
+        {/* Show the report when it's ready */}
+        {textAnalysis && <TextAnalysisReport report={textAnalysis} />}
       </ScrollView>
     </ScrollView>
   );

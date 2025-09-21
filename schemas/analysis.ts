@@ -42,3 +42,32 @@ export interface AnalysisResult {
     };
   };
 }
+
+export interface CoreCompetency {
+  competency: string;
+  assessment: string;
+  evidence: string;
+}
+
+export interface ResumeFeedback {
+  job_fit_assessment: string;
+  strengths_and_opportunities: string;
+  gaps_and_improvements: string;
+}
+
+export interface QuestionFeedback {
+  question: string;
+  answer: string;
+  evaluation: {
+    applied_framework: string;
+    feedback: string;
+  };
+}
+
+export interface TextAnalysisReportData {
+  overall_summary: string;
+  core_competency_analysis: CoreCompetency[];
+  growth_potential: string;
+  resume_feedback: ResumeFeedback;
+  question_by_question_feedback: QuestionFeedback[];
+}
