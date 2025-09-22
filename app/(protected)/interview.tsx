@@ -1,4 +1,6 @@
-import { AnalysisResultPanel } from '@/components/interview/AnalysisResultPanel';
+import { AIAdvicePanel } from '@/components/interview/AIAdvicePanel';
+import { VideoAnalysisPanel } from '@/components/interview/VideoAnalysisPanel';
+import { VoiceAnalysisPanel } from '@/components/interview/VoiceAnalysisPanel';
 import { PercentileAnalysisPanel } from '@/components/interview/PercentileAnalysisPanel';
 import { RealtimeFeedbackPanel } from '@/components/interview/RealtimeFeedbackPanel';
 import { TextAnalysisReport } from '@/components/interview/TextAnalysisReport';
@@ -6,8 +8,48 @@ import { TextAnalysisLoading } from '@/components/interview/TextAnalysisLoading'
 import { useInterview } from '@/hooks/useInterview';
 import { useInterviewSessionStore } from '@/stores/interviewStore';
 import { CameraView } from 'expo-camera';
-import React, { useEffect } from 'react';
-import { Button, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Button, ScrollView, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
+import { TextAnalysisReportData } from '@/schemas/analysis';
+import * as SecureStore from "expo-secure-store";
+
+// Local storage utility for answers
+const ANSWERS_STORAGE_KEY = 'interview_answers';
+
+const saveAnswer = async (question: string, answer: string) => {
+  try {
+    let storedAnswers: { [key: string]: string } = {};
+    if (Platform.OS === 'web') {
+      const existing = localStorage.getItem(ANSWERS_STORAGE_KEY);
+      if (existing) storedAnswers = JSON.parse(existing);
+      storedAnswers = { ...storedAnswers, [question]: answer };
+      localStorage.setItem(ANSWERS_STORAGE_KEY, JSON.stringify(storedAnswers));
+    } else {
+      // For native, use SecureStore (assuming it's okay for non-sensitive answers)
+      const existing = await SecureStore.getItemAsync(ANSWERS_STORAGE_KEY);
+      if (existing) storedAnswers = JSON.parse(existing);
+      storedAnswers = { ...storedAnswers, [question]: answer };
+      await SecureStore.setItemAsync(ANSWERS_STORAGE_KEY, JSON.stringify(storedAnswers));
+    }
+  } catch (error) {
+    console.error('Failed to save answer:', error);
+  }
+};
+
+const getAnswers = async (): Promise<{ [key: string]: string }> => {
+  try {
+    if (Platform.OS === 'web') {
+      const existing = localStorage.getItem(ANSWERS_STORAGE_KEY);
+      return existing ? JSON.parse(existing) : {};
+    } else {
+      const existing = await SecureStore.getItemAsync(ANSWERS_STORAGE_KEY);
+      return existing ? JSON.parse(existing) : {};
+    }
+  } catch (error) {
+    console.error('Failed to get answers:', error);
+    return {};
+  }
+};
 
 const InterviewScreen = () => {
   const {
@@ -34,6 +76,9 @@ const InterviewScreen = () => {
   } = useInterview();
   const { current_question } = useInterviewSessionStore();
 
+  const [storedUserAnswers, setStoredUserAnswers] = useState<{ [key: string]: string }>({});
+  const [finalReportData, setFinalReportData] = useState<TextAnalysisReportData | null>(null);
+
   useEffect(() => {
     if (cameraRef.current) {
       console.log('✅ CameraView가 성공적으로 연결되었습니다.');
@@ -41,6 +86,43 @@ const InterviewScreen = () => {
       console.log('🟡 CameraView가 아직 연결되지 않았습니다.');
     }
   }, [cameraRef.current]);
+
+  useEffect(() => {
+    if (finalResults.voice && finalResults.video && !aiAdvice && !isFetchingAdvice) {
+      getAIAdvice();
+    }
+  }, [finalResults.voice, finalResults.video, aiAdvice, isFetchingAdvice, getAIAdvice]);
+
+  // Effect to save answer when recording stops
+  useEffect(() => {
+    if (!isRecording && transcript && current_question) {
+      saveAnswer(current_question, transcript);
+    }
+  }, [isRecording, transcript, current_question]);
+
+  // Effect to load stored answers
+  useEffect(() => {
+    const loadAnswers = async () => {
+      const answers = await getAnswers();
+      setStoredUserAnswers(answers);
+    };
+    loadAnswers();
+  }, []); // Load once on component mount
+
+  // Effect to combine textAnalysis with stored answers
+  useEffect(() => {
+    if (textAnalysis) {
+      const combinedReport = { ...textAnalysis };
+      combinedReport.question_by_question_feedback = combinedReport.question_by_question_feedback.map(item => {
+        const storedAnswer = storedUserAnswers[item.question];
+        if (storedAnswer) {
+          return { ...item, answer: storedAnswer };
+        }
+        return item;
+      });
+      setFinalReportData(combinedReport);
+    }
+  }, [textAnalysis, storedUserAnswers]);
 
   if (!hasPermission) {
     return (
@@ -54,21 +136,28 @@ const InterviewScreen = () => {
     <ScrollView style={styles.container}>
       <Text style={styles.title}>AI 면접 코칭</Text>
 
-      <View style={styles.videoContainer}>
-        <CameraView
-          style={styles.camera}
-          ref={cameraRef}
-        />
+      <View style={styles.cameraAndAvatarContainer}>
+        <View style={styles.avatarPlaceholder}>
+          <Text style={{ color: 'white', textAlign: 'center', marginTop: '50%' }}>아바타 자리</Text>
+        </View>
+        <View style={styles.cameraViewWrapper}>
+          <CameraView
+            style={styles.camera}
+            ref={cameraRef}
+          />
+        </View>
       </View>
 
       {/* --- Main Controls --- */}
       {!isAnalyzing ? (
         <View style={styles.buttonContainer}>
-          <Button 
-            title="AI 면접 시작"
-            onPress={startAnalysis} 
+          <TouchableOpacity
+            style={styles.startButton}
+            onPress={startAnalysis}
             disabled={isAnalyzing}
-          />
+          >
+            <Text style={styles.startButtonText}>AI 면접 시작</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <View style={styles.controlsContainer}>
@@ -98,58 +187,101 @@ const InterviewScreen = () => {
         </View>
       )}
 
-      <ScrollView>
-        {(isAnalyzing && (current_question || isFetchingNextQuestion)) && (
-          <View style={styles.questionPanel}>
-            <Text style={styles.panelTitle}>질문</Text>
-            <Text style={styles.questionText}>
-              {isFetchingNextQuestion
-                ? "다음 질문을 생성중입니다. 잠시만 기다려주세요..."
-                : current_question}
-            </Text>
+      <View>
+        {isAnalyzing ? ( // During interview/analysis
+          <View style={styles.twoColumnContainer}>
+            <View style={styles.leftColumn}>
+              {(current_question || isFetchingNextQuestion) && (
+                <View style={styles.questionPanel}>
+                  <Text style={styles.panelTitle}>질문</Text>
+                  <Text style={styles.questionText}>
+                    {isFetchingNextQuestion
+                      ? "다음 질문을 생성중입니다. 잠시만 기다려주세요..."
+                      : current_question}
+                  </Text>
+                </View>
+              )}
+              <View style={styles.transcriptionPanel}>
+                <Text style={styles.panelTitle}>실시간 답변</Text>
+                <Text style={styles.transcriptionText}>
+                  {isAnalyzing && !isRecording && !transcript
+                    ? "답변 시작하기 버튼을 눌러주세요."
+                    : transcript || status}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.rightColumn}>
+              <RealtimeFeedbackPanel feedback={realtimeFeedback} />
+            </View>
           </View>
+        ) : ( // After interview, show full analysis report in a ScrollView
+          <ScrollView style={styles.analysisReportScrollView}>
+            {/* Show loading indicator if analysis is done but text report is not yet ready */}
+            {!isAnalyzing && finalResults.voice && !finalReportData && <TextAnalysisLoading />}
+
+            {/* Show the report when it's ready */}
+            {finalReportData && <TextAnalysisReport report={finalReportData} style={{ marginBottom: 24 }} />}
+
+            {finalResults.voice && finalResults.video && (
+              <View style={styles.panel}>
+                <Text style={styles.mainTitle}>비언어적 표현 분석 결과</Text>
+                <View style={styles.analysisResultsRow}> {/* New container for two columns */}
+                  <View style={styles.analysisResultsColumn}> {/* Left column for Voice and Percentile */}
+                    <VoiceAnalysisPanel voiceScores={finalResults.voice} />
+            {finalResults.voice && percentileAnalysis && (
+              <View style={styles.percentilePanelWrapper}> {/* Apply new style */}
+                <PercentileAnalysisPanel 
+                  percentileData={percentileAnalysis}
+                  isLoading={isFetchingPercentiles}
+                  onUpdateAnalysis={getPercentileAnalysis}
+                />
+              </View>
+            )}                  </View>
+                  <View style={styles.verticalDottedDivider} /> {/* Dotted line divider */}
+                  <View style={styles.analysisResultsColumn}> {/* Right column for Video and AI Advice */}
+                    <VideoAnalysisPanel videoAnalysis={finalResults.video} />
+                    {aiAdvice && (
+                      <AIAdvicePanel advice={aiAdvice} isLoading={isFetchingAdvice} />
+                    )}
+                  </View>
+                </View>
+              </View>
+            )}
+
+
+          </ScrollView>
         )}
-        
-        {isAnalyzing && (
-          <View style={styles.transcriptionPanel}>
-            <Text style={styles.panelTitle}>실시간 답변</Text>
-            <Text style={styles.transcriptionText}>
-              {transcript || status}
-            </Text>
-          </View>
-        )}
 
-        <RealtimeFeedbackPanel feedback={realtimeFeedback} />
-
-        {finalResults.voice && finalResults.video && (
-          <AnalysisResultPanel 
-            voiceScores={finalResults.voice} 
-            videoAnalysis={finalResults.video}
-            aiAdvice={aiAdvice}
-            isFetchingAdvice={isFetchingAdvice}
-            onGetAIAdvice={getAIAdvice}
-          />
-        )}
-
-        {finalResults.voice && percentileAnalysis && (
-          <PercentileAnalysisPanel 
-            percentileData={percentileAnalysis}
-            isLoading={isFetchingPercentiles}
-            onUpdateAnalysis={getPercentileAnalysis}
-          />
-        )}
-
-        {/* Show loading indicator if analysis is done but text report is not yet ready */}
-        {!isAnalyzing && finalResults.voice && !textAnalysis && <TextAnalysisLoading />}
-
-        {/* Show the report when it's ready */}
-        {textAnalysis && <TextAnalysisReport report={textAnalysis} />}
-      </ScrollView>
+      </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  panel: {
+    backgroundColor: '#ffffff', // White background
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+  },
+  percentilePanelWrapper: { // New style for PercentileAnalysisPanel
+    backgroundColor: "#f7fafc", // Reverted to previous light gray background
+    borderRadius: 12,
+    padding: 20,
+    marginTop: 20, 
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    marginBottom: 20, // To match other panels
+  },
+  mainTitle: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  adviceButtonContainer: {
+    marginTop: 20,
+  },
   container: {
     flex: 1,
     padding: 16,
@@ -161,13 +293,27 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     textAlign: 'center',
   },
-  videoContainer: {
-    width: '100%',
+  cameraAndAvatarContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '75%', // This container will take 75% of the screen width
+    alignSelf: 'center', // Center the container itself
+    marginBottom: 16,
+  },
+  avatarPlaceholder: {
+    width: '50%', // Each child takes 50% of cameraAndAvatarContainer's width
+    aspectRatio: 16 / 9,
+    backgroundColor: '#333', // A different background for placeholder
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginRight: 8, // Space between avatar and camera
+  },
+  cameraViewWrapper: { // This will replace the old videoContainer style
+    width: '50%', // Each child takes 50% of cameraAndAvatarContainer's width
     aspectRatio: 16 / 9,
     backgroundColor: '#000',
     borderRadius: 8,
     overflow: 'hidden',
-    marginBottom: 16,
   },
   camera: {
     flex: 1,
@@ -210,10 +356,67 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   buttonContainer: {
+    width: '15%',
+    alignSelf: 'center',
     marginVertical: 16,
   },
   buttonWrapper: {
     marginHorizontal: 8,
+  },
+  startButton: {
+    backgroundColor: '#4CAF50', // A pleasant green
+    paddingVertical: 11,
+    paddingHorizontal: 22,
+    borderRadius: 25, // Rounded corners
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5, // Android shadow
+    shadowColor: '#000', // iOS shadow
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  startButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  twoColumnContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+    width: '75%',
+    alignSelf: 'center',
+  },
+  leftColumn: {
+    flex: 1,
+    marginRight: 8,
+  },
+  rightColumn: {
+    flex: 1,
+    marginLeft: 8,
+  },
+  analysisReportScrollView: {
+    flex: 1,
+    marginTop: 16,
+  },
+  analysisResultsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  analysisResultsColumn: {
+    flex: 1,
+    marginHorizontal: 15, // Further increased spacing between columns
+    padding: 20, // Increased padding to further reduce graph size visually
+  },
+  verticalDottedDivider: {
+    width: 1, // Thin line
+    backgroundColor: 'transparent', // Transparent background
+    borderWidth: 1,
+    borderColor: '#ccc', // Light gray color
+    borderStyle: 'dotted', // Dotted style
+    marginVertical: 10, // Vertical margin to align with content
   },
 });
 

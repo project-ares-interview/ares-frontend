@@ -11,7 +11,10 @@ export const AIAdvicePanel = ({ advice, isLoading }: Props) => {
     <View style={styles.panel}>
       <Text style={styles.title}>🤖 AI 종합 조언</Text>
       {isLoading ? (
-        <ActivityIndicator size="large" color="#2c5282" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#2c5282" />
+          <Text style={styles.loadingText}>AI 종합 조언을 생성 중입니다. 잠시만 기다려주세요...</Text>
+        </View>
       ) : (
         <Text style={styles.adviceText}>{advice || "조언을 받아오지 못했습니다."}</Text>
       )}
@@ -29,14 +32,25 @@ const styles = StyleSheet.create({
     borderColor: "#e2e8f0",
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 12,
     color: "#2d3748",
+    textAlign: "center",
   },
   adviceText: {
     fontSize: 16,
     lineHeight: 24,
     color: "#4a5568",
   },
-});
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+  },
+  loadingText: {
+    marginLeft: 10,
+    fontSize: 16,
+    color: '#4a5568',
+  },});
