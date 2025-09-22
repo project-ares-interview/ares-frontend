@@ -111,7 +111,7 @@ export const PercentileAnalysisPanel = ({
     console.log(`[Generated Curve Data for ${scoreKey}]`, curveData.slice(0, 10)); // Log first 10 values
 
     const chartWidth = Platform.select({ web: 450, default: Dimensions.get("window").width - 48 });
-    const chartDrawableWidth = chartWidth - 60; // Adjusted for padding
+    const chartDrawableWidth = chartWidth - 80; // Adjusted for more padding for Y-axis labels
     const userScoreX = 40 + (user_score / 100) * chartDrawableWidth; // Position calculation
 
     return (
@@ -168,7 +168,7 @@ export const PercentileAnalysisPanel = ({
 
   return (
     <View style={styles.panel}>
-      <Text style={styles.title}>점수 분포 분석</Text>
+      <Text style={styles.title}>📊 점수 분포 분석</Text>
       
       {Object.keys(filterOptions).map((key) => (
         <View key={key} style={styles.filterGroup}>
@@ -192,7 +192,9 @@ export const PercentileAnalysisPanel = ({
         </View>
       ))}
 
-      <Button title="분석하기" onPress={() => onUpdateAnalysis(filters)} />
+      <View style={styles.buttonHalfWidth}>
+        <Button title="그래프 생성하기" onPress={() => onUpdateAnalysis(filters)} />
+      </View>
 
       {isLoading ? (
         <ActivityIndicator
@@ -264,7 +266,11 @@ const styles = StyleSheet.create({
     ...Platform.select({
       web: {
         width: "45%",
-        minWidth: 400,
+        marginHorizontal: 15, // Set margin to 15
+      },
+      default: {
+        width: "45%",
+        marginHorizontal: 15, // Set margin to 15
       },
     }),
   },
@@ -295,4 +301,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "bold",
   },
-});
+  buttonHalfWidth: {
+    width: '50%',
+    alignSelf: 'center',
+    marginVertical: 10, // Add some vertical margin
+  },});

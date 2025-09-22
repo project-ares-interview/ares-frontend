@@ -191,67 +191,73 @@ export default function InterviewStartPage() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <Card containerStyle={styles.card}>
-        <RNEText h4 style={styles.title}>면접 설정</RNEText>
+      <View style={styles.twoColumnLayout}> {/* Main two-column container */}
+        <View style={styles.leftColumn}> {/* Left column for Interview Settings */}
+          <Card containerStyle={styles.card}>
+            <RNEText h4 style={styles.title}>면접 설정</RNEText>
 
-        <Text style={styles.label}>이름 (필수)</Text>
-        <Controller control={control} name="name" render={({ field: { onChange, onBlur, value } }) => (
-          <Input placeholder="홍길동" value={value} onBlur={onBlur} onChangeText={onChange} errorMessage={errors.name?.message} />
-        )} />
+            <Text style={styles.label}>이름 (필수)</Text>
+            <Controller control={control} name="name" render={({ field: { onChange, onBlur, value } }) => (
+              <Input placeholder="홍길동" value={value} onBlur={onBlur} onChangeText={onChange} errorMessage={errors.name?.message} />
+            )} />
 
-        <Text style={styles.label}>성별 (필수)</Text>
-        {renderSelectButtons(gender, setGender, [{ label: '남성', value: 'male' }, { label: '여성', value: 'female' }])}
+            <Text style={styles.label}>성별 (필수)</Text>
+            {renderSelectButtons(gender, setGender, [{ label: '남성', value: 'male' }, { label: '여성', value: 'female' }])}
 
-        <Text style={styles.label}>지원회사명 (필수)</Text>
-        <Controller control={control} name="company" render={({ field: { onChange, onBlur, value } }) => (
-          <Input placeholder="(주)아레스" value={value} onBlur={onBlur} onChangeText={onChange} errorMessage={errors.company?.message} />
-        )} />
+            <Text style={styles.label}>지원회사명 (필수)</Text>
+            <Controller control={control} name="company" render={({ field: { onChange, onBlur, value } }) => (
+              <Input placeholder="(주)아레스" value={value} onBlur={onBlur} onChangeText={onChange} errorMessage={errors.company?.message} />
+            )} />
 
-        <Text style={styles.label}>지원직무 (필수)</Text>
-        <Controller control={control} name="job_title" render={({ field: { onChange, onBlur, value } }) => (
-          <Input placeholder="프론트엔드 개발자" value={value} onBlur={onBlur} onChangeText={onChange} errorMessage={errors.job_title?.message} />
-        )} />
+            <Text style={styles.label}>지원직무 (필수)</Text>
+            <Controller control={control} name="job_title" render={({ field: { onChange, onBlur, value } }) => (
+              <Input placeholder="프론트엔드 개발자" value={value} onBlur={onBlur} onChangeText={onChange} errorMessage={errors.job_title?.message} />
+            )} />
 
-        <Text style={styles.label}>면접 모드 (필수)</Text>
-        {renderSelectButtons(interviewerMode, setInterviewerMode, [{ label: '실무 면접', value: 'team_lead' }, { label: '임원 면접', value: 'executive' }])}
+            <Text style={styles.label}>면접 모드 (필수)</Text>
+            {renderSelectButtons(interviewerMode, setInterviewerMode, [{ label: '실무 면접', value: 'team_lead' }, { label: '임원 면접', value: 'executive' }])}
 
-        <Text style={styles.label}>난이도 (필수)</Text>
-        {renderSelectButtons(difficulty, setDifficulty, [{ label: '보통', value: 'normal' }, { label: '어려움', value: 'hard' }])}
+            <Text style={styles.label}>난이도 (필수)</Text>
+            {renderSelectButtons(difficulty, setDifficulty, [{ label: '보통', value: 'normal' }, { label: '어려움', value: 'hard' }])}
 
-        <Text style={styles.label}>부서 (선택)</Text>
-        <Controller control={control} name="department" render={({ field: { onChange, onBlur, value } }) => (
-          <Input placeholder="개발팀" value={value} onBlur={onBlur} onChangeText={onChange} />
-        )} />
+            <Text style={styles.label}>부서 (선택)</Text>
+            <Controller control={control} name="department" render={({ field: { onChange, onBlur, value } }) => (
+              <Input placeholder="개발팀" value={value} onBlur={onBlur} onChangeText={onChange} />
+            )} />
 
-        <Text style={styles.label}>기술 스택 (선택, 쉼표로 구분)</Text>
-        <Controller control={control} name="skills" render={({ field: { onChange, onBlur, value } }) => (
-          <Input placeholder="React, TypeScript" value={value} onBlur={onBlur} onChangeText={onChange} />
-        )} />
+            <Text style={styles.label}>기술 스택 (선택, 쉼표로 구분)</Text>
+            <Controller control={control} name="skills" render={({ field: { onChange, onBlur, value } }) => (
+              <Input placeholder="React, TypeScript" value={value} onBlur={onBlur} onChangeText={onChange} />
+            )} />
 
-        <Text style={styles.label}>자격증 (선택)</Text>
-        <Controller control={control} name="certifications" render={({ field: { onChange, onBlur, value } }) => (
-          <Input placeholder="정보처리기사" value={value} onBlur={onBlur} onChangeText={onChange} />
-        )} />
+            <Text style={styles.label}>자격증 (선택)</Text>
+            <Controller control={control} name="certifications" render={({ field: { onChange, onBlur, value } }) => (
+              <Input placeholder="정보처리기사" value={value} onBlur={onBlur} onChangeText={onChange} />
+            )} />
 
-        <Text style={styles.label}>기타 활동 (선택)</Text>
-        <Controller control={control} name="activities" render={({ field: { onChange, onBlur, value } }) => (
-          <Input placeholder="오픈소스 프로젝트 참여" value={value} onBlur={onBlur} onChangeText={onChange} />
-        )} />
-      </Card>
+            <Text style={styles.label}>기타 활동 (선택)</Text>
+            <Controller control={control} name="activities" render={({ field: { onChange, onBlur, value } }) => (
+              <Input placeholder="오픈소스 프로젝트 참여" value={value} onBlur={onBlur} onChangeText={onChange} />
+            )} />
+          </Card>
+        </View>
 
-      <Card containerStyle={styles.card}>
-        <Card.Title>Job Description (JD)</Card.Title>
-        <Card.Divider />
-        {renderFileInput('JD', jdFile, () => pickDocument(setJdFile))}
-        <Controller name="jd_text" control={control} render={({ field: { onChange, onBlur, value } }) => <Input label="Or Paste JD Text" placeholder="Paste the job description here..." value={value} onChangeText={onChange} onBlur={onBlur} multiline numberOfLines={6} style={styles.textArea} />} />
-      </Card>
+        <View style={styles.rightColumn}> {/* Right column for JD and Resume */}
+          <Card containerStyle={styles.card}>
+            <Card.Title>Job Description (JD)</Card.Title>
+            <Card.Divider />
+            {renderFileInput('JD', jdFile, () => pickDocument(setJdFile))}
+            <Controller name="jd_text" control={control} render={({ field: { onChange, onBlur, value } }) => <Input label="Or Paste JD Text" placeholder="Paste the job description here..." value={value} onChangeText={onChange} onBlur={onBlur} multiline numberOfLines={6} style={styles.textArea} />} />
+          </Card>
 
-      <Card containerStyle={styles.card}>
-        <Card.Title>Resume</Card.Title>
-        <Card.Divider />
-        {renderFileInput('Resume', resumeFile, () => pickDocument(setResumeFile))}
-        <Controller name="resume_text" control={control} render={({ field: { onChange, onBlur, value } }) => <Input label="Or Paste Resume Text" placeholder="Paste your resume here..." value={value} onChangeText={onChange} onBlur={onBlur} multiline numberOfLines={6} style={styles.textArea} />} />
-      </Card>
+          <Card containerStyle={styles.card}>
+            <Card.Title>Resume</Card.Title>
+            <Card.Divider />
+            {renderFileInput('Resume', resumeFile, () => pickDocument(setResumeFile))}
+            <Controller name="resume_text" control={control} render={({ field: { onChange, onBlur, value } }) => <Input label="Or Paste Resume Text" placeholder="Paste your resume here..." value={value} onChangeText={onChange} onBlur={onBlur} multiline numberOfLines={6} style={styles.textArea} />} />
+          </Card>
+        </View>
+      </View>
 
       <Button
         title={isAnalyzing ? "Starting Interview..." : "면접 시작하기"}
@@ -271,6 +277,20 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 16,
     justifyContent: 'center',
+  },
+  twoColumnLayout: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    flex: 1, // Take up available space
+    paddingHorizontal: 16, // Match contentContainer padding
+  },
+  leftColumn: {
+    flex: 1,
+    marginRight: 8, // Space between columns
+  },
+  rightColumn: {
+    flex: 1,
+    marginLeft: 8, // Space between columns
   },
   card: {
     borderRadius: 8,
