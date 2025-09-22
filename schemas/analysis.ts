@@ -55,19 +55,39 @@ export interface ResumeFeedback {
   gaps_and_improvements: string;
 }
 
+export interface StrengthsWeaknessesItem {
+  theme: string;
+  evidence: string[];
+}
+
+export interface WeaknessesMatrixItem extends StrengthsWeaknessesItem {
+  severity: string;
+}
+
+export interface ScoreAggregation {
+  calibration: string;
+}
+
 export interface QuestionFeedback {
   question: string;
-  answer: string;
   evaluation: {
     applied_framework: string;
     feedback: string;
+    evidence_quote?: string;
+    model_answer?: string;
   };
 }
 
 export interface TextAnalysisReportData {
   overall_summary: string;
-  core_competency_analysis: CoreCompetency[];
-  growth_potential: string;
+  interview_flow_rationale: string;
+  strengths_matrix?: StrengthsWeaknessesItem[];
+  weaknesses_matrix?: WeaknessesMatrixItem[];
+  score_aggregation?: ScoreAggregation;
+  missed_opportunities?: string[];
+  potential_followups_global?: string[];
   resume_feedback: ResumeFeedback;
+  hiring_recommendation?: 'hire' | 'no_hire';
+  next_actions?: string[];
   question_by_question_feedback: QuestionFeedback[];
 }

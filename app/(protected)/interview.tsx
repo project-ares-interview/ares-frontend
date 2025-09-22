@@ -8,48 +8,10 @@ import { TextAnalysisLoading } from '@/components/interview/TextAnalysisLoading'
 import { useInterview } from '@/hooks/useInterview';
 import { useInterviewSessionStore } from '@/stores/interviewStore';
 import { CameraView } from 'expo-camera';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Button, ScrollView, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
-import { TextAnalysisReportData } from '@/schemas/analysis';
-import * as SecureStore from "expo-secure-store";
 
-// Local storage utility for answers
-const ANSWERS_STORAGE_KEY = 'interview_answers';
 
-const saveAnswer = async (question: string, answer: string) => {
-  try {
-    let storedAnswers: { [key: string]: string } = {};
-    if (Platform.OS === 'web') {
-      const existing = localStorage.getItem(ANSWERS_STORAGE_KEY);
-      if (existing) storedAnswers = JSON.parse(existing);
-      storedAnswers = { ...storedAnswers, [question]: answer };
-      localStorage.setItem(ANSWERS_STORAGE_KEY, JSON.stringify(storedAnswers));
-    } else {
-      // For native, use SecureStore (assuming it's okay for non-sensitive answers)
-      const existing = await SecureStore.getItemAsync(ANSWERS_STORAGE_KEY);
-      if (existing) storedAnswers = JSON.parse(existing);
-      storedAnswers = { ...storedAnswers, [question]: answer };
-      await SecureStore.setItemAsync(ANSWERS_STORAGE_KEY, JSON.stringify(storedAnswers));
-    }
-  } catch (error) {
-    console.error('Failed to save answer:', error);
-  }
-};
-
-const getAnswers = async (): Promise<{ [key: string]: string }> => {
-  try {
-    if (Platform.OS === 'web') {
-      const existing = localStorage.getItem(ANSWERS_STORAGE_KEY);
-      return existing ? JSON.parse(existing) : {};
-    } else {
-      const existing = await SecureStore.getItemAsync(ANSWERS_STORAGE_KEY);
-      return existing ? JSON.parse(existing) : {};
-    }
-  } catch (error) {
-    console.error('Failed to get answers:', error);
-    return {};
-  }
-};
 
 const InterviewScreen = () => {
   const {
@@ -76,9 +38,6 @@ const InterviewScreen = () => {
   } = useInterview();
   const { current_question } = useInterviewSessionStore();
 
-  const [storedUserAnswers, setStoredUserAnswers] = useState<{ [key: string]: string }>({});
-  const [finalReportData, setFinalReportData] = useState<TextAnalysisReportData | null>(null);
-
   useEffect(() => {
     if (cameraRef.current) {
       console.log('✅ CameraView가 성공적으로 연결되었습니다.');
@@ -93,36 +52,19 @@ const InterviewScreen = () => {
     }
   }, [finalResults.voice, finalResults.video, aiAdvice, isFetchingAdvice, getAIAdvice]);
 
-  // Effect to save answer when recording stops
   useEffect(() => {
-    if (!isRecording && transcript && current_question) {
-      saveAnswer(current_question, transcript);
+    if (cameraRef.current) {
+      console.log('✅ CameraView가 성공적으로 연결되었습니다.');
+    } else {
+      console.log('🟡 CameraView가 아직 연결되지 않았습니다.');
     }
-  }, [isRecording, transcript, current_question]);
+  }, [cameraRef.current]);
 
-  // Effect to load stored answers
   useEffect(() => {
-    const loadAnswers = async () => {
-      const answers = await getAnswers();
-      setStoredUserAnswers(answers);
-    };
-    loadAnswers();
-  }, []); // Load once on component mount
-
-  // Effect to combine textAnalysis with stored answers
-  useEffect(() => {
-    if (textAnalysis) {
-      const combinedReport = { ...textAnalysis };
-      combinedReport.question_by_question_feedback = combinedReport.question_by_question_feedback.map(item => {
-        const storedAnswer = storedUserAnswers[item.question];
-        if (storedAnswer) {
-          return { ...item, answer: storedAnswer };
-        }
-        return item;
-      });
-      setFinalReportData(combinedReport);
+    if (finalResults.voice && finalResults.video && !aiAdvice && !isFetchingAdvice) {
+      getAIAdvice();
     }
-  }, [textAnalysis, storedUserAnswers]);
+  }, [finalResults.voice, finalResults.video, aiAdvice, isFetchingAdvice, getAIAdvice]);
 
   if (!hasPermission) {
     return (
@@ -217,10 +159,10 @@ const InterviewScreen = () => {
         ) : ( // After interview, show full analysis report in a ScrollView
           <ScrollView style={styles.analysisReportScrollView}>
             {/* Show loading indicator if analysis is done but text report is not yet ready */}
-            {!isAnalyzing && finalResults.voice && !finalReportData && <TextAnalysisLoading />}
+            {!isAnalyzing && finalResults.voice && !textAnalysis && <TextAnalysisLoading />}
 
             {/* Show the report when it's ready */}
-            {finalReportData && <TextAnalysisReport report={finalReportData} style={{ marginBottom: 24 }} />}
+            {textAnalysis && <TextAnalysisReport report={textAnalysis} style={{ marginBottom: 24 }} />}
 
             {finalResults.voice && finalResults.video && (
               <View style={styles.panel}>
