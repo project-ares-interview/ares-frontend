@@ -5,29 +5,28 @@ import { PercentileAnalysisPanel } from '@/components/interview/PercentileAnalys
 import { RealtimeFeedbackPanel } from '@/components/interview/RealtimeFeedbackPanel';
 import { TextAnalysisReport } from '@/components/interview/TextAnalysisReport';
 import { TextAnalysisLoading } from '@/components/interview/TextAnalysisLoading';
-import Avatar from '@/components/interview/Avatar';
+import Avatar, { AvatarRef } from '@/components/interview/Avatar';
 import { useInterview } from '@/hooks/useInterview';
 import { useInterviewSessionStore } from '@/stores/interviewStore';
 import { CameraView } from 'expo-camera';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, ScrollView, StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
 
-
-
 const InterviewScreen = () => {
+  const avatarRef = useRef<AvatarRef>(null);
   const {
     hasPermission,
-    isAnalyzing, // Overall session state
-    isRecording, // Audio recording state
+    isAnalyzing,
+    isRecording,
     status,
     transcript,
     realtimeFeedback,
     finalResults,
     cameraRef,
-    startAnalysis, // Starts the whole session
-    stopAnalysis,  // Ends the whole session
-    startRecording,// Starts only audio recording
-    stopRecording, // Stops only audio recording
+    startAnalysis,
+    stopAnalysis,
+    startRecording,
+    stopRecording,
     aiAdvice,
     isFetchingAdvice,
     getAIAdvice,
@@ -39,28 +38,41 @@ const InterviewScreen = () => {
   } = useInterview();
   const { current_question } = useInterviewSessionStore();
 
-  useEffect(() => {
-    if (cameraRef.current) {
-      console.log('✅ CameraView가 성공적으로 연결되었습니다.');
-    } else {
-      console.log('🟡 CameraView가 아직 연결되지 않았습니다.');
-    }
-  }, [cameraRef.current]);
+  const [isWaitingForFirstQuestion, setIsWaitingForFirstQuestion] = useState(false);
+  const prevQuestionRef = useRef<string | null>();
 
-  useEffect(() => {
-    if (finalResults.voice && finalResults.video && !aiAdvice && !isFetchingAdvice) {
-      getAIAdvice();
-    }
-  }, [finalResults.voice, finalResults.video, aiAdvice, isFetchingAdvice, getAIAdvice]);
+  const handleStartAnalysis = () => {
+    startAnalysis();
+    setIsWaitingForFirstQuestion(true);
+  };
 
+  // Effect for the first question
   useEffect(() => {
-    if (cameraRef.current) {
-      console.log('✅ CameraView가 성공적으로 연결되었습니다.');
-    } else {
-      console.log('🟡 CameraView가 아직 연결되지 않았습니다.');
+    if (isWaitingForFirstQuestion && current_question) {
+      avatarRef.current?.speak(current_question);
+      setIsWaitingForFirstQuestion(false); // Reset the flag
     }
-  }, [cameraRef.current]);
+  }, [isWaitingForFirstQuestion, current_question]);
 
+  // Effect for subsequent questions (Q2 onwards)
+  useEffect(() => {
+    const questionChanged = prevQuestionRef.current !== current_question;
+    // This should only run for Q2+
+    if (isAnalyzing && !isWaitingForFirstQuestion && questionChanged && current_question) {
+      avatarRef.current?.speak(current_question);
+    }
+    prevQuestionRef.current = current_question;
+  }, [current_question, isAnalyzing, isWaitingForFirstQuestion]);
+
+
+  // This effect handles stopping the avatar's speech when the user starts recording
+  useEffect(() => {
+    if (isRecording && avatarRef.current && Platform.OS === 'web') {
+      avatarRef.current.stopSpeaking();
+    }
+  }, [isRecording]);
+
+  // This effect fetches AI advice once the analysis results are available
   useEffect(() => {
     if (finalResults.voice && finalResults.video && !aiAdvice && !isFetchingAdvice) {
       getAIAdvice();
@@ -82,7 +94,7 @@ const InterviewScreen = () => {
       <View style={styles.cameraAndAvatarContainer}>
         <View style={styles.avatarPlaceholder}>
           {Platform.OS === 'web' ? 
-            <Avatar question={current_question} isRecording={isRecording} /> :
+            <Avatar ref={avatarRef} /> :
             <Text style={{ color: 'white', textAlign: 'center', marginTop: '50%' }}>아바타는 웹에서만 지원됩니다.</Text>
           }
         </View>
@@ -99,7 +111,7 @@ const InterviewScreen = () => {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.startButton}
-            onPress={startAnalysis}
+            onPress={handleStartAnalysis}
             disabled={isAnalyzing}
           >
             <Text style={styles.startButtonText}>AI 면접 시작</Text>
