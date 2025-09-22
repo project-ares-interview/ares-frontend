@@ -5,6 +5,7 @@ import { PercentileAnalysisPanel } from '@/components/interview/PercentileAnalys
 import { RealtimeFeedbackPanel } from '@/components/interview/RealtimeFeedbackPanel';
 import { TextAnalysisReport } from '@/components/interview/TextAnalysisReport';
 import { TextAnalysisLoading } from '@/components/interview/TextAnalysisLoading';
+import Avatar from '@/components/interview/Avatar';
 import { useInterview } from '@/hooks/useInterview';
 import { useInterviewSessionStore } from '@/stores/interviewStore';
 import { CameraView } from 'expo-camera';
@@ -80,7 +81,10 @@ const InterviewScreen = () => {
 
       <View style={styles.cameraAndAvatarContainer}>
         <View style={styles.avatarPlaceholder}>
-          <Text style={{ color: 'white', textAlign: 'center', marginTop: '50%' }}>아바타 자리</Text>
+          {Platform.OS === 'web' ? 
+            <Avatar question={current_question} isRecording={isRecording} /> :
+            <Text style={{ color: 'white', textAlign: 'center', marginTop: '50%' }}>아바타는 웹에서만 지원됩니다.</Text>
+          }
         </View>
         <View style={styles.cameraViewWrapper}>
           <CameraView
