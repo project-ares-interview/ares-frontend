@@ -43,51 +43,58 @@ export interface AnalysisResult {
   };
 }
 
-export interface CoreCompetency {
-  competency: string;
-  assessment: string;
-  evidence: string;
-}
-
 export interface ResumeFeedback {
   job_fit_assessment: string;
   strengths_and_opportunities: string;
   gaps_and_improvements: string;
 }
 
-export interface StrengthsWeaknessesItem {
+export interface StrengthsMatrixItem {
   theme: string;
   evidence: string[];
 }
 
-export interface WeaknessesMatrixItem extends StrengthsWeaknessesItem {
-  severity: string;
+export interface WeaknessesMatrixItem {
+  theme: string;
+  severity: 'low' | 'medium' | 'high' | string;
+  evidence: string[];
 }
 
 export interface ScoreAggregation {
+  main_avg: Record<string, number>;
+  ext_avg: Record<string, number>;
   calibration: string;
 }
 
-export interface QuestionFeedback {
+export interface QuestionEvaluation {
+  applied_framework: string;
+  scores_main: Record<string, number>;
+  scores_ext: Record<string, number>;
+  feedback: string;
+  evidence_quote?: string;
+}
+
+export interface QuestionByQuestionFeedbackItem {
+  question_id: string;
+  stage: string;
+  objective: string;
   question: string;
-  evaluation: {
-    applied_framework: string;
-    feedback: string;
-    evidence_quote?: string;
-    model_answer?: string;
-  };
+  question_intent: string;
+  evaluation: QuestionEvaluation;
+  model_answer?: string;
+  additional_followups: string[];
 }
 
 export interface TextAnalysisReportData {
   overall_summary: string;
   interview_flow_rationale: string;
-  strengths_matrix?: StrengthsWeaknessesItem[];
-  weaknesses_matrix?: WeaknessesMatrixItem[];
-  score_aggregation?: ScoreAggregation;
-  missed_opportunities?: string[];
-  potential_followups_global?: string[];
+  strengths_matrix: StrengthsMatrixItem[];
+  weaknesses_matrix: WeaknessesMatrixItem[];
+  score_aggregation: ScoreAggregation;
+  missed_opportunities: string[];
+  potential_followups_global: string[];
   resume_feedback: ResumeFeedback;
-  hiring_recommendation?: 'hire' | 'no_hire';
-  next_actions?: string[];
-  question_by_question_feedback: QuestionFeedback[];
+  hiring_recommendation: string;
+  next_actions: string[];
+  question_by_question_feedback: QuestionByQuestionFeedbackItem[];
 }
