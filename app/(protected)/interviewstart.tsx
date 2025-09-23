@@ -11,11 +11,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Card, Input, Text as RNEText } from '@rneui/themed';
 import * as DocumentPicker from 'expo-document-picker';
 import { DocumentPickerAsset } from 'expo-document-picker';
-import { router } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { z } from 'zod';
 
 const interviewSchema = z.object({
@@ -36,6 +36,7 @@ export default function InterviewStartPage() {
   const { t } = useTranslation();
   const { setSettings: setInterviewSettings, setAnalysisContext, ...settings } = useInterviewSettingsStore();
   const { startSession: startInterviewSession } = useInterviewSessionStore();
+  const router = useRouter(); // Declare router here
 
   const [gender, setGender] = useState(settings.gender);
   const [interviewerMode, setInterviewerMode] = useState(settings.interviewer_mode || 'team_lead');
@@ -74,22 +75,28 @@ export default function InterviewStartPage() {
   };
 
   const onSubmit = async (data: InterviewFormData) => {
+    console.log('onSubmit called');
     if (!gender) {
       Alert.alert('Validation Error', '성별을 선택해주세요.');
+      console.log('Validation failed: gender not selected');
       return;
     }
     if (!jdFile && !data.jd_text) {
       Alert.alert('Validation Error', 'Please provide either a Job Description file or text.');
+      console.log('Validation failed: JD missing');
       return;
     }
     if (!resumeFile && !data.resume_text) {
       Alert.alert('Validation Error', 'Please provide either a Resume file or text.');
+      console.log('Validation failed: Resume missing');
       return;
     }
 
     setIsAnalyzing(true);
+    console.log('setIsAnalyzing(true)');
 
     try {
+      console.log('Starting resume analysis...');
       // 1. 이력서 분석 요청
       const companyData: CompanyData = {
         name: data.company,
@@ -106,14 +113,17 @@ export default function InterviewStartPage() {
       };
 
       const analysisResponse = await resumeService.analyzeResume(analysisInput);
+      console.log('Resume analysis complete', analysisResponse);
 
       const jd_context = analysisResponse?.input_contexts?.raw?.jd_context;
       const resume_context = analysisResponse?.input_contexts?.raw?.resume_context;
 
       if (!jd_context || !resume_context) {
+        console.error('Failed to get raw context from analysis: jd_context or resume_context missing');
         throw new Error('Failed to get raw context from analysis.');
       }
 
+      console.log('Starting interview...');
       // 2. 면접 시작 요청 (질문 생성)
       const interviewStartPayload: InterviewStartRequest = {
         jd_context,
@@ -130,6 +140,7 @@ export default function InterviewStartPage() {
       };
 
       const interviewResponse = await interviewService.startInterview(interviewStartPayload);
+      console.log('Interview started', interviewResponse);
 
       // 3. 모든 정보 스토어에 저장
       setAnalysisContext(jd_context, resume_context);
@@ -144,15 +155,19 @@ export default function InterviewStartPage() {
         current_question: interviewResponse.question,
         turn_label: interviewResponse.turn_label,
       });
+      console.log('Interview session data saved');
 
       // 4. 면접 페이지로 이동
+      console.log('Navigating to interview page...');
       router.push('/(protected)/interview');
 
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || err.message || 'An unknown error occurred.';
       Alert.alert('Error', `Failed to start interview. ${errorMessage}`);
+      console.error('Error during interview start process:', err);
     } finally {
       setIsAnalyzing(false);
+      console.log('setIsAnalyzing(false)');
     }
   };
 
@@ -184,6 +199,7 @@ export default function InterviewStartPage() {
           onPress={onPress}
           title={file ? file.name : `Select ${label} File`}
           icon={<FontAwesome5 name="file-upload" size={16} color="white" style={{ marginRight: 8 }} />}
+          buttonStyle={styles.fileUploadButton}
         />
       </View>
     </View>
@@ -194,7 +210,17 @@ export default function InterviewStartPage() {
       <View style={styles.twoColumnLayout}> {/* Main two-column container */}
         <View style={styles.leftColumn}> {/* Left column for Interview Settings */}
           <Card containerStyle={styles.card}>
-            <RNEText style={styles.title}>면접 설정</RNEText>
+            <View style={styles.sectionHeader}>
+              <RNEText style={styles.title}>면접 설정</RNEText>
+              <View style={styles.guideTextAndButtonContainer}>
+                <Text style={styles.guidePromptText}>JAI 면접 이용이 처음이시라면?</Text>
+                <Link href="/(protected)/interviewguide" asChild>
+                  <TouchableOpacity style={styles.guideButton}>
+                    <Text style={styles.guideButtonText}>면접 가이드 보기</Text>
+                  </TouchableOpacity>
+                </Link>
+              </View>
+            </View>
 
             <Text style={styles.label}>이름 (필수)</Text>
             <Controller control={control} name="name" render={({ field: { onChange, onBlur, value } }) => (
@@ -263,7 +289,7 @@ export default function InterviewStartPage() {
           </Card>
 
           <Button
-            title={isAnalyzing ? "Starting Interview..." : "면접 시작하기"}
+            title={isAnalyzing ? "작성 내용을 분석중입니다. 잠시만 기다려주세요.\n해당 작업은 작성 내용에 따라 30초~1분 정도 소요됩니다." : "면접 시작하기"}
             onPress={handleSubmit(onSubmit)}
             disabled={!isValid || !gender || isAnalyzing}
             containerStyle={styles.buttonContainer}
@@ -341,7 +367,7 @@ const styles = StyleSheet.create({
     borderRadius: 8, // Rounded buttons
   },
   selectedButton: {
-    backgroundColor: '#34495e', // Darker, modern blue-gray
+    backgroundColor: '#0056b3', // Darker blue for selected buttons
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 15,
@@ -360,6 +386,12 @@ const styles = StyleSheet.create({
   unselectedButtonText: {
     color: '#34495e', // Match selected button text color
     fontWeight: '600',
+  },
+  fileUploadButton: {
+    backgroundColor: '#17a2b8', // A light blue for file upload buttons
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
   },
   fileInputContainer: {
     marginBottom: 16,
@@ -407,6 +439,29 @@ const styles = StyleSheet.create({
   startButtonText: {
     color: '#fff',
     fontSize: 18, // Larger text
+    fontWeight: 'bold',
+  },
+  guideTextAndButtonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    // Explicitly push content to the right within this container
+    justifyContent: 'flex-end',
+    flex: 1, // Allow container to take available space
+  },
+  guidePromptText: {
+    fontSize: 13,
+    color: '#555',
+    marginRight: 8,
+  },
+  guideButton: {
+    backgroundColor: '#007bff', // A more prominent blue for the guide button
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  guideButtonText: {
+    color: '#ffffff',
+    fontSize: 13,
     fontWeight: 'bold',
   },
 });

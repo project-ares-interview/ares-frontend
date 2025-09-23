@@ -173,25 +173,7 @@ export const TextAnalysisReport: React.FC<Props> = ({ report }) => {
           </Card>
         )}
 
-        {/* Full Resume Analysis */}
-        {report.full_resume_analysis && (
-            <Card containerStyle={[styles.card, styles.reportColumnItem]}>
-              <Card.Title style={styles.cardTitle}>이력서 종합 분석</Card.Title>
-              <Card.Divider />
-              <View style={styles.resumeSection}>
-                  <Text style={styles.subHeader}>심층 분석</Text>
-                  <Markdown style={markdownStyle}>{report.full_resume_analysis["심층분석"]}</Markdown>
-              </View>
-              <View style={styles.resumeSection}>
-                  <Text style={styles.subHeader}>교차 분석</Text>
-                  <Markdown style={markdownStyle}>{report.full_resume_analysis["교차분석"]}</Markdown>
-              </View>
-              <View style={styles.resumeSection}>
-                  <Text style={styles.subHeader}>NCS 요약</Text>
-                  <Markdown style={markdownStyle}>{report.full_resume_analysis["NCS요약"]}</Markdown>
-              </View>
-            </Card>
-        )}
+
 
         {/* Hiring Recommendation */}
         {'hiring_recommendation' in report && (
@@ -215,53 +197,81 @@ export const TextAnalysisReport: React.FC<Props> = ({ report }) => {
             ))}
           </Card>
         )}
+
+        {/* Resume Comprehensive Analysis */}
+        {report.full_resume_analysis && (
+          <Card containerStyle={styles.card}>
+            <Card.Title style={styles.cardTitle}>이력서 종합 분석</Card.Title>
+            <Card.Divider />
+            <Text style={styles.subHeader}>심층 분석</Text>
+            <Markdown style={markdownStyle}>
+              {report.full_resume_analysis["심층분석"]}
+            </Markdown>
+            <Text style={styles.subHeader}>교차 분석</Text>
+            <Markdown style={markdownStyle}>
+              {report.full_resume_analysis["교차분석"]}
+            </Markdown>
+            <Text style={styles.subHeader}>정합성 점검</Text>
+            <Markdown style={markdownStyle}>
+              {report.full_resume_analysis["정합성점검"]}
+            </Markdown>
+            <Text style={styles.subHeader}>NCS 요약</Text>
+            <Markdown style={markdownStyle}>
+              {report.full_resume_analysis["NCS요약"]}
+            </Markdown>
+          </Card>
+        )}
       </View>
 
+      
       {/* Question by Question Feedback (single column) */}
       <Card containerStyle={styles.card}>
         <Card.Title style={styles.cardTitle}>질문별 상세 피드백</Card.Title>
         <Card.Divider />
-        {report.question_by_question_feedback.map((q_item, index) => (
-          <ListItem.Accordion
-            key={index}
-            content={
-              <ListItem.Content>
-                <ListItem.Title style={styles.questionTitle}>{`질문 그룹 ${index + 1}: ${q_item.thematic_summary}`}</ListItem.Title>
-              </ListItem.Content>
-            }
-            isExpanded={expanded[index] || false}
-            onPress={() => toggleExpand(index)}
-            containerStyle={styles.accordionContainer}
-          >
-            {q_item.details.map((detail, detailIndex) => (
-              <View key={detailIndex} style={styles.feedbackContainer}>
-                  <Text style={styles.questionTitle}>{`Q${index + 1}.${detailIndex + 1}. ${detail.question}`}</Text>
-                  <Divider style={styles.feedbackDivider}/>
-
-                  <Text style={styles.feedbackLabel}>적용된 프레임워크: <Chip title={detail.evaluation.applied_framework || 'N/A'} size="sm" /></Text>
-
-                  {detail.evaluation.evidence_quote ? (
-                    <>
-                      <Text style={styles.feedbackLabel}>근거 발췌:</Text>
-                      <Text style={styles.answerText}>{detail.evaluation.evidence_quote}</Text>
-                      <Divider style={styles.feedbackDivider}/>
-                    </>
-                  ) : null}
-
-                  {!!detail.model_answer && (
-                    <>
-                      <Text style={styles.feedbackLabel}>모범 답안:</Text>
-                      <Text style={styles.answerText}>{detail.model_answer}</Text>
-                      <Divider style={styles.feedbackDivider}/>
-                    </>
-                  )}
-
-                  <Text style={styles.feedbackLabel}>상세 피드백:</Text>
-                  <Text style={styles.feedbackText}>{detail.evaluation.feedback}</Text>
-              </View>
-            ))}
-          </ListItem.Accordion>
-        ))}
+        {report.question_by_question_feedback?.length > 0 ? (
+          report.question_by_question_feedback.map((qbqf, index) => (
+            <View key={`qbqf-${index}`} style={styles.qbqfItem}>
+              <ListItem.Accordion
+                content={
+                  <ListItem.Content>
+                    <ListItem.Title style={styles.qbqfTitle}>
+                      {qbqf.main_question_id}. {qbqf.thematic_summary}
+                    </ListItem.Title>
+                  </ListItem.Content>
+                }
+                isExpanded={expanded[index] || false}
+                onPress={() => toggleExpand(index)}
+                containerStyle={styles.qbqfAccordionContainer}
+              >
+                {qbqf.details.map((detail, detailIndex) => (
+                  <ListItem key={`detail-${detailIndex}`} containerStyle={styles.qbqfDetailItem}>
+                    <ListItem.Content>
+                      <ListItem.Title style={styles.qbqfDetailQuestion}>질문: {detail.question}</ListItem.Title>
+                      <ListItem.Subtitle style={styles.qbqfDetailFeedback}>피드백: {detail.evaluation.feedback}</ListItem.Subtitle>
+                      {detail.evaluation.evidence_quote && (
+                        <Text style={styles.qbqfDetailEvidence}>근거: {detail.evaluation.evidence_quote}</Text>
+                      )}
+                      <Text style={styles.qbqfDetailModelAnswer}>모범 답변: {detail.model_answer}</Text>
+                      {detail.coaching && Object.keys(detail.coaching).length > 0 && (
+                        <View style={styles.qbqfDetailCoaching}>
+                          <Text style={styles.qbqfDetailCoachingTitle}>코칭:</Text>
+                          {Object.entries(detail.coaching).map(([key, value], coachingIndex) => (
+                            <Text key={`coaching-${coachingIndex}`} style={styles.qbqfDetailCoachingText}>
+                              • {key}: {value}
+                            </Text>
+                          ))}
+                        </View>
+                      )}
+                    </ListItem.Content>
+                  </ListItem>
+                ))}
+              </ListItem.Accordion>
+              {index < report.question_by_question_feedback.length - 1 && <Divider style={styles.itemDivider} />}
+            </View>
+          ))
+        ) : (
+          <Text style={styles.bodyText}>질문별 상세 피드백이 없습니다.</Text>
+        )}
       </Card>
     </View>
   );
@@ -269,23 +279,40 @@ export const TextAnalysisReport: React.FC<Props> = ({ report }) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 8,
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#f5f5f5',
   },
-  mainTitle: {
-    textAlign: 'center',
+  twoColumnReportContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  reportColumnItem: {
+    width: '48%',
     marginBottom: 16,
   },
   card: {
     borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    width: '100%',
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 8,
   },
   bodyText: {
-    fontSize: 15,
-    lineHeight: 22,
-    marginBottom: 10,
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 4,
+  },
+  subHeader: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 8,
+    marginBottom: 4,
   },
   competencyItem: {
     marginBottom: 12,
@@ -294,72 +321,72 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   competencyTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    flex: 1,
-  },
-  evidenceText: {
-    fontSize: 14,
-    color: '#555',
-    fontStyle: 'italic',
-  },
-  itemDivider: {
-      marginTop: 12,
-  },
-  resumeSection: {
-      marginBottom: 12,
-  },
-  subHeader: {
-      fontSize: 16,
-      fontWeight: '600',
-      marginBottom: 4,
-  },
-  accordionContainer: {
-    paddingVertical: 8,
-  },
-  questionTitle: {
+    fontSize: 15,
     fontWeight: 'bold',
   },
-  feedbackContainer: {
-    padding: 16,
+  evidenceText: {
+    fontSize: 13,
+    color: '#555',
+    marginLeft: 8,
+  },
+  itemDivider: {
+    marginVertical: 8,
+  },
+  qbqfItem: {
+    marginBottom: 10,
+  },
+  qbqfTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  qbqfAccordionContainer: {
+    padding: 0,
     backgroundColor: '#f9f9f9',
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderRadius: 8,
+    marginBottom: 5,
   },
-  feedbackLabel: {
-      fontSize: 15,
-      fontWeight: 'bold',
-      marginBottom: 6,
-      marginTop: 8,
+  qbqfDetailItem: {
+    paddingLeft: 15,
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderColor: '#eee',
   },
-  answerText: {
-      fontSize: 14,
-      lineHeight: 20,
-      backgroundColor: '#FFF',
-      padding: 8,
-      borderRadius: 4,
-      borderWidth: 1,
-      borderColor: '#EEE',
+  qbqfDetailQuestion: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 5,
   },
-  feedbackDivider: {
-      marginVertical: 12,
+  qbqfDetailFeedback: {
+    fontSize: 14,
+    marginBottom: 3,
   },
-  feedbackText: {
-      fontSize: 14,
-      lineHeight: 20,
+  qbqfDetailEvidence: {
+    fontSize: 13,
+    color: '#555',
+    fontStyle: 'italic',
+    marginBottom: 3,
   },
-  // New styles for two-column layout
-  twoColumnReportContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    paddingHorizontal: 8, // Adjust padding to match container
+  qbqfDetailModelAnswer: {
+    fontSize: 14,
+    color: '#007bff',
+    marginBottom: 5,
   },
-  reportColumnItem: {
-    width: '48%', // Slightly less than 50% to allow for spacing
-    marginBottom: 16, // Spacing between rows
+  qbqfDetailCoaching: {
+    marginTop: 5,
+    paddingLeft: 10,
+    borderLeftWidth: 2,
+    borderColor: '#ddd',
+  },
+  qbqfDetailCoachingTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  qbqfDetailCoachingText: {
+    fontSize: 13,
+    color: '#666',
   },
 });

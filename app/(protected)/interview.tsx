@@ -152,7 +152,7 @@ const InterviewScreen = () => {
               </View>
             </View>
             <Text style={styles.instructionsText}>
-              질문은 총 5개~15개가 생성될 수 있습니다. {'\n'}
+              질문은 답변 내용에 따라 총 5개~15개가 생성됩니다. {'\n'}
               도중에 면접을 중단하고 분석 결과를 보고 싶다면 {'\n'}
               언제든지 '면접 종료하기' 버튼을 누르세요. {'\n'}
               <Text style={styles.warningText}>

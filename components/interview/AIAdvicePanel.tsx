@@ -36,7 +36,7 @@ const markdownStyle = StyleSheet.create({
 export const AIAdvicePanel = ({ advice, isLoading }: Props) => {
   return (
     <View style={styles.panel}>
-      <Text style={styles.title}>🤖 AI 종합 조언</Text>
+      <Text style={styles.title}>🤖 JAI 종합 조언</Text>
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#2c5282" />
