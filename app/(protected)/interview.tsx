@@ -117,34 +117,48 @@ const InterviewScreen = () => {
               onPress={handleStartAnalysis}
               disabled={isAnalyzing}
             >
-              <Text style={styles.startButtonText}>AI 면접 시작</Text>
+              <Text style={styles.startButtonText}>JAI 면접 시작</Text>
             </TouchableOpacity>
+            <Text style={styles.instructionsText}>
+              'AI 면접 시작' 버튼을 누르면 면접이 시작됩니다. {'\n'}
+              면접관의 질문을 듣고 '답변 시작하기'를 눌러 답변을 녹화하세요.
+            </Text>
           </View>
         ) : (
-          <View style={styles.controlsContainerSmall}>
-            <View style={styles.buttonWrapper}>
-              <Button
-                title="답변 시작하기"
-                onPress={startRecording}
-                disabled={isRecording || !current_question || isFetchingNextQuestion}
-              />
+          <View>
+            <View style={styles.controlsContainerSmall}>
+              <View style={styles.buttonWrapper}>
+                <Button
+                  title="답변 시작하기"
+                  onPress={startRecording}
+                  disabled={isRecording || !current_question || isFetchingNextQuestion}
+                />
+              </View>
+              <View style={styles.buttonWrapper}>
+                <Button
+                  title="답변 끝내기"
+                  onPress={stopRecording}
+                  disabled={!isRecording}
+                  color="#f44336"
+                />
+              </View>
+              <View style={styles.buttonWrapper}>
+                <Button
+                  title="면접 종료하기"
+                  onPress={stopAnalysis}
+                  disabled={!isAnalyzing}
+                  color="#4CAF50"
+                />
+              </View>
             </View>
-            <View style={styles.buttonWrapper}>
-              <Button
-                title="답변 끝내기"
-                onPress={stopRecording}
-                disabled={!isRecording}
-                color="#f44336"
-              />
-            </View>
-            <View style={styles.buttonWrapper}>
-              <Button
-                title="면접 종료하기"
-                onPress={stopAnalysis}
-                disabled={!isAnalyzing}
-                color="#4CAF50"
-              />
-            </View>
+            <Text style={styles.instructionsText}>
+              질문은 총 5개~15개가 생성될 수 있습니다. {'\n'}
+              도중에 면접을 중단하고 분석 결과를 보고 싶다면 {'\n'}
+              언제든지 '면접 종료하기' 버튼을 누르세요. {'\n'}
+              <Text style={styles.warningText}>
+                (단, 분석 결과 확인 후에는 되돌아오실 수 없습니다.)
+              </Text>
+            </Text>
           </View>
         )}
       </View>
@@ -251,7 +265,17 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-  }
+  },
+  instructionsText: {
+    marginTop: 16,
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#555',
+    lineHeight: 22,
+  },
+  warningText: {
+    color: 'red',
+  },
 });
 
 export default InterviewScreen;

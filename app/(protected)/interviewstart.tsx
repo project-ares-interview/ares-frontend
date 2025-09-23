@@ -235,14 +235,14 @@ export default function InterviewStartPage() {
               <Input inputContainerStyle={styles.inputField} placeholder="React, TypeScript" value={value} onBlur={onBlur} onChangeText={onChange} />
             )} />
 
-            <Text style={styles.label}>자격증 (선택)</Text>
+            <Text style={styles.label}>자격증 (선택, 쉼표로 구분)</Text>
             <Controller control={control} name="certifications" render={({ field: { onChange, onBlur, value } }) => (
-              <Input inputContainerStyle={styles.inputField} placeholder="정보처리기사" value={value} onBlur={onBlur} onChangeText={onChange} />
+              <Input inputContainerStyle={styles.inputField} placeholder="정보처리기사, 토익900점" value={value} onBlur={onBlur} onChangeText={onChange} />
             )} />
 
-            <Text style={styles.label}>기타 활동 (선택)</Text>
+            <Text style={styles.label}>기타 활동 (선택, 쉼표로 구분)</Text>
             <Controller control={control} name="activities" render={({ field: { onChange, onBlur, value } }) => (
-              <Input inputContainerStyle={styles.inputField} placeholder="오픈소스 프로젝트 참여" value={value} onBlur={onBlur} onChangeText={onChange} />
+              <Input inputContainerStyle={styles.inputField} placeholder="오픈소스 프로젝트 참여, 자원봉사" value={value} onBlur={onBlur} onChangeText={onChange} />
             )} />
           </Card>
         </View>
@@ -252,14 +252,14 @@ export default function InterviewStartPage() {
             <Card.Title>직무기술서(JD, 필수)</Card.Title>
             <Card.Divider />
             {renderFileInput('직무기술서(JD)', jdFile, () => pickDocument(setJdFile))}
-            <Controller name="jd_text" control={control} render={({ field: { onChange, onBlur, value } }) => <Input label="또는 텍스트로 붙여넣기" placeholder="이곳에 직무기술서 내용을 붙여넣거나, 파일이 없는 경우 '없음'이라고 입력하세요." value={value} onChangeText={onChange} onBlur={onBlur} multiline numberOfLines={6} style={styles.textArea} />} />
+            <Controller name="jd_text" control={control} render={({ field: { onChange, onBlur, value } }) => <Input label="또는 텍스트로 붙여넣기" placeholder="이곳에 지원회사에서 제공한 직무기술서 내용을 붙여넣거나, 파일이 없는 경우 '없음'이라고 입력하세요." value={value} onChangeText={onChange} onBlur={onBlur} multiline numberOfLines={6} style={styles.textArea} />} />
           </Card>
 
           <Card containerStyle={styles.card}>
             <Card.Title>이력서(필수)</Card.Title>
             <Card.Divider />
             {renderFileInput('이력서', resumeFile, () => pickDocument(setResumeFile))}
-            <Controller control={control} name="resume_text" render={({ field: { onChange, onBlur, value } }) => <Input label="또는 텍스트로 붙여넣기" placeholder="이곳에 이력서 내용을 붙여넣거나, 파일이 없는 경우 '없음'이라고 입력하세요." value={value} onChangeText={onChange} onBlur={onBlur} multiline numberOfLines={6} style={styles.textArea} />} />
+            <Controller control={control} name="resume_text" render={({ field: { onChange, onBlur, value } }) => <Input label="또는 텍스트로 붙여넣기" placeholder="이곳에 본인의 이력서 내용을 붙여넣거나, 파일이 없는 경우 '없음'이라고 입력하세요." value={value} onChangeText={onChange} onBlur={onBlur} multiline numberOfLines={6} style={styles.textArea} />} />
           </Card>
 
           <Button
