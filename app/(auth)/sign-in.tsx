@@ -1,18 +1,20 @@
 import { useGoogleSignIn } from "@/hooks/useGoogleSignIn";
 import { useSignIn } from "@/hooks/useSignIn";
+import { FontAwesome5 } from "@expo/vector-icons";
 import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
-import { Button, Icon, Input, Text as RNEText } from "@rneui/themed";
 import { Link } from "expo-router";
 import React from "react";
 import { Controller } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
+  ActivityIndicator,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 
 function SignInForm() {
@@ -31,92 +33,107 @@ function SignInForm() {
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
     >
-      <RNEText h2 style={styles.title}>
-        Sign In
-      </RNEText>
-      <Controller
-        control={control}
-        name="email"
-        render={({ field: { onChange, onBlur, value } }) => (
-          <Input
-            placeholder={t("pages.sign_in.email")}
-            leftIcon={<Icon name="email" type="material-community" />}
-            value={value}
-            onBlur={onBlur}
-            onChangeText={onChange}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            errorMessage={errors.email && t(errors.email.message as any)}
+      <View style={styles.formContainer}>
+        <Text style={styles.title}>Sign In</Text>
+
+        <View style={styles.formGroup}>
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <View>
+                <TextInput
+                  style={styles.input}
+                  placeholder={t("pages.sign_in.email")}
+                  placeholderTextColor="#aaa"
+                  value={value}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
+                {errors.email && (
+                  <Text style={styles.errorText}>
+                    {t(errors.email.message as any)}
+                  </Text>
+                )}
+              </View>
+            )}
           />
-        )}
-      />
-
-      <Controller
-        control={control}
-        name="password"
-        render={({ field: { onChange, onBlur, value } }) => (
-          <Input
-            placeholder={t("pages.sign_in.password")}
-            leftIcon={<Icon name="lock" type="material-community" />}
-            value={value}
-            onBlur={onBlur}
-            onChangeText={onChange}
-            secureTextEntry
-            errorMessage={errors.password && t(errors.password.message as any)}
-          />
-        )}
-      />
-
-      <Button
-        title={t("pages.sign_in.sign_in")}
-        onPress={submit}
-        disabled={!isValid}
-        containerStyle={styles.buttonContainer}
-        buttonStyle={styles.signInButton}
-      />
-
-      <View style={styles.signUpContainer}>
-        <Text style={{ fontSize: 16 }}>
-          {t("pages.sign_in.sign_up_notice")}
-        </Text>
-        <Link href="/sign-up" style={styles.signUpLink}>
-          <Text style={styles.signUpLinkText}>
-            {t("pages.sign_in.sign_up")}
-          </Text>
-        </Link>
-      </View>
-
-      <View style={styles.divider}>
-        <View style={styles.dividerLine} />
-        <Text style={styles.dividerText}>OR</Text>
-        <View style={styles.dividerLine} />
-      </View>
-
-      {Platform.OS === "web" ? (
-        <View style={styles.googleButtonContainer}>
-          <TouchableOpacity
-            style={styles.socialButton}
-            onPress={() => googleLogin()}
-          >
-            <Icon
-              name="google"
-              type="antdesign"
-              color="#DB4437"
-              containerStyle={{ pointerEvents: "none" }}
-            />
-          </TouchableOpacity>
         </View>
-      ) : (
-        <Button
-          title="Sign in with Google"
-          onPress={() => promptMobileAsync()}
-          disabled={!isReady}
-          icon={
-            <Icon name="google" type="antdesign" style={{ marginRight: 10 }} />
-          }
-          containerStyle={styles.buttonContainer}
-        />
-      )}
+
+        <View style={styles.formGroup}>
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <View>
+                <TextInput
+                  style={styles.input}
+                  placeholder={t("pages.sign_in.password")}
+                  placeholderTextColor="#aaa"
+                  value={value}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  secureTextEntry
+                />
+                {errors.password && (
+                  <Text style={styles.errorText}>
+                    {t(errors.password.message as any)}
+                  </Text>
+                )}
+              </View>
+            )}
+          />
+        </View>
+
+        <TouchableOpacity
+          style={[styles.button, !isValid && styles.disabledButton]}
+          onPress={submit}
+          disabled={!isValid}
+        >
+          <Text style={styles.buttonText}>{t("pages.sign_in.sign_in")}</Text>
+        </TouchableOpacity>
+
+        <View style={styles.divider}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>OR</Text>
+          <View style={styles.dividerLine} />
+        </View>
+
+        {Platform.OS === "web" ? (
+          <View style={styles.googleButtonContainer}>
+            <TouchableOpacity
+              style={styles.socialButton}
+              onPress={() => googleLogin()}
+            >
+              <FontAwesome5 name="google" size={24} color="#DB4437" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={[styles.button, styles.googleMobileButton]}
+            onPress={() => promptMobileAsync()}
+            disabled={!isReady}
+          >
+            <FontAwesome5 name="google" size={18} color="#fff" style={{ marginRight: 10 }} />
+            <Text style={styles.buttonText}>Sign in with Google</Text>
+          </TouchableOpacity>
+        )}
+
+        <View style={styles.signUpContainer}>
+          <Text style={{ fontSize: 16 }}>
+            {t("pages.sign_in.sign_up_notice")}
+          </Text>
+          <Link href="/sign-up" asChild>
+            <TouchableOpacity>
+              <Text style={styles.signUpLinkText}>
+                {t("pages.sign_in.sign_up")}
+              </Text>
+            </TouchableOpacity>
+          </Link>
+        </View>
+      </View>
     </ScrollView>
   );
 }
@@ -141,22 +158,52 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   contentContainer: {
-    padding: 24,
     flexGrow: 1,
     justifyContent: "center",
+    padding: 24,
+  },
+  formContainer: {
+    width: "100%",
+    maxWidth: 420,
+    alignSelf: "center",
   },
   title: {
+    fontSize: 28,
+    fontWeight: "bold",
     marginBottom: 24,
     textAlign: "center",
+    color: "#333",
   },
-  buttonContainer: {
-    marginTop: 16,
+  formGroup: {
+    marginBottom: 15,
   },
-  signInButton: {
-    backgroundColor: "#000000",
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: "white",
+  },
+  errorText: {
+    color: "red",
+    marginTop: 4,
+    marginLeft: 2,
+  },
+  button: {
+    backgroundColor: "#4972c3ff",
     borderRadius: 8,
     paddingVertical: 12,
-    width: "100%",
+    alignItems: "center",
+    marginTop: 16,
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  disabledButton: {
+    backgroundColor: "#ccc",
   },
   divider: {
     flexDirection: "row",
@@ -183,18 +230,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderColor: "#E0E0E0",
-    cursor: "pointer",
+  },
+  googleMobileButton: {
+    flexDirection: "row",
+    backgroundColor: "#DB4437",
   },
   signUpContainer: {
-    flexDirection: "column",
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     marginTop: 24,
-  },
-  signUpLink: {
+    gap: 8,
   },
   signUpLinkText: {
-    color: "#000",
+    color: "#4972c3ff",
     fontWeight: "bold",
+    fontSize: 16,
   },
 });

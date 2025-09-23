@@ -1,23 +1,35 @@
-import { AnalysisInput, AnalysisResult, CompanyData } from '@/schemas/analysis';
-import { resumeService } from '@/services/resumeService';
-import { FontAwesome5 } from '@expo/vector-icons';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Card, Input, Text } from '@rneui/themed';
-import * as DocumentPicker from 'expo-document-picker';
-import { DocumentPickerAsset } from 'expo-document-picker';
-import React, { useState } from 'react';
-import { Control, Controller, FieldErrors, useForm, UseFormHandleSubmit } from 'react-hook-form';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
-import Markdown from 'react-native-markdown-display';
-import { z } from 'zod';
+import { AnalysisInput, AnalysisResult, CompanyData } from "@/schemas/analysis";
+import { resumeService } from "@/services/resumeService";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as DocumentPicker from "expo-document-picker";
+import { DocumentPickerAsset } from "expo-document-picker";
+import React, { useState } from "react";
+import {
+  Control,
+  Controller,
+  FieldErrors,
+  useForm,
+  UseFormHandleSubmit,
+} from "react-hook-form";
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import Markdown from "react-native-markdown-display";
+import { z } from "zod";
 
 // Schemas and Types
 const companySchema = z.object({
-  name: z.string().min(1, 'Company name is required'),
-  job_title: z.string().min(1, 'Job title is required'),
-  department: z.string().optional(),
-  location: z.string().optional(),
-  kpi: z.string().optional(),
+  name: z.string().min(1, "Company name is required"),
+  job_title: z.string().min(1, "Job title is required"),
   requirements: z.string().optional(),
 });
 const analysisSchema = z.object({
@@ -39,27 +51,39 @@ interface AnalysisFormProps {
   jdFile: DocumentPickerAsset | null;
   setJdFile: React.Dispatch<React.SetStateAction<DocumentPickerAsset | null>>;
   resumeFile: DocumentPickerAsset | null;
-  setResumeFile: React.Dispatch<React.SetStateAction<DocumentPickerAsset | null>>;
+  setResumeFile: React.Dispatch<
+    React.SetStateAction<DocumentPickerAsset | null>
+  >;
   researchFile: DocumentPickerAsset | null;
-  setResearchFile: React.Dispatch<React.SetStateAction<DocumentPickerAsset | null>>;
+  setResearchFile: React.Dispatch<
+    React.SetStateAction<DocumentPickerAsset | null>
+  >;
 }
 
 const AnalysisForm: React.FC<AnalysisFormProps> = ({
-  control, errors, handleSubmit, onSubmit, loading,
-  jdFile, setJdFile,
-  resumeFile, setResumeFile,
-  researchFile, setResearchFile
+  control,
+  errors,
+  handleSubmit,
+  onSubmit,
+  loading,
+  jdFile,
+  setJdFile,
+  resumeFile,
+  setResumeFile,
+  researchFile,
+  setResearchFile,
 }) => {
-
-  const pickDocument = async (setter: React.Dispatch<React.SetStateAction<DocumentPickerAsset | null>>) => {
+  const pickDocument = async (
+    setter: React.Dispatch<React.SetStateAction<DocumentPickerAsset | null>>
+  ) => {
     try {
       const pickerResult = await DocumentPicker.getDocumentAsync({});
       if (!pickerResult.canceled) {
         setter(pickerResult.assets[0]);
       }
     } catch (err) {
-      console.error('Error picking document:', err);
-      Alert.alert('Error', 'Failed to pick document.');
+      console.error("Error picking document:", err);
+      Alert.alert("Error", "Failed to pick document.");
     }
   };
 
@@ -68,47 +92,175 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({
     file: DocumentPickerAsset | null,
     onPress: () => void
   ) => (
-    <View style={styles.fileInputContainer}>
+    <View style={styles.formGroup}>
       <Text style={styles.label}>{label}</Text>
-      <View style={styles.fileInput}>
-        <Button
-          onPress={onPress}
-          title={file ? file.name : `Select ${label} File`}
-          icon={<FontAwesome5 name="file-upload" size={16} color="white" style={{ marginRight: 8 }} />}
+      <TouchableOpacity style={styles.fileButton} onPress={onPress}>
+        <FontAwesome5
+          name="file-upload"
+          size={16}
+          color="#4972c3ff"
+          style={{ marginRight: 8 }}
         />
-      </View>
+        <Text style={styles.fileButtonText} numberOfLines={1}>
+          {file ? file.name : `${label} 파일 선택`}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 
   return (
     <View>
-      <Text h3 style={styles.title}>AI Resume Analysis</Text>
-      <Card containerStyle={styles.card}>
-        <Card.Title>Company & Job Information</Card.Title>
-        <Card.Divider />
-        <Controller name="company.name" control={control} render={({ field: { onChange, onBlur, value } }) => <Input label="Company Name" placeholder="e.g., Google" value={value} onChangeText={onChange} onBlur={onBlur} errorMessage={errors.company?.name?.message} />} />
-        <Controller name="company.job_title" control={control} render={({ field: { onChange, onBlur, value } }) => <Input label="Job Title" placeholder="e.g., Software Engineer" value={value} onChangeText={onChange} onBlur={onBlur} errorMessage={errors.company?.job_title?.message} />} />
-        <Controller name="company.requirements" control={control} render={({ field: { onChange, onBlur, value } }) => <Input label="Requirements (comma-separated)" placeholder="e.g., 5+ years of React, AWS" value={value} onChangeText={onChange} onBlur={onBlur} multiline />} />
-      </Card>
-      <Card containerStyle={styles.card}>
-        <Card.Title>Job Description (JD)</Card.Title>
-        <Card.Divider />
-        {renderFileInput('JD', jdFile, () => pickDocument(setJdFile))}
-        <Controller name="jd_text" control={control} render={({ field: { onChange, onBlur, value } }) => <Input label="Or Paste JD Text" placeholder="Paste the job description here..." value={value} onChangeText={onChange} onBlur={onBlur} multiline numberOfLines={6} style={styles.textArea} />} />
-      </Card>
-      <Card containerStyle={styles.card}>
-        <Card.Title>Resume</Card.Title>
-        <Card.Divider />
-        {renderFileInput('Resume', resumeFile, () => pickDocument(setResumeFile))}
-        <Controller name="resume_text" control={control} render={({ field: { onChange, onBlur, value } }) => <Input label="Or Paste Resume Text" placeholder="Paste your resume here..." value={value} onChangeText={onChange} onBlur={onBlur} multiline numberOfLines={6} style={styles.textArea} />} />
-      </Card>
-      <Card containerStyle={styles.card}>
-        <Card.Title>Additional Research (Optional)</Card.Title>
-        <Card.Divider />
-        {renderFileInput('Research', researchFile, () => pickDocument(setResearchFile))}
-        <Controller name="research_text" control={control} render={({ field: { onChange, onBlur, value } }) => <Input label="Or Paste Research Text" placeholder="Paste any additional research material here..." value={value} onChangeText={onChange} onBlur={onBlur} multiline numberOfLines={4} style={styles.textArea} />} />
-      </Card>
-      <Button title="Analyze Resume" onPress={handleSubmit(onSubmit)} loading={loading} disabled={loading} buttonStyle={styles.submitButton} containerStyle={styles.submitContainer} />
+      <Text style={styles.title}>AI 이력서 첨삭</Text>
+      <Text style={styles.requiredInfoText}>📌 는 필수 항목입니다.</Text>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>회사 & 직업 정보 </Text>
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>회사 이름 📌</Text>
+          <Controller
+            name="company.name"
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={styles.input}
+                placeholder="예시: Microsoft"
+                placeholderTextColor="#999"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+              />
+            )}
+          />
+          {errors.company?.name && (
+            <Text style={styles.errorText}>{errors.company.name.message}</Text>
+          )}
+        </View>
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>직업 이름 📌</Text>
+          <Controller
+            name="company.job_title"
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={styles.input}
+                placeholder="예시: 데이터 분석가"
+                placeholderTextColor="#999"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+              />
+            )}
+          />
+          {errors.company?.job_title && (
+            <Text style={styles.errorText}>
+              {errors.company.job_title.message}
+            </Text>
+          )}
+        </View>
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>우대사항 ( , 로 구분해주세요)</Text>
+          <Controller
+            name="company.requirements"
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={[styles.input, styles.textarea]}
+                placeholder="예시: ADP 자격증 보유, 경력 5년 이상..."
+                placeholderTextColor="#999"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                multiline
+              />
+            )}
+          />
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>직무 기술서 📌</Text>
+        {renderFileInput("직무 기술서", jdFile, () => pickDocument(setJdFile))}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>또는 직무 기술서 작성</Text>
+          <Controller
+            name="jd_text"
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={[styles.input, styles.textarea]}
+                placeholder="📎여기에 직무 기술서를 붙여넣어 주세요!"
+                placeholderTextColor="#999"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                multiline
+              />
+            )}
+          />
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>이력서/자기소개서 📌</Text>
+        {renderFileInput("이력서/자기소개서", resumeFile, () =>
+          pickDocument(setResumeFile)
+        )}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>또는 이력서/자기소개서 작성</Text>
+          <Controller
+            name="resume_text"
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={[styles.input, styles.textarea]}
+                placeholder="📎여기에 이력서/자소서를 붙여넣어 주세요!"
+                placeholderTextColor="#999"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                multiline
+              />
+            )}
+          />
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>추가 자료</Text>
+        {renderFileInput("자료", researchFile, () =>
+          pickDocument(setResearchFile)
+        )}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>또는 추자 자료 작성</Text>
+          <Controller
+            name="research_text"
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={[styles.input, styles.textarea]}
+                placeholder="📎여기에 추가 조사 자료를 붙여넣어 주세요!"
+                placeholderTextColor="#999"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                multiline
+              />
+            )}
+          />
+        </View>
+      </View>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleSubmit(onSubmit)}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>이력서 분석하기📈</Text>
+        )}
+      </TouchableOpacity>
     </View>
   );
 };
@@ -119,28 +271,51 @@ interface AnalysisResultDisplayProps {
   result: AnalysisResult | null;
 }
 
-const AnalysisResultDisplay: React.FC<AnalysisResultDisplayProps> = ({ loading, error, result }) => {
+const AnalysisResultDisplay: React.FC<AnalysisResultDisplayProps> = ({
+  loading,
+  error,
+  result,
+}) => {
   if (loading) {
-    return <View style={styles.centered}><ActivityIndicator size="large" color="#007bff" /></View>;
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#4972c3ff" />
+      </View>
+    );
   }
   if (error) {
-    return <View style={styles.centered}><Text style={styles.errorText}>{error}</Text></View>;
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
   }
   if (!result) {
     return (
-        <View style={styles.centered}>
-            <Text style={styles.placeholderText}>분석 결과가 여기에 표시됩니다.</Text>
-        </View>
+      <View style={styles.centered}>
+        <Text style={styles.placeholderText}>
+          분석 결과가 여기에 표시됩니다.
+        </Text>
+      </View>
     );
   }
 
+  const renderResultSection = (title: string, content: string) => (
+    <View key={title} style={styles.eventItem}>
+      <View style={styles.eventHeader}>
+        <Text style={styles.eventSummary}>{title}</Text>
+      </View>
+      <Markdown style={markdownStyles}>{content || "N/A"}</Markdown>
+    </View>
+  );
+
   return (
     <View>
-        <Text h4 style={styles.resultAreaTitle}>Analysis Result</Text>
-        <Card containerStyle={styles.card}><Card.Title>심층분석</Card.Title><Card.Divider /><Markdown style={markdownStyles}>{result["심층분석"]}</Markdown></Card>
-        <Card containerStyle={styles.card}><Card.Title>교차분석</Card.Title><Card.Divider /><Markdown style={markdownStyles}>{result["교차분석"]}</Markdown></Card>
-        <Card containerStyle={styles.card}><Card.Title>정합성 점검</Card.Title><Card.Divider /><Markdown style={markdownStyles}>{result["정합성점검"]}</Markdown></Card>
-        <Card containerStyle={styles.card}><Card.Title>NCS 요약</Card.Title><Card.Divider /><Markdown style={markdownStyles}>{result["NCS요약"]}</Markdown></Card>
+      <Text style={styles.title}>Analysis Result</Text>
+      {renderResultSection("심층분석", result["심층분석"])}
+      {renderResultSection("교차분석", result["교차분석"])}
+      {renderResultSection("정합성 점검", result["정합성점검"])}
+      {renderResultSection("NCS 요약", result["NCS요약"])}
     </View>
   );
 };
@@ -152,24 +327,43 @@ const ResumeAnalysisScreen = () => {
   const isWideScreen = width > 1000;
 
   const [jdFile, setJdFile] = useState<DocumentPickerAsset | null>(null);
-  const [resumeFile, setResumeFile] = useState<DocumentPickerAsset | null>(null);
-  const [researchFile, setResearchFile] = useState<DocumentPickerAsset | null>(null);
+  const [resumeFile, setResumeFile] = useState<DocumentPickerAsset | null>(
+    null
+  );
+  const [researchFile, setResearchFile] = useState<DocumentPickerAsset | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
 
-  const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
     resolver: zodResolver(analysisSchema),
-    defaultValues: { company: { name: '', job_title: '', department: '', location: '', kpi: '', requirements: '' }, jd_text: '', resume_text: '', research_text: '' },
+    defaultValues: {
+      company: { name: "", job_title: "", requirements: "" },
+      jd_text: "",
+      resume_text: "",
+      research_text: "",
+    },
   });
 
   const onSubmit = async (data: FormData) => {
     if (!jdFile && !data.jd_text) {
-      Alert.alert('Validation Error', 'Please provide either a Job Description file or text.');
+      Alert.alert(
+        "Validation Error",
+        "Please provide either a Job Description file or text."
+      );
       return;
     }
     if (!resumeFile && !data.resume_text) {
-      Alert.alert('Validation Error', 'Please provide either a Resume file or text.');
+      Alert.alert(
+        "Validation Error",
+        "Please provide either a Resume file or text."
+      );
       return;
     }
     setLoading(true);
@@ -177,8 +371,11 @@ const ResumeAnalysisScreen = () => {
 
     const companyData: CompanyData = {
       ...data.company,
-      kpi: data.company.kpi ? data.company.kpi.split(',').map(s => s.trim()) : [],
-      requirements: data.company.requirements ? data.company.requirements.split(',').map(s => s.trim()) : [],
+      kpi: [], // kpi and location are not in the form anymore
+      location: "",
+      requirements: data.company.requirements
+        ? data.company.requirements.split(",").map((s) => s.trim())
+        : [],
     };
     const analysisInput: AnalysisInput = {
       company: companyData,
@@ -194,9 +391,15 @@ const ResumeAnalysisScreen = () => {
       const response = await resumeService.analyzeResume(analysisInput);
       setResult(response);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.error || err.message || 'An unknown error occurred.';
+      const errorMessage =
+        err.response?.data?.error ||
+        err.message ||
+        "An unknown error occurred.";
       setError(`Analysis failed: ${errorMessage}`);
-      Alert.alert('Analysis Error', `Failed to analyze resume. ${errorMessage}`);
+      Alert.alert(
+        "Analysis Error",
+        `Failed to analyze resume. ${errorMessage}`
+      );
     } finally {
       setLoading(false);
     }
@@ -204,8 +407,19 @@ const ResumeAnalysisScreen = () => {
 
   return (
     <ScrollView style={styles.outerContainer}>
-      <View style={[styles.mainContainer, isWideScreen ? styles.rowLayout : styles.columnLayout]}>
-        <View style={[styles.formColumn, isWideScreen && styles.wideColumn, isWideScreen && styles.formColumnBorder]}>
+      <View
+        style={[
+          styles.mainContainer,
+          isWideScreen ? styles.rowLayout : styles.columnLayout,
+        ]}
+      >
+        <View
+          style={[
+            styles.formColumn,
+            isWideScreen && styles.wideColumn,
+            isWideScreen && styles.formColumnBorder,
+          ]}
+        >
           <AnalysisForm
             control={control}
             errors={errors}
@@ -221,124 +435,130 @@ const ResumeAnalysisScreen = () => {
           />
         </View>
         <View style={[styles.resultColumn, isWideScreen && styles.wideColumn]}>
-          <AnalysisResultDisplay loading={loading} error={error} result={result} />
+          <AnalysisResultDisplay
+            loading={loading}
+            error={error}
+            result={result}
+          />
         </View>
       </View>
     </ScrollView>
   );
 };
 
+// --- Styles ---
+
 const markdownStyles = StyleSheet.create({
   heading1: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 10,
     marginBottom: 5,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: "#ddd",
     paddingBottom: 5,
+    color: "#555",
   },
   heading2: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 8,
     marginBottom: 4,
+    color: "#555",
   },
-  body: {
-    fontSize: 16,
-    lineHeight: 24,
-  },
+  body: { fontSize: 16, lineHeight: 24, color: "#555" },
 });
 
 const styles = StyleSheet.create({
-  outerContainer: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
+  outerContainer: { flex: 1, backgroundColor: "#fff" },
   mainContainer: {
-    // No flex: 1, allows ScrollView to manage height
+    width: "70%",
+    maxWidth: 1280,
+    alignSelf: "center",
   },
-  rowLayout: {
-    flexDirection: 'row',
-    alignItems: 'flex-start', // Prevents columns from stretching to equal height
-  },
-  columnLayout: {
-    flexDirection: 'column',
-  },
-  formColumn: {
-    padding: 16,
-  },
-  resultColumn: {
-    padding: 16,
-  },
-  wideColumn: {
-    flex: 1, // Takes up proportional width
-    minWidth: 450, // Ensures it doesn't get too cramped
-  },
-  formColumnBorder: {
-    borderRightWidth: 1,
-    borderRightColor: '#ddd',
-  },
+  rowLayout: { flexDirection: "row", alignItems: "flex-start" },
+  columnLayout: { flexDirection: "column" },
+  formColumn: { padding: 20 },
+  resultColumn: { padding: 20, backgroundColor: "#f9f9f9" },
+  wideColumn: { flex: 1, minWidth: 450 },
+  formColumnBorder: { borderRightWidth: 1, borderRightColor: "#e0e0e0" },
   title: {
-    textAlign: 'center',
-    marginBottom: 24,
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10, // Reduced margin
+    color: "#555",
+    textAlign: "center",
   },
-  card: {
-    borderRadius: 8,
-    marginBottom: 16,
+  requiredInfoText: {
+    textAlign: "center",
+    color: "#555",
+    fontSize: 14,
+    marginBottom: 20,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-    marginLeft: 10,
+  section: { marginBottom: 20 },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 15,
+    color: "#555",
   },
-  fileInputContainer: {
-    marginBottom: 16,
-  },
-  fileInput: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  textArea: {
-    textAlignVertical: 'top',
+  formGroup: { marginBottom: 15 },
+  label: { fontSize: 16, marginBottom: 5, color: "#555" },
+  input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 4,
-    padding: 8,
-    height: 120,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 10,
+    fontSize: 15,
+    backgroundColor: "white",
   },
-  submitButton: {
+  textarea: { height: 120, textAlignVertical: "top" },
+  fileButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#eef7ff",
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#7e91b9ff",
+  },
+  fileButtonText: { color: "#4972c3ff", fontWeight: "600", flexShrink: 1 },
+  button: {
+    backgroundColor: "#4972c3ff",
     paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 10,
   },
-  submitContainer: {
-    marginVertical: 24,
-  },
+  buttonText: { color: "white", fontWeight: "bold", fontSize: 16 },
   centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
     minHeight: 300,
   },
-  errorText: {
-    color: 'red',
-    textAlign: 'center',
+  errorText: { color: "red", textAlign: "center", marginTop: 5 },
+  placeholderText: { fontSize: 18, color: "#a4a2a2ff", textAlign: "center" },
+  eventItem: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: "#101828",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#4972c3ff",
   },
-  placeholderText: {
-    fontSize: 18,
-    color: '#888',
-    textAlign: 'center',
+  eventHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 5,
   },
-  resultAreaTitle: {
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  resultContent: {
-    fontSize: 16,
-    lineHeight: 24,
-  },
+  eventSummary: { fontSize: 18, fontWeight: "600", color: "#555" },
 });
 
 export default ResumeAnalysisScreen;

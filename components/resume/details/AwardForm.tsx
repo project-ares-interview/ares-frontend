@@ -2,11 +2,11 @@ import { Award, AwardCreate, AwardUpdate } from "@/schemas/resume";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import DatePicker from "./DatePicker";
 
@@ -18,7 +18,7 @@ interface FormLabelProps {
 const FormLabel: React.FC<FormLabelProps> = ({ label, required }) => (
   <Text style={styles.label}>
     {label}
-    {required && <Text style={styles.asterisk}>*</Text>}
+    {required && <Text style={styles.requiredAsterisk}> *</Text>}
   </Text>
 );
 
@@ -48,6 +48,8 @@ const AwardForm: React.FC<AwardFormProps> = ({
         issuer: initialData.issuer,
         date_awarded: initialData.date_awarded,
       });
+    } else {
+      setFormData({ title: "", issuer: "", date_awarded: "" });
     }
   }, [initialData]);
 
@@ -70,100 +72,107 @@ const AwardForm: React.FC<AwardFormProps> = ({
   };
 
   return (
-    <View style={styles.form}>
-      <FormLabel label={t("resume.award.title")} required />
-      <TextInput
-        style={styles.input}
-        placeholder={t("resume.award.title_placeholder")}
-        placeholderTextColor="#aaa"
-        value={formData.title}
-        onChangeText={(v) => handleChange("title", v)}
-      />
-      <FormLabel label={t("resume.award.issuer")} required />
-      <TextInput
-        style={styles.input}
-        placeholder={t("resume.award.issuer_placeholder")}
-        placeholderTextColor="#aaa"
-        value={formData.issuer}
-        onChangeText={(v) => handleChange("issuer", v)}
-      />
-      <DatePicker
-        label={t("resume.award.date_awarded")}
-        date={formData.date_awarded}
-        onDateChange={(v) => handleChange("date_awarded", v)}
-        required
-      />
+    <View style={styles.formContainer}>
+      <View style={styles.formGroup}>
+        <FormLabel label={t("resume.award.title")} required />
+        <TextInput
+          style={styles.input}
+          placeholder={t("resume.award.title_placeholder")}
+          placeholderTextColor="#aaa"
+          value={formData.title}
+          onChangeText={(v) => handleChange("title", v)}
+        />
+      </View>
+      <View style={styles.formGroup}>
+        <FormLabel label={t("resume.award.issuer")} required />
+        <TextInput
+          style={styles.input}
+          placeholder={t("resume.award.issuer_placeholder")}
+          placeholderTextColor="#aaa"
+          value={formData.issuer}
+          onChangeText={(v) => handleChange("issuer", v)}
+        />
+      </View>
+      <View style={styles.formGroup}>
+        <DatePicker
+          label={t("resume.award.date_awarded")}
+          date={formData.date_awarded}
+          onDateChange={(v) => handleChange("date_awarded", v)}
+          required
+        />
+      </View>
       <View style={styles.buttonContainer}>
-        <Pressable
+        <TouchableOpacity
           style={[styles.button, styles.cancelButton]}
           onPress={onCancel}
         >
           <Text style={styles.buttonText}>{t("common.cancel")}</Text>
-        </Pressable>
-        <Pressable
+        </TouchableOpacity>
+        <TouchableOpacity
           style={[
             styles.button,
-            styles.saveButton,
             !isFormValid && styles.disabledButton,
           ]}
           onPress={handleSubmit}
           disabled={!isFormValid}
         >
           <Text style={styles.buttonText}>{t("common.save")}</Text>
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  form: {
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#eee",
+  formContainer: {
+    backgroundColor: "#f9f9f9",
     borderRadius: 8,
+    padding: 16,
     marginVertical: 10,
   },
-  label: {
-    fontSize: 14,
-    fontWeight: "bold",
-    marginBottom: 5,
+  formGroup: {
+    marginBottom: 15,
   },
-  asterisk: {
-    color: "red",
-    marginLeft: 8,
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: "#555",
+    fontWeight: "500",
+  },
+  requiredAsterisk: {
+    color: "#ff4d4f",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 4,
+    borderColor: "#ccc",
+    borderRadius: 5,
     padding: 10,
-    marginBottom: 10,
-    fontSize: 14,
+    fontSize: 15,
+    backgroundColor: "white",
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "flex-end",
     marginTop: 10,
+    gap: 10,
   },
   button: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 4,
-    marginLeft: 8,
-  },
-  saveButton: {
-    backgroundColor: "#28a745",
-  },
-  disabledButton: {
-    backgroundColor: "#a1a1a1",
+    backgroundColor: "#4972c3ff",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
   },
   cancelButton: {
-    backgroundColor: "#6c757d",
+    backgroundColor: "#7e91b9ff",
+  },
+  disabledButton: {
+    backgroundColor: "#ccc",
   },
   buttonText: {
     color: "white",
     fontWeight: "bold",
+    fontSize: 14,
   },
 });
 

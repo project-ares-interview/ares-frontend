@@ -72,70 +72,75 @@ const CoverLetterPage = () => {
   }
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.scrollContent}
-    >
-      <Text style={styles.title}>{t("cover_letter.page_title")}</Text>
+    <ScrollView style={styles.outerContainer}>
+      <View style={styles.mainContentContainer}>
+        <Text style={styles.title}>{t("cover_letter.page_title")}</Text>
 
-      {selectedCoverLetter ? (
-        <CoverLetterForm
-          onSubmit={handleFormSubmit}
-          onCancel={clearSelectedCoverLetter}
-          initialData={selectedCoverLetter.id ? selectedCoverLetter : undefined}
-          isLoading={isLoading}
-        />
-      ) : (
-        <>
-          {error && <Text style={styles.error}>{error}</Text>}
+        {selectedCoverLetter ? (
+          <CoverLetterForm
+            onSubmit={handleFormSubmit}
+            onCancel={clearSelectedCoverLetter}
+            initialData={selectedCoverLetter.id ? selectedCoverLetter : undefined}
+            isLoading={isLoading}
+          />
+        ) : (
+          <>
+            {error && <Text style={styles.error}>{error}</Text>}
 
-          <View style={styles.tipBox}>
-            <Text style={styles.tipTitle}>💡 자기소개서 작성 꿀팁!</Text>
-            <Text style={styles.tipText}>
-              {
-                "👉 자신에게 맞는 직무의 자기소개서를 작성할 시에 가상면접에 도움이 됩니다! 만약, 작성하고 싶지 않다면 안하셔도 가상면접은 실행됩니다.\n정확도를 올리고 싶다면 자기소개서를 적어주세요✍️\n\n1. 지원 동기 명확히\n회사·직무와 내 경험을 연결해 구체적으로 작성\n\n2. 스토리 구조 활용\n상황 → 행동 → 결과 (STAR 기법)로 풀어내기\n\n3. 성과는 수치로\n구체적 수치·결과를 넣어 신뢰도 높이기\n\n4. 직무와 연결\n강점이 해당 직무에 어떻게 쓰이는지 강조\n\n5. 차별화 포인트\n나만의 경험·배경으로 개성을 드러내기\n\n6. 간결하고 읽기 쉽게\n짧은 문장, 핵심만 담아 가독성 높이기\n\n7. 포부로 마무리\n회사와 함께 성장할 의지를 보여주기"
-              }
+            <View style={styles.tipBox}>
+              <Text style={styles.tipTitle}>💡 자기소개서 작성 꿀팁!</Text>
+              <Text style={styles.tipText}>
+                {
+                  "자기소개서 관리가 힘들 떄 회사별/직무별로 자기소개서를 관리해보세요!✨\n-회사와 직무에 맞는 지원 동기를 구체적으로 연결하세요.\n-경험은 상황 → 행동 → 결과(STAR) 구조로 스토리처럼 풀어내세요.\n-강점은 성과와 수치로 증명하고, 마지막은 포부로 마무리하세요."
+                }
+              </Text>
+            </View>
+
+            <TouchableOpacity style={styles.button} onPress={handleAddNew}>
+              <Text style={styles.buttonText}>
+                {t("cover_letter.add_button")}
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            <Text style={styles.sectionTitle}>
+              {t("cover_letter.my_letters")}
             </Text>
-          </View>
 
-          <TouchableOpacity style={styles.button} onPress={handleAddNew}>
-            <Text style={styles.buttonText}>
-              {t("cover_letter.add_button")}
-            </Text>
-          </TouchableOpacity>
+            {isLoading && coverLetters.length > 0 && <ActivityIndicator />}
 
-          <View style={styles.divider} />
-
-          <Text style={styles.sectionTitle}>
-            {t("cover_letter.my_letters")}
-          </Text>
-
-          {isLoading && coverLetters.length > 0 && <ActivityIndicator />}
-
-          {coverLetters.length > 0
-            ? coverLetters.map((item) => (
-                <CoverLetterCard
-                  key={item.id}
-                  coverLetter={item}
-                  onSelect={() => selectCoverLetter(item)}
-                  onDelete={() => handleDelete(item.id)}
-                />
-              ))
-            : !isLoading && (
-                <Text style={styles.emptyText}>
-                  {t("cover_letter.no_data")}
-                </Text>
-              )}
-        </>
-      )}
+            {coverLetters.length > 0
+              ? coverLetters.map((item) => (
+                  <CoverLetterCard
+                    key={item.id}
+                    coverLetter={item}
+                    onSelect={() => selectCoverLetter(item)}
+                    onDelete={() => handleDelete(item.id)}
+                  />
+                ))
+              : !isLoading && (
+                  <Text style={styles.emptyText}>
+                    {t("cover_letter.no_data")}
+                  </Text>
+                )}
+          </>
+        )}
+      </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  outerContainer: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f5f5f5",
+  },
+  mainContentContainer: {
+    width: "70%",
+    maxWidth: 1280,
+    alignSelf: "center",
+    paddingVertical: 20,
   },
   scrollContent: {
     padding: 20,

@@ -1,7 +1,8 @@
 import { Award } from "@/schemas/resume";
+import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface AwardCardProps {
   award: Award;
@@ -21,15 +22,15 @@ const AwardCard: React.FC<AwardCardProps> = ({ award, onEdit, onDelete }) => {
         </Text>
       </View>
       <View style={styles.actions}>
-        <Pressable style={[styles.button, styles.editButton]} onPress={onEdit}>
-          <Text style={styles.buttonText}>{t("common.edit")}</Text>
-        </Pressable>
-        <Pressable
+        <TouchableOpacity style={styles.button} onPress={onEdit}>
+          <FontAwesome5 name="pen" size={14} color="#fff" />
+        </TouchableOpacity>
+        <TouchableOpacity
           style={[styles.button, styles.deleteButton]}
           onPress={onDelete}
         >
-          <Text style={styles.buttonText}>{t("common.delete")}</Text>
-        </Pressable>
+          <FontAwesome5 name="trash" size={14} color="#fff" />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -37,23 +38,28 @@ const AwardCard: React.FC<AwardCardProps> = ({ award, onEdit, onDelete }) => {
 
 const styles = StyleSheet.create({
   card: {
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#eee",
+    backgroundColor: "#f9f9f9",
     borderRadius: 8,
+    padding: 12,
     marginBottom: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderLeftWidth: 4,
+    borderLeftColor: "#4972c3ff",
   },
   content: {
-    marginBottom: 8,
+    flex: 1,
   },
   title: {
     fontSize: 16,
     fontWeight: "bold",
+    color: "#333",
   },
   issuer: {
     fontSize: 14,
     color: "#555",
-    marginVertical: 4,
+    marginVertical: 2,
   },
   date: {
     fontSize: 12,
@@ -61,27 +67,16 @@ const styles = StyleSheet.create({
   },
   actions: {
     flexDirection: "row",
-    justifyContent: "flex-end",
-    borderTopWidth: 1,
-    borderColor: "#eee",
-    paddingTop: 8,
-    marginTop: 8,
+    alignItems: "center",
   },
   button: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 4,
+    backgroundColor: "#4972c3ff",
+    padding: 10,
+    borderRadius: 8,
     marginLeft: 8,
   },
-  editButton: {
-    backgroundColor: "#007bff",
-  },
   deleteButton: {
-    backgroundColor: "#dc3545",
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
+    backgroundColor: "#7e91b9ff",
   },
 });
 

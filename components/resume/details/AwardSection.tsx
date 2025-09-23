@@ -1,10 +1,10 @@
 import { Award, AwardCreate, AwardUpdate } from "@/schemas/resume";
 import { resumeService } from "@/services/resumeService";
 import { useResumeStore } from "@/stores/resumeStore";
-import { Icon } from "@rneui/themed";
+import { FontAwesome5 } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { showConfirmation } from "../../../utils/alert";
 import AwardCard from "./AwardCard";
 import AwardForm from "./AwardForm";
@@ -65,25 +65,25 @@ const AwardSection: React.FC<AwardSectionProps> = ({ resumeId, awards }) => {
   };
 
   return (
-    <View style={styles.section}>
-      <View style={styles.header}>
+    <View style={styles.sectionContainer}>
+      <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>{t("resume.award.section_title")}</Text>
-        <Pressable style={styles.addButton} onPress={handleAddNew}>
-          <Icon name="add" color="white" style={{ pointerEvents: "none" }} />
-        </Pressable>
+        <TouchableOpacity style={styles.addButton} onPress={handleAddNew}>
+          <FontAwesome5 name="plus" size={16} color="#fff" />
+        </TouchableOpacity>
       </View>
 
-      {awards.length > 0 ? (
-        awards.map((award) => (
-          <AwardCard
-            key={award.id}
-            award={award}
-            onEdit={() => handleEdit(award)}
-            onDelete={() => handleDelete(award.id)}
-          />
-        ))
-      ) : (
-        !isFormVisible && <Text>{t("resume.award.no_data")}</Text>
+      {awards.length > 0 && (
+        <View style={styles.cardContainer}>
+          {awards.map((award) => (
+            <AwardCard
+              key={award.id}
+              award={award}
+              onEdit={() => handleEdit(award)}
+              onDelete={() => handleDelete(award.id)}
+            />
+          ))}
+        </View>
       )}
 
       {isFormVisible && (
@@ -96,19 +96,24 @@ const AwardSection: React.FC<AwardSectionProps> = ({ resumeId, awards }) => {
           }}
         />
       )}
+
+      {awards.length === 0 && !isFormVisible && (
+        <Text style={styles.noDataText}>{t("resume.award.no_data")}</Text>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  section: {
-    backgroundColor: "white",
-    marginHorizontal: 16,
+  sectionContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
     marginVertical: 8,
     padding: 16,
-    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
   },
-  header: {
+  sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -117,15 +122,20 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
+    color: "#333",
   },
   addButton: {
-    backgroundColor: "#007bff",
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    justifyContent: "center",
-    alignItems: "center",
-    cursor: "pointer",
+    backgroundColor: "#4972c3ff",
+    padding: 8,
+    borderRadius: 8,
+  },
+  cardContainer: {
+    marginTop: 8,
+  },
+  noDataText: {
+    textAlign: "center",
+    color: "#888",
+    paddingVertical: 16,
   },
 });
 

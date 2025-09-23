@@ -1,7 +1,7 @@
 import { Resume } from "@/schemas/resume";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface ResumeCardProps {
   resume: Resume;
@@ -16,60 +16,69 @@ const ResumeCard: React.FC<ResumeCardProps> = ({
 }) => {
   const { t } = useTranslation();
   return (
-    <View style={styles.card}>
-      <Pressable onPress={onSelect} style={styles.contentContainer}>
-        <Text style={styles.title}>{resume.title}</Text>
-        <Text style={styles.date}>
+    <TouchableOpacity onPress={onSelect} style={styles.eventItem}>
+      <View style={styles.eventContent}>
+        <View style={styles.eventHeader}>
+          <Text style={styles.eventSummary}>{resume.title}</Text>
+          <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
+            <Text style={styles.deleteButtonText}>{t("common.delete")}</Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.eventTime}>
           {t("resume.list.last_updated")}:{" "}
           {new Date(resume.updated_at).toLocaleDateString()}
         </Text>
-      </Pressable>
-      <Pressable onPress={onDelete} style={styles.deleteButton}>
-        <Text style={styles.deleteButtonText}>{t("common.delete")}</Text>
-      </Pressable>
-    </View>
+      </View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
+  eventItem: {
+    backgroundColor: "white",
+    borderRadius: 12,
     padding: 16,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 4,
+    marginBottom: 12,
+    marginHorizontal: 16, // Keep horizontal margin for list consistency
+    shadowColor: "#101828",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#4972c3ff",
+  },
+  eventContent: {
+    flex: 1,
+  },
+  eventHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-  },
-  contentContainer: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
     marginBottom: 8,
   },
-  date: {
+  eventSummary: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#555",
+    flex: 1,
+  },
+  eventTime: {
     fontSize: 12,
-    color: "#999",
+    color: "#666",
   },
   deleteButton: {
-    marginLeft: 16,
-    padding: 8,
-    backgroundColor: "#ff4d4f",
-    borderRadius: 4,
+    backgroundColor: "#4972c3ff",
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 10,
   },
   deleteButtonText: {
-    color: "#fff",
+    color: "white",
+    fontSize: 12,
     fontWeight: "bold",
   },
 });

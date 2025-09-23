@@ -1,10 +1,10 @@
 import { Career, CareerCreate, CareerUpdate } from "@/schemas/resume";
 import { resumeService } from "@/services/resumeService";
 import { useResumeStore } from "@/stores/resumeStore";
-import { Icon } from "@rneui/themed";
+import { FontAwesome5 } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { showConfirmation } from "../../../utils/alert";
 import CareerCard from "./CareerCard";
 import CareerForm from "./CareerForm";
@@ -35,7 +35,6 @@ const CareerSection: React.FC<CareerSectionProps> = ({
       setEditingCareer(null);
     } catch (error) {
       console.error("Failed to save career:", error);
-      // TODO: Show error to user
     }
   };
 
@@ -69,25 +68,25 @@ const CareerSection: React.FC<CareerSectionProps> = ({
   };
 
   return (
-    <View style={styles.section}>
-      <View style={styles.header}>
+    <View style={styles.sectionContainer}>
+      <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>{t("resume.career.section_title")}</Text>
-        <Pressable style={styles.addButton} onPress={handleAddNew}>
-          <Icon name="add" color="white" style={{ pointerEvents: "none" }} />
-        </Pressable>
+        <TouchableOpacity style={styles.addButton} onPress={handleAddNew}>
+          <FontAwesome5 name="plus" size={16} color="#fff" />
+        </TouchableOpacity>
       </View>
 
-      {careers.length > 0 ? (
-        careers.map((career) => (
-          <CareerCard
-            key={career.id}
-            career={career}
-            onEdit={() => handleEdit(career)}
-            onDelete={() => handleDelete(career.id)}
-          />
-        ))
-      ) : (
-        !isFormVisible && <Text>{t("resume.career.no_data")}</Text>
+      {careers.length > 0 && (
+        <View style={styles.cardContainer}>
+          {careers.map((career) => (
+            <CareerCard
+              key={career.id}
+              career={career}
+              onEdit={() => handleEdit(career)}
+              onDelete={() => handleDelete(career.id)}
+            />
+          ))}
+        </View>
       )}
 
       {isFormVisible && (
@@ -100,19 +99,24 @@ const CareerSection: React.FC<CareerSectionProps> = ({
           }}
         />
       )}
+
+      {careers.length === 0 && !isFormVisible && (
+        <Text style={styles.noDataText}>{t("resume.career.no_data")}</Text>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  section: {
-    backgroundColor: "white",
-    marginHorizontal: 16,
+  sectionContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
     marginVertical: 8,
     padding: 16,
-    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
   },
-  header: {
+  sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -121,15 +125,20 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
+    color: "#333",
   },
   addButton: {
-    backgroundColor: "#007bff",
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    justifyContent: "center",
-    alignItems: "center",
-    cursor: "pointer",
+    backgroundColor: "#4972c3ff",
+    padding: 8,
+    borderRadius: 8,
+  },
+  cardContainer: {
+    marginTop: 8,
+  },
+  noDataText: {
+    textAlign: "center",
+    color: "#888",
+    paddingVertical: 16,
   },
 });
 
