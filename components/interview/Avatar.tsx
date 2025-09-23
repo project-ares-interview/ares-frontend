@@ -30,12 +30,24 @@ const Avatar = forwardRef<AvatarRef, {}>((props, ref) => {
   const spokenTextQueue = useRef<string[]>([]);
   const pendingSpeakRequest = useRef<string | null>(null);
 
+  const avatarProfiles = [
+    { character: 'harry', style: 'business', voice: 'ko-KR-BongJinNeural' },
+    { character: 'jeff', style: 'business', voice: 'ko-KR-InJoonNeural' },
+    { character: 'lori', style: 'graceful', voice: 'ko-KR-JiMinNeural' },
+    { character: 'lisa', style: 'casual-sitting', voice: 'ko-KR-SoonBokNeural' }
+  ];
+
+  const [selectedProfile] = useState(() => {
+      const randomIndex = Math.floor(Math.random() * avatarProfiles.length);
+      return avatarProfiles[randomIndex];
+  });
+
   const config = {
     speechKey: process.env.EXPO_PUBLIC_SPEECHKEY,
     speechRegion: 'eastus2',
-    ttsVoice: 'ko-KR-BongJinNeural',
-    avatarCharacter: 'harry',
-    avatarStyle: 'business',
+    ttsVoice: selectedProfile.voice,
+    avatarCharacter: selectedProfile.character,
+    avatarStyle: selectedProfile.style,
   };
 
   const speakNext = (text: string) => {
