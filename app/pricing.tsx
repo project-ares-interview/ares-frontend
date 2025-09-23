@@ -43,7 +43,7 @@ export default function Pricing() {
   ];
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       
       <View style={styles.pricingContainer}>
         {pricingPlans.map((plan, index) => (
@@ -81,7 +81,10 @@ export default function Pricing() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 20,
   },
   mainTitle: {
     fontSize: 40,
@@ -90,7 +93,6 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   pricingContainer: {
-    flex: 1,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "stretch",
