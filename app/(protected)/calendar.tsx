@@ -1,12 +1,13 @@
-// app/calendar.tsx (React Native 최종 버전)
+// app/calendar.tsx (백엔드 API 연동 버전)
 
-import { useRouter } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+// import { useRouter } from "expo-router"; // 필요시 사용
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Picker } from "@react-native-picker/picker";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Button,
-  Linking,
   Platform,
   ScrollView,
   StyleSheet,
@@ -15,30 +16,24 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { WebView } from "react-native-webview"; // 🌟 웹뷰를 위해 설치 필요
-import api from "../../services/api"; // 🌟 실제 경로 확인 필요
+import { WebView } from "react-native-webview";
+import { useBackendCalendar } from "../../hooks/useBackendCalendar";
 
-// --- [타입 정의는 그대로 사용합니다] ---
-interface CalendarEvent {
-  id?: string;
-  summary: string;
-  start: any; // 🌟 백엔드에서 객체로 오므로 any로 변경
-  end: any; // 🌟 백엔드에서 객체로 오므로 any로 변경
-  description?: string;
-  raw_start?: string;
-  raw_end?: string;
-}
-
-// ... (다른 interface들은 그대로) ...
+// --- [타입 정의는 useBackendCalendar hook에서 가져옴] ---
 
 export default function CalendarPage() {
-  // 🌟 JSX.Element 반환 타입은 생략해도 됩니다.
+  // --- [백엔드 API 연동 Hook 사용] ---
+  const {
+    isAuthenticated,
+    isLoading,
+    events,
+    promptAuth,
+    addEvent,
+    deleteEvent,
+    error,
+  } = useBackendCalendar();
+
   // --- [State 관리] ---
-  const [status, setStatus] = useState<
-    "loading" | "authenticated" | "google_auth_required" | "error"
-  >("loading");
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [googleAuthUrl, setGoogleAuthUrl] = useState<string | null>(null);
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
@@ -52,41 +47,67 @@ export default function CalendarPage() {
   const [endTime, setEndTime] = useState("");
   const [description, setDescription] = useState("");
 
-  const router = useRouter();
+  // 날짜/시간 입력 모드: calendar | select
+  const [inputMode, setInputMode] = useState<"calendar" | "select">("calendar");
 
-  // --- [Data Fetching] ---
-  const fetchCalendarData = useCallback(async () => {
-    try {
-      const response = await api.get<any>("/calendar/");
+  // Calendar 모드용 상태 (모바일)
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
 
-      setStatus(response.data.status || "authenticated"); // status가 없을 경우를 대비
+  // Select 모드용 상태
+  const now = useMemo(() => new Date(), []);
+  const years = useMemo(() => {
+    const y: number[] = [];
+    const base = now.getFullYear();
+    for (let i = 0; i < 5; i++) y.push(base + i);
+    return y;
+  }, [now]);
+  const months = useMemo(() => Array.from({ length: 12 }, (_, i) => i + 1), []);
+  const hours = useMemo(() => Array.from({ length: 24 }, (_, i) => i), []);
+  const minutes = useMemo(() => Array.from({ length: 60 }, (_, i) => i), []);
 
-      if (response.data.status === "authenticated") {
-        setEvents(response.data.events || []);
-      } else if (response.data.status === "google_auth_required") {
-        setGoogleAuthUrl(response.data.authorization_url || null);
-      } else {
-        // 백엔드가 events만 보냈을 경우를 대비 (이전 버전 호환)
-        setEvents(response.data.events || []);
-        setStatus("authenticated");
-      }
-    } catch (error: any) {
-      if (error.response && error.response.status === 401) {
-        Alert.alert(
-          "로그인 필요",
-          "로그인이 필요합니다. 로그인 페이지로 이동합니다.",
-          [{ text: "확인", onPress: () => router.replace("/(auth)/sign-in") }]
-        );
-      } else {
-        console.error("캘린더 데이터 로딩 중 오류:", error);
-        setStatus("error");
-      }
-    }
-  }, [router]);
+  const pad2 = (n: number) => (n < 10 ? `0${n}` : `${n}`);
+  const daysInMonth = (year: number, month: number) => new Date(year, month, 0).getDate();
 
+  const [sYear, setSYear] = useState<number>(now.getFullYear());
+  const [sMonth, setSMonth] = useState<number>(now.getMonth() + 1);
+  const [sDay, setSDay] = useState<number>(now.getDate());
+  const [sHour, setSHour] = useState<number>(9);
+  const [sMinute, setSMinute] = useState<number>(0);
+
+  const [eYear, setEYear] = useState<number>(now.getFullYear());
+  const [eMonth, setEMonth] = useState<number>(now.getMonth() + 1);
+  const [eDay, setEDay] = useState<number>(now.getDate());
+  const [eHour, setEHour] = useState<number>(18);
+  const [eMinute, setEMinute] = useState<number>(0);
+
+  const sDays = useMemo(() => Array.from({ length: daysInMonth(sYear, sMonth) }, (_, i) => i + 1), [sYear, sMonth]);
+  const eDays = useMemo(() => Array.from({ length: daysInMonth(eYear, eMonth) }, (_, i) => i + 1), [eYear, eMonth]);
+
+  // 입력 변경시 startTime/endTime 동기화
   useEffect(() => {
-    fetchCalendarData();
-  }, [fetchCalendarData]);
+    if (inputMode === "calendar") {
+      if (startDate) setStartTime(`${startDate.getFullYear()}-${pad2(startDate.getMonth() + 1)}-${pad2(startDate.getDate())}T${pad2(startDate.getHours())}:${pad2(startDate.getMinutes())}:00`);
+      if (endDate) setEndTime(`${endDate.getFullYear()}-${pad2(endDate.getMonth() + 1)}-${pad2(endDate.getDate())}T${pad2(endDate.getHours())}:${pad2(endDate.getMinutes())}:00`);
+    } else {
+      setStartTime(`${sYear}-${pad2(sMonth)}-${pad2(sDay)}T${pad2(sHour)}:${pad2(sMinute)}:00`);
+      setEndTime(`${eYear}-${pad2(eMonth)}-${pad2(eDay)}T${pad2(eHour)}:${pad2(eMinute)}:00`);
+    }
+  }, [inputMode, startDate, endDate, sYear, sMonth, sDay, sHour, sMinute, eYear, eMonth, eDay, eHour, eMinute]);
+
+  // const router = useRouter(); // 필요시 사용
+
+  // --- [Error 처리] ---
+  useEffect(() => {
+    if (error) {
+      setMessage({
+        type: "error",
+        text: error,
+      });
+    }
+  }, [error]);
 
   // --- [Event Handlers] ---
   const handleAddEvent = async () => {
@@ -102,25 +123,28 @@ export default function CalendarPage() {
     // 사용자가 시간 없이 날짜만 입력한 경우 기본값 설정
     let tempStartTime = startTime;
     if (startTime && !startTime.includes(":")) {
-      tempStartTime = `${startTime} 00:00`;
+      tempStartTime = `${startTime}T00:00:00`;
+    } else {
+      tempStartTime = tempStartTime.replace(" ", "T");
     }
 
     let tempEndTime = endTime;
     if (endTime && !endTime.includes(":")) {
-      tempEndTime = `${endTime} 23:59`; // 종료일은 하루의 끝으로 설정
+      tempEndTime = `${endTime}T23:59:59`; // 종료일은 하루의 끝으로 설정
+    } else {
+      tempEndTime = tempEndTime.replace(" ", "T");
     }
 
-    // 백엔드는 "YYYY-MM-DDTHH:mm" 형식을 기대합니다.
-    const formattedStartTime = tempStartTime.replace(" ", "T");
-    const formattedEndTime = tempEndTime.replace(" ", "T");
+    // 백엔드 API 형식으로 변환
+    const eventData = {
+      summary,
+      start: tempStartTime,
+      end: tempEndTime,
+      description: description || undefined,
+    };
 
-    try {
-      const response = await api.post("/calendar/add-event/", {
-        summary,
-        start_time: formattedStartTime,
-        end_time: formattedEndTime,
-        description,
-      });
+    const success = await addEvent(eventData);
+    if (success) {
       setMessage({
         type: "success",
         text: "일정이 성공적으로 추가되었습니다!",
@@ -129,9 +153,7 @@ export default function CalendarPage() {
       setStartTime("");
       setEndTime("");
       setDescription("");
-      await fetchCalendarData();
-    } catch (error) {
-      console.error("이벤트 추가 중 오류:", error);
+    } else {
       setMessage({
         type: "error",
         text: "일정 추가에 실패했습니다. 입력 형식(YYYY-MM-DD 또는 YYYY-MM-DD HH:mm)을 확인해주세요.",
@@ -156,21 +178,13 @@ export default function CalendarPage() {
 
       if (userConfirmed) {
         (async () => {
-          try {
-            const response = await api.delete(
-              `/calendar/delete-event/${eventId}/`
-            );
+          const success = await deleteEvent(eventId);
+          if (success) {
             setMessage({
               type: "success",
-              text:
-                response.data.message || "일정이 성공적으로 삭제되었습니다.",
+              text: "일정이 성공적으로 삭제되었습니다.",
             });
-            await fetchCalendarData();
-          } catch (error: any) {
-            console.error(
-              "일정 삭제 실패:",
-              error.response?.data || error.message
-            );
+          } else {
             setMessage({ type: "error", text: "일정 삭제에 실패했습니다." });
           }
         })();
@@ -188,22 +202,13 @@ export default function CalendarPage() {
           {
             text: "삭제",
             onPress: async () => {
-              try {
-                const response = await api.delete(
-                  `/calendar/delete-event/${eventId}/`
-                );
+              const success = await deleteEvent(eventId);
+              if (success) {
                 setMessage({
                   type: "success",
-                  text:
-                    response.data.message ||
-                    "일정이 성공적으로 삭제되었습니다.",
+                  text: "일정이 성공적으로 삭제되었습니다.",
                 });
-                await fetchCalendarData();
-              } catch (error: any) {
-                console.error(
-                  "일정 삭제 실패:",
-                  error.response?.data || error.message
-                );
+              } else {
                 setMessage({
                   type: "error",
                   text: "일정 삭제에 실패했습니다.",
@@ -216,31 +221,18 @@ export default function CalendarPage() {
         { cancelable: false }
       );
     }
-
-    console.log("[5] Alert.alert 함수 호출이 완료되었습니다.");
   };
 
   const handleGoogleAuth = () => {
-    if (googleAuthUrl) {
-      // 🌟 앱의 내장 브라우저 대신, 기기의 기본 브라우저를 엽니다.
-      Linking.openURL(googleAuthUrl);
-    }
+    promptAuth();
   };
 
   // --- [렌더링] ---
-  if (status === "loading") {
+  if (isLoading) {
     return (
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" />
         <Text>사용자님의 구글 캘린더 정보를 불러오는 중...</Text>
-      </View>
-    );
-  }
-
-  if (status === "error") {
-    return (
-      <View style={styles.centerContainer}>
-        <Text>오류가 발생했습니다. 잠시 후 다시 시도해주세요.</Text>
       </View>
     );
   }
@@ -257,7 +249,7 @@ export default function CalendarPage() {
         <Text style={styles.title}>채용 공고 정리 🗓️</Text>
 
         {/* [분기 1] Google 인증 필요 화면 */}
-        {status === "google_auth_required" && (
+        {!isAuthenticated && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Google Calendar 연동</Text>
             <Text style={styles.paragraph}>
@@ -271,7 +263,7 @@ export default function CalendarPage() {
         )}
 
         {/* [분기 2] 인증 완료 화면 */}
-        {status === "authenticated" && (
+        {isAuthenticated && (
           <View>
             {message && (
               <View
@@ -298,24 +290,227 @@ export default function CalendarPage() {
                 placeholder="예: 삼성전자 (AI 엔지니어)"
               />
             </View>
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>접수 시작(날짜 필수✔️):</Text>
-              <TextInput
-                style={styles.input}
-                value={startTime}
-                onChangeText={setStartTime}
-                placeholder="YYYY-MM-DD HH:mm"
-              />
+            {/* 입력 모드 토글 */}
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.button, inputMode === 'calendar' ? {} : { backgroundColor: '#9aaad7' }]}
+                onPress={() => setInputMode('calendar')}
+              >
+                <Text style={styles.buttonText}>달력으로 선택</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, inputMode === 'select' ? {} : { backgroundColor: '#9aaad7' }]}
+                onPress={() => setInputMode('select')}
+              >
+                <Text style={styles.buttonText}>연/월/일/시/분 선택</Text>
+              </TouchableOpacity>
             </View>
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>접수 마감(날짜 필수✔️):</Text>
-              <TextInput
-                style={styles.input}
-                value={endTime}
-                onChangeText={setEndTime}
-                placeholder="YYYY-MM-DD HH:mm"
-              />
-            </View>
+
+            {inputMode === 'calendar' ? (
+              <>
+                {/* Calendar 입력 */}
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>접수 시작(날짜 필수✔️):</Text>
+                  {Platform.OS === 'web' ? (
+                    // 웹은 공통 입력 스타일 래퍼로 감싸 동일한 크기/테두리 적용
+                    <View style={styles.inputWebWrapper}>
+                      {/* @ts-ignore */}
+                      <input
+                        type="datetime-local"
+                        className="ares-input-web"
+                        style={styles.inputWebField as any}
+                        value={startTime ? startTime.substring(0,16) : ''}
+                        onChange={(e: any) => setStartTime(e.target.value.replace(' ', 'T') + (e.target.value.length === 16 ? ':00' : ''))}
+                      />
+                    </View>
+                  ) : (
+                    <>
+                      <TouchableOpacity style={styles.input} onPress={() => setShowStartPicker(true)}>
+                        <Text>{startTime ? startTime.replace('T', ' ') : '날짜/시간 선택'}</Text>
+                      </TouchableOpacity>
+                      {showStartPicker && (
+                        <DateTimePicker
+                          value={startDate ?? new Date()}
+                          mode="datetime"
+                          is24Hour
+                          onChange={(_, d) => {
+                            setShowStartPicker(false);
+                            if (d) setStartDate(d);
+                          }}
+                        />
+                      )}
+                    </>
+                  )}
+                </View>
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>접수 마감(날짜 필수✔️):</Text>
+                  {Platform.OS === 'web' ? (
+                    <View style={styles.inputWebWrapper}>
+                      {/* @ts-ignore */}
+                      <input
+                        type="datetime-local"
+                        className="ares-input-web"
+                        style={styles.inputWebField as any}
+                        value={endTime ? endTime.substring(0,16) : ''}
+                        onChange={(e: any) => setEndTime(e.target.value.replace(' ', 'T') + (e.target.value.length === 16 ? ':00' : ''))}
+                      />
+                    </View>
+                  ) : (
+                    <>
+                      <TouchableOpacity style={styles.input} onPress={() => setShowEndPicker(true)}>
+                        <Text>{endTime ? endTime.replace('T', ' ') : '날짜/시간 선택'}</Text>
+                      </TouchableOpacity>
+                      {showEndPicker && (
+                        <DateTimePicker
+                          value={endDate ?? new Date()}
+                          mode="datetime"
+                          is24Hour
+                          onChange={(_, d) => {
+                            setShowEndPicker(false);
+                            if (d) setEndDate(d);
+                          }}
+                        />
+                      )}
+                    </>
+                  )}
+                </View>
+              </>
+            ) : (
+              <>
+                {/* Select 입력 */}
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>접수 시작(연/월/일/시/분)</Text>
+                  {Platform.OS === 'web' ? (
+                    <View style={{ gap: 8 }}>
+                      {/* @ts-ignore */}
+                      <select value={sYear} onChange={(e: any) => setSYear(Number(e.target.value))}>
+                        {years.map((y) => (
+                          <option key={y} value={y}>{y}년</option>
+                        ))}
+                      </select>
+                      {/* @ts-ignore */}
+                      <select value={sMonth} onChange={(e: any) => setSMonth(Number(e.target.value))}>
+                        {months.map((m) => (
+                          <option key={m} value={m}>{m}월</option>
+                        ))}
+                      </select>
+                      {/* @ts-ignore */}
+                      <select value={sDay} onChange={(e: any) => setSDay(Number(e.target.value))}>
+                        {sDays.map((d) => (
+                          <option key={d} value={d}>{d}일</option>
+                        ))}
+                      </select>
+                      {/* @ts-ignore */}
+                      <select value={sHour} onChange={(e: any) => setSHour(Number(e.target.value))}>
+                        {hours.map((h) => (
+                          <option key={h} value={h}>{pad2(h)}시</option>
+                        ))}
+                      </select>
+                      {/* @ts-ignore */}
+                      <select value={sMinute} onChange={(e: any) => setSMinute(Number(e.target.value))}>
+                        {minutes.map((m) => (
+                          <option key={m} value={m}>{pad2(m)}분</option>
+                        ))}
+                      </select>
+                    </View>
+                  ) : (
+                    <View style={{ gap: 8 }}>
+                      <Picker selectedValue={sYear} onValueChange={(v) => setSYear(v)}>
+                        {years.map((y) => (
+                          <Picker.Item key={y} label={`${y}년`} value={y} />
+                        ))}
+                      </Picker>
+                      <Picker selectedValue={sMonth} onValueChange={(v) => setSMonth(v)}>
+                        {months.map((m) => (
+                          <Picker.Item key={m} label={`${m}월`} value={m} />
+                        ))}
+                      </Picker>
+                      <Picker selectedValue={sDay} onValueChange={(v) => setSDay(v)}>
+                        {sDays.map((d) => (
+                          <Picker.Item key={d} label={`${d}일`} value={d} />
+                        ))}
+                      </Picker>
+                      <Picker selectedValue={sHour} onValueChange={(v) => setSHour(v)}>
+                        {hours.map((h) => (
+                          <Picker.Item key={h} label={`${pad2(h)}시`} value={h} />
+                        ))}
+                      </Picker>
+                      <Picker selectedValue={sMinute} onValueChange={(v) => setSMinute(v)}>
+                        {minutes.map((m) => (
+                          <Picker.Item key={m} label={`${pad2(m)}분`} value={m} />
+                        ))}
+                      </Picker>
+                    </View>
+                  )}
+                </View>
+
+                <View style={styles.formGroup}>
+                  <Text style={styles.label}>접수 마감(연/월/일/시/분)</Text>
+                  {Platform.OS === 'web' ? (
+                    <View style={{ gap: 8 }}>
+                      {/* @ts-ignore */}
+                      <select value={eYear} onChange={(e: any) => setEYear(Number(e.target.value))}>
+                        {years.map((y) => (
+                          <option key={y} value={y}>{y}년</option>
+                        ))}
+                      </select>
+                      {/* @ts-ignore */}
+                      <select value={eMonth} onChange={(e: any) => setEMonth(Number(e.target.value))}>
+                        {months.map((m) => (
+                          <option key={m} value={m}>{m}월</option>
+                        ))}
+                      </select>
+                      {/* @ts-ignore */}
+                      <select value={eDay} onChange={(e: any) => setEDay(Number(e.target.value))}>
+                        {eDays.map((d) => (
+                          <option key={d} value={d}>{d}일</option>
+                        ))}
+                      </select>
+                      {/* @ts-ignore */}
+                      <select value={eHour} onChange={(e: any) => setEHour(Number(e.target.value))}>
+                        {hours.map((h) => (
+                          <option key={h} value={h}>{pad2(h)}시</option>
+                        ))}
+                      </select>
+                      {/* @ts-ignore */}
+                      <select value={eMinute} onChange={(e: any) => setEMinute(Number(e.target.value))}>
+                        {minutes.map((m) => (
+                          <option key={m} value={m}>{pad2(m)}분</option>
+                        ))}
+                      </select>
+                    </View>
+                  ) : (
+                    <View style={{ gap: 8 }}>
+                      <Picker selectedValue={eYear} onValueChange={(v) => setEYear(v)}>
+                        {years.map((y) => (
+                          <Picker.Item key={y} label={`${y}년`} value={y} />
+                        ))}
+                      </Picker>
+                      <Picker selectedValue={eMonth} onValueChange={(v) => setEMonth(v)}>
+                        {months.map((m) => (
+                          <Picker.Item key={m} label={`${m}월`} value={m} />
+                        ))}
+                      </Picker>
+                      <Picker selectedValue={eDay} onValueChange={(v) => setEDay(v)}>
+                        {eDays.map((d) => (
+                          <Picker.Item key={d} label={`${d}일`} value={d} />
+                        ))}
+                      </Picker>
+                      <Picker selectedValue={eHour} onValueChange={(v) => setEHour(v)}>
+                        {hours.map((h) => (
+                          <Picker.Item key={h} label={`${pad2(h)}시`} value={h} />
+                        ))}
+                      </Picker>
+                      <Picker selectedValue={eMinute} onValueChange={(v) => setEMinute(v)}>
+                        {minutes.map((m) => (
+                          <Picker.Item key={m} label={`${pad2(m)}분`} value={m} />
+                        ))}
+                      </Picker>
+                    </View>
+                  )}
+                </View>
+              </>
+            )}
             <View style={styles.formGroup}>
               <Text style={styles.label}>상세 일정👀(선택사항):</Text>
               <TextInput
@@ -367,9 +562,13 @@ export default function CalendarPage() {
                       </Text>
                     )}
 
-                    {/* 백엔드가 가공하고 정렬해서 보내준 데이터를 그대로 보여주기만 합니다. */}
-                    <Text style={styles.eventTime}>시작: {event.start}</Text>
-                    <Text style={styles.eventTime}>종료: {event.end}</Text>
+                    {/* 백엔드 API 응답 형식에 맞게 날짜 표시 */}
+                    <Text style={styles.eventTime}>
+                      시작: {new Date(event.start).toLocaleString('ko-KR')}
+                    </Text>
+                    <Text style={styles.eventTime}>
+                      종료: {new Date(event.end).toLocaleString('ko-KR')}
+                    </Text>
                   </View>
                 </View>
               ))
@@ -438,6 +637,21 @@ const styles = StyleSheet.create({
     fontSize: 15,
     backgroundColor: "white",
   },
+  // 웹 datetime-local 입력을 RN TextInput과 동일 크기로 보이게 하기 위한 래퍼/필드 스타일
+  inputWebWrapper: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    backgroundColor: "white",
+  },
+  inputWebField: {
+    width: "100%",
+    padding: 10,
+    fontSize: 15,
+    border: "none",
+    outline: "none",
+    boxSizing: "border-box",
+  } as any,
   textarea: { height: 100, textAlignVertical: "top" },
   buttonContainer: {
     flexDirection: "row",
