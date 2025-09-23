@@ -2,11 +2,12 @@ import { CoverLetter, CoverLetterCreate } from "@/schemas/coverLetter";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    View
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 interface CoverLetterFormProps {
@@ -30,6 +31,9 @@ const CoverLetterForm: React.FC<CoverLetterFormProps> = ({
     if (initialData) {
       setTitle(initialData.title);
       setContent(initialData.content);
+    } else {
+      setTitle("");
+      setContent("");
     }
   }, [initialData]);
 
@@ -38,92 +42,114 @@ const CoverLetterForm: React.FC<CoverLetterFormProps> = ({
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>{t("cover_letter.form.title")}</Text>
-      <TextInput
-        style={styles.input}
-        value={title}
-        onChangeText={setTitle}
-        placeholder={t("cover_letter.form.title_placeholder")}
-        placeholderTextColor="#aaa"
-      />
-      <Text style={styles.label}>{t("cover_letter.form.content")}</Text>
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        value={content}
-        onChangeText={setContent}
-        placeholder={t("cover_letter.form.content_placeholder")}
-        placeholderTextColor="#aaa"
-        multiline
-      />
+    <View style={styles.formContainer}>
+      <Text style={styles.formTitle}>
+        {initialData?.id
+          ? t("cover_letter.form.edit_title")
+          : t("cover_letter.form.new_title")}
+      </Text>
+
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>{t("cover_letter.form.title")}</Text>
+        <TextInput
+          style={styles.input}
+          value={title}
+          onChangeText={setTitle}
+          placeholder={t("cover_letter.form.title_placeholder")}
+          placeholderTextColor="#aaa"
+        />
+      </View>
+
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>{t("cover_letter.form.content")}</Text>
+        <TextInput
+          style={[styles.input, styles.textarea]}
+          value={content}
+          onChangeText={setContent}
+          placeholder={t("cover_letter.form.content_placeholder")}
+          placeholderTextColor="#aaa"
+          multiline
+        />
+      </View>
+
       <View style={styles.buttonContainer}>
-        <Pressable
-          style={[styles.button, styles.submitButton]}
-          onPress={handleSubmit}
-          disabled={isLoading}
-        >
-          <Text style={styles.buttonText}>
-            {isLoading
-              ? t("cover_letter.form.saving")
-              : t("common.save")}
-          </Text>
-        </Pressable>
-        <Pressable
+        <TouchableOpacity
           style={[styles.button, styles.cancelButton]}
           onPress={onCancel}
           disabled={isLoading}
         >
           <Text style={styles.buttonText}>{t("common.cancel")}</Text>
-        </Pressable>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSubmit}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>{t("common.save")}</Text>
+          )}
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    backgroundColor: "#fff",
+  formContainer: {
+    backgroundColor: "#f9f9f9", // Slightly different background for the form
+    padding: 20,
     borderRadius: 8,
-    margin: 16,
+  },
+  formTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 20,
+    textAlign: "left",
+  },
+  formGroup: {
+    marginBottom: 15,
   },
   label: {
     fontSize: 16,
+    marginBottom: 5,
+    color: "#555",
     fontWeight: "bold",
-    marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 4,
-    padding: 12,
-    marginBottom: 16,
-    fontSize: 16,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 10,
+    fontSize: 15,
+    backgroundColor: "white",
   },
-  textArea: {
-    height: 200,
+  textarea: {
+    height: 250,
     textAlignVertical: "top",
   },
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
+    marginTop: 10,
+    gap: 10,
   },
   button: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 4,
-    marginLeft: 10,
-  },
-  submitButton: {
-    backgroundColor: "#007bff",
+    backgroundColor: "#4972c3ff",
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    flex: 1,
   },
   cancelButton: {
-    backgroundColor: "#6c757d",
+    backgroundColor: "#7e91b9ff",
   },
   buttonText: {
-    color: "#fff",
+    color: "white",
     fontWeight: "bold",
-    textAlign: "center",
+    fontSize: 14,
   },
 });
 

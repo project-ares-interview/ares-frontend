@@ -58,10 +58,14 @@
         "form": {
             "content": "Content",
             "content_placeholder": "Enter cover letter content",
+            "edit_title": "Edit Cover Letter",
+            "new_title": "New Cover Letter",
             "saving": "Saving...",
             "title": "Title",
             "title_placeholder": "Enter cover letter title"
         },
+        "loading": "Loading cover letters...",
+        "my_letters": "My Cover Letters",
         "no_data": "No cover letters created yet.",
         "page_title": "Cover Letter Management"
     },
