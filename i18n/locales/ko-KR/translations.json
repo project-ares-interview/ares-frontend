@@ -58,10 +58,14 @@
         "form": {
             "content": "내용",
             "content_placeholder": "자기소개서 내용을 입력하세요",
+            "edit_title": "자기소개서 수정",
+            "new_title": "새 자기소개서 작성",
             "saving": "저장 중...",
             "title": "제목",
             "title_placeholder": "자기소개서 제목을 입력하세요"
         },
+        "loading": "자기소개서를 불러오는 중...",
+        "my_letters": "내 자기소개서",
         "no_data": "작성된 자기소개서가 없습니다.",
         "page_title": "자기소개서 관리"
     },

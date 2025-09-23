@@ -1,7 +1,7 @@
 import { CoverLetter } from "@/schemas/coverLetter";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface CoverLetterCardProps {
   coverLetter: CoverLetter;
@@ -16,68 +16,77 @@ const CoverLetterCard: React.FC<CoverLetterCardProps> = ({
 }) => {
   const { t } = useTranslation();
   return (
-    <View style={styles.card}>
-      <Pressable onPress={onSelect} style={styles.contentContainer}>
-        <Text style={styles.title}>{coverLetter.title}</Text>
-        <Text style={styles.content} numberOfLines={2}>
+    <TouchableOpacity onPress={onSelect} style={styles.eventItem}>
+      <View style={styles.eventContent}>
+        <View style={styles.eventHeader}>
+          <Text style={styles.eventSummary}>{coverLetter.title}</Text>
+          <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
+            <Text style={styles.deleteButtonText}>{t("common.delete")}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.eventDescription} numberOfLines={2}>
           {coverLetter.content}
         </Text>
-        <Text style={styles.date}>
+
+        <Text style={styles.eventTime}>
           {t("cover_letter.created_date")}:{" "}
           {new Date(coverLetter.created_at).toLocaleDateString()}
         </Text>
-      </Pressable>
-      <Pressable onPress={onDelete} style={styles.deleteButton}>
-        <Text style={styles.deleteButtonText}>{t("common.delete")}</Text>
-      </Pressable>
-    </View>
+      </View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
+  eventItem: {
+    backgroundColor: "white",
+    borderRadius: 12,
     padding: 16,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 4,
+    marginBottom: 12,
+    shadowColor: "#101828",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#4972c3ff",
+  },
+  eventContent: {
+    flex: 1,
+  },
+  eventHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 8,
   },
-  contentContainer: {
+  eventSummary: {
+    fontSize: 18,
+    fontWeight: "600",
     flex: 1,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  content: {
+  eventDescription: {
     fontSize: 14,
-    color: "#666",
-    marginBottom: 8,
+    color: "#555",
+    lineHeight: 20,
+    marginBottom: 10,
   },
-  date: {
+  eventTime: {
     fontSize: 12,
-    color: "#999",
+    color: "#666",
   },
   deleteButton: {
-    marginLeft: 16,
+    backgroundColor: "#7e91b9ff ",
     padding: 8,
-    backgroundColor: "#ff4d4f",
-    borderRadius: 4,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 10,
   },
   deleteButtonText: {
-    color: "#fff",
+    color: "white",
+    fontSize: 12,
     fontWeight: "bold",
   },
 });
