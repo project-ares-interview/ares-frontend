@@ -1,5 +1,5 @@
 import { Picker } from "@react-native-picker/picker";
-import { Button, Card, Icon, Input, Text } from "@rneui/themed";
+import { Button, Icon, Input, Text } from "@rneui/themed";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -201,109 +201,89 @@ const EducationForm = ({
   ].includes(schoolType);
 
   return (
-    <ScrollView style={styles.formContainer}>
-      <Text style={styles.pickerLabel}>
-        {t("profile.education.school_type")}
-      </Text>
-      <Picker
-        selectedValue={schoolType}
-        onValueChange={(itemValue) => setSchoolType(itemValue)}
-        style={styles.picker}
-      >
-        {schoolTypeOptions.map((opt) => (
-          <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
-        ))}
-      </Picker>
-
-      <Input
-        label={t("profile.education.school_name")}
-        value={schoolName}
-        onChangeText={setSchoolName}
-        placeholder={t("profile.education.school_name_placeholder")}
-        placeholderTextColor="#aaa"
-        containerStyle={styles.inputContainer}
-      />
+    <View style={styles.formContainer}>
+      <View style={styles.formRow}>
+        <View style={styles.pickerFieldContainer}>
+          <Text style={styles.pickerLabel}>
+            {t("profile.education.school_type")}
+          </Text>
+          <Picker
+            selectedValue={schoolType}
+            onValueChange={(itemValue) => setSchoolType(itemValue)}
+            style={styles.picker}
+          >
+            {schoolTypeOptions.map((opt) => (
+              <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+            ))}
+          </Picker>
+        </View>
+        <Input
+          label={t("profile.education.school_name")}
+          value={schoolName}
+          onChangeText={setSchoolName}
+          placeholder={t("profile.education.school_name_placeholder")}
+          placeholderTextColor="#aaa"
+          containerStyle={styles.inputFieldContainer}
+          inputContainerStyle={styles.inputUnderline}
+        />
+      </View>
       {showMajorAndDegree && (
-        <>
+        <View style={styles.formRow}>
           <Input
             label={t("profile.education.major")}
             value={major}
             onChangeText={setMajor}
             placeholder={t("profile.education.major_placeholder")}
             placeholderTextColor="#aaa"
-            containerStyle={styles.inputContainer}
+            containerStyle={styles.inputFieldContainer}
+            inputContainerStyle={styles.inputUnderline}
           />
-          <Text style={styles.pickerLabel}>
-            {t("profile.education.degree")}
-          </Text>
-          <Picker
-            selectedValue={degree}
-            onValueChange={(itemValue) => setDegree(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item
-              label={t("profile.education.degree_placeholder")}
-              value=""
-            />
-            {degreeOptions.map((opt) => (
+          <View style={styles.pickerFieldContainer}>
+            <Text style={styles.pickerLabel}>
+              {t("profile.education.degree")}
+            </Text>
+            <Picker
+              selectedValue={degree}
+              onValueChange={(itemValue) => setDegree(itemValue)}
+              style={styles.picker}
+            >
               <Picker.Item
-                key={opt.value}
-                label={opt.label}
-                value={opt.value}
+                label={t("profile.education.degree_placeholder")}
+                value=""
               />
-            ))}
-          </Picker>
-        </>
+              {degreeOptions.map((opt) => (
+                <Picker.Item
+                  key={opt.value}
+                  label={opt.label}
+                  value={opt.value}
+                />
+              ))}
+            </Picker>
+          </View>
+        </View>
       )}
 
-      <Text style={styles.pickerLabel}>{t("profile.education.status")}</Text>
-      <Picker
-        selectedValue={status}
-        onValueChange={(itemValue) => setStatus(itemValue)}
-        style={styles.picker}
-      >
-        {statusOptions.map((opt) => (
-          <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
-        ))}
-      </Picker>
-
-      {/* 입학일 선택 */}
-      <Text style={styles.pickerLabel}>
-        {t("profile.education.admission_date")}
-      </Text>
-      <View style={styles.datePickerContainer}>
-        <Picker
-          selectedValue={admissionYear}
-          onValueChange={(itemValue) => setAdmissionYear(itemValue)}
-          style={styles.datePicker}
-        >
-          <Picker.Item label={t("common.select_year")} value="" />
-          {yearOptions.map((opt) => (
-            <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
-          ))}
-        </Picker>
-        <Picker
-          selectedValue={admissionMonth}
-          onValueChange={(itemValue) => setAdmissionMonth(itemValue)}
-          style={styles.datePicker}
-        >
-          <Picker.Item label={t("common.select_month")} value="" />
-          {monthOptions.map((opt) => (
-            <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
-          ))}
-        </Picker>
-      </View>
-
-      {/* 졸업일 선택 (재학중이 아닌 경우에만) */}
-      {status !== "attending" && (
-        <>
+      <View style={styles.formRow}>
+        <View style={styles.pickerFieldContainer}>
+          <Text style={styles.pickerLabel}>{t("profile.education.status")}</Text>
+          <Picker
+            selectedValue={status}
+            onValueChange={(itemValue) => setStatus(itemValue)}
+            style={styles.picker}
+          >
+            {statusOptions.map((opt) => (
+              <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+            ))}
+          </Picker>
+        </View>
+        <View style={styles.datePickerRowContainer}>
           <Text style={styles.pickerLabel}>
-            {t("profile.education.graduation_date")}
+            {t("profile.education.admission_date")}
           </Text>
           <View style={styles.datePickerContainer}>
             <Picker
-              selectedValue={graduationYear}
-              onValueChange={(itemValue) => setGraduationYear(itemValue)}
+              selectedValue={admissionYear}
+              onValueChange={(itemValue) => setAdmissionYear(itemValue)}
               style={styles.datePicker}
             >
               <Picker.Item label={t("common.select_year")} value="" />
@@ -312,8 +292,8 @@ const EducationForm = ({
               ))}
             </Picker>
             <Picker
-              selectedValue={graduationMonth}
-              onValueChange={(itemValue) => setGraduationMonth(itemValue)}
+              selectedValue={admissionMonth}
+              onValueChange={(itemValue) => setAdmissionMonth(itemValue)}
               style={styles.datePicker}
             >
               <Picker.Item label={t("common.select_month")} value="" />
@@ -322,7 +302,39 @@ const EducationForm = ({
               ))}
             </Picker>
           </View>
-        </>
+        </View>
+      </View>
+
+      {status !== "attending" && (
+        <View style={styles.formRow}>
+          <View style={styles.datePickerRowContainer}>
+            <Text style={styles.pickerLabel}>
+              {t("profile.education.graduation_date")}
+            </Text>
+            <View style={styles.datePickerContainer}>
+              <Picker
+                selectedValue={graduationYear}
+                onValueChange={(itemValue) => setGraduationYear(itemValue)}
+                style={styles.datePicker}
+              >
+                <Picker.Item label={t("common.select_year")} value="" />
+                {yearOptions.map((opt) => (
+                  <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+                ))}
+              </Picker>
+              <Picker
+                selectedValue={graduationMonth}
+                onValueChange={(itemValue) => setGraduationMonth(itemValue)}
+                style={styles.datePicker}
+              >
+                <Picker.Item label={t("common.select_month")} value="" />
+                {monthOptions.map((opt) => (
+                  <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+                ))}
+              </Picker>
+            </View>
+          </View>
+        </View>
       )}
 
       <View style={styles.formButtonGroup}>
@@ -330,16 +342,20 @@ const EducationForm = ({
           title={t("common.save")}
           onPress={handleSave}
           disabled={!schoolName.trim() || !admissionYear || !admissionMonth}
-          containerStyle={styles.formButton}
+          containerStyle={styles.formButtonContainer}
+          buttonStyle={styles.primaryButton}
+          titleStyle={styles.primaryButtonTitle}
         />
         <Button
           title={t("common.cancel")}
           onPress={onCancel}
           type="outline"
-          containerStyle={styles.formButton}
+          containerStyle={styles.formButtonContainer}
+          buttonStyle={styles.secondaryButton}
+          titleStyle={styles.secondaryButtonTitle}
         />
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -371,13 +387,15 @@ const EducationSection = () => {
   };
 
   if (loading) {
-    return <ActivityIndicator />;
+    return <ActivityIndicator style={styles.activityIndicator} />;
   }
 
   return (
-    <Card>
-      <Card.Title>{t("profile.education.title")}</Card.Title>
-      <Card.Divider />
+    <View style={styles.sectionContainer}>
+      <Text style={styles.sectionTitle}>{t("profile.education.title")}</Text>
+      {educations.length === 0 && !editingEducationId && (
+        <Text style={styles.noDataText}>{t("profile.education.no_data")}</Text>
+      )}
       {educations.map((edu) =>
         editingEducationId === edu.id ? (
           <EducationForm
@@ -389,21 +407,29 @@ const EducationSection = () => {
         ) : (
           <View key={edu.id} style={styles.itemContainer}>
             <View>
-              <Text style={styles.itemTextBold}>{edu.school_name}</Text>
-              <Text>
-                {edu.major} {edu.degree && `(${t(`profile.education.degree_options.${edu.degree}`)})`}
-              </Text>
-              <Text>
+              <Text style={styles.itemValue}>{edu.school_name}</Text>
+              {edu.major && (
+                <Text style={styles.itemLabel}>
+                  {edu.major} {edu.degree && `(${t(`profile.education.degree_options.${edu.degree}`)})`}
+                </Text>
+              )}
+              <Text style={styles.itemLabel}>
                 {getDisplayDate(edu.admission_date)} ~{" "}
-                {edu.graduation_date ? getDisplayDate(edu.graduation_date) : ""}
+                {edu.graduation_date ? getDisplayDate(edu.graduation_date) : t("profile.education.status_options.attending")}
               </Text>
             </View>
             <View style={styles.buttonGroup}>
-              <TouchableOpacity onPress={() => setEditingEducationId(edu.id)}>
-                <Icon name="edit" type="material" />
+              <TouchableOpacity
+                onPress={() => setEditingEducationId(edu.id)}
+                style={styles.iconButton}
+              >
+                <Icon name="edit" type="material" color="#4b5563" />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDelete(edu.id)}>
-                <Icon name="delete" type="material" color="error" />
+              <TouchableOpacity
+                onPress={() => handleDelete(edu.id)}
+                style={styles.iconButton}
+              >
+                <Icon name="delete" type="material" color="#dc2626" />
               </TouchableOpacity>
             </View>
           </View>
@@ -421,68 +447,167 @@ const EducationSection = () => {
           title={t("profile.education.add_button")}
           onPress={() => setEditingEducationId("new")}
           containerStyle={styles.addButton}
+          buttonStyle={styles.addButtonInner}
+          titleStyle={styles.addButtonTitle}
         />
       )}
-    </Card>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  sectionContainer: {
+    marginBottom: 0, // Managed by parent gap
+    width: '48%', // Will be constrained by parent flexWrap
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 16,
+  },
+  activityIndicator: {
+    marginTop: 20,
+  },
+  noDataText: {
+    fontSize: 16,
+    color: '#6b7280',
+    textAlign: 'center',
+    marginTop: 10,
+    marginBottom: 20,
+  },
   itemContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
-    padding: 8,
+    marginBottom: 12,
+    padding: 16,
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 5,
+    borderColor: "#e5e7eb",
+    borderRadius: 8,
+    backgroundColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
-  itemTextBold: {
+  itemLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#4b5563',
+  },
+  itemValue: {
     fontSize: 16,
-    fontWeight: "bold",
+    color: '#111827',
+    marginBottom: 4,
   },
   buttonGroup: {
     flexDirection: "row",
-    gap: 15,
+    gap: 10,
+  },
+  iconButton: {
+    padding: 8,
   },
   addButton: {
     marginTop: 16,
   },
+  addButtonInner: {
+    backgroundColor: '#2563eb',
+    borderRadius: 8,
+    paddingVertical: 10,
+  },
+  addButtonTitle: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   formContainer: {
     paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: '#f9fafb',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    marginBottom: 16,
   },
-  inputContainer: {
-    marginVertical: 8,
+  formRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 0,
+  },
+  inputFieldContainer: {
+    width: '48%',
+    marginBottom: 8,
+  },
+  pickerFieldContainer: {
+    width: '48%',
+    marginBottom: 8,
+  },
+  inputUnderline: {
+    borderBottomWidth: 0,
+    backgroundColor: '#ffffff',
   },
   pickerLabel: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#86939e",
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#4b5563",
     marginLeft: 10,
-    marginTop: 8,
+    marginBottom: 5,
   },
   picker: {
-    marginVertical: 8,
-    marginHorizontal: 10,
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: '#d1d5db',
+    backgroundColor: '#ffffff',
+    height: 40,
   },
   formButtonGroup: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginVertical: 16,
+    marginTop: 16,
   },
-  formButton: {
+  formButtonContainer: {
     flex: 1,
     marginHorizontal: 8,
   },
+  primaryButton: {
+    backgroundColor: '#2563eb',
+    borderRadius: 8,
+    paddingVertical: 10,
+  },
+  primaryButtonTitle: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  secondaryButton: {
+    backgroundColor: '#e5e7eb',
+    borderRadius: 8,
+    paddingVertical: 10,
+  },
+  secondaryButtonTitle: {
+    color: '#4b5563',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  datePickerRowContainer: {
+    width: '48%',
+    marginBottom: 8,
+  },
   datePickerContainer: {
-    flexDirection: "row",
-    marginVertical: 8,
-    marginHorizontal: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     gap: 8,
   },
   datePicker: {
     flex: 1,
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: '#d1d5db',
+    backgroundColor: '#ffffff',
+    height: 40,
   },
 });
 

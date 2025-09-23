@@ -9,7 +9,23 @@
         "save": "Save",
         "select_day": "Select Day",
         "select_month": "Select Month",
-        "select_year": "Select Year"
+        "select_year": "Select Year",
+        "day": "day",
+        "count": "",
+        "view_all": "View All",
+        "minute": "m",
+        "completed": "completed",
+        "strength": "Strength",
+        "weakness": "Weakness",
+        "practice": "practice",
+        "current": "Current",
+        "in_progress": "In Progress",
+        "progress_rate": "Progress Rate",
+        "name": "Name",
+        "email": "Email",
+        "logout": "Logout",
+        "yes": "Yes",
+        "no": "No"
     },
     "components": {
         "footer": {
@@ -97,6 +113,54 @@
             },
             "subtitle": "The most sophisticated AI interview practice service that asks and analyzes questions like a real interviewer",
             "title": "The new standard for AI interview practice"
+        },
+        "dashboard": {
+            "title": "My Dashboard",
+            "subtitle": "Welcome back, {{name}}!",
+            "next_level": "Next Level",
+            "overview": "Overview",
+            "learning_progress": "Learning Progress",
+            "achievements": "Achievements",
+            "settings": "Settings",
+            "total_practice_count": "Total Practice Count",
+            "average_score": "Average Score",
+            "consecutive_learning": "Consecutive Learning",
+            "total_learning_time": "Total Learning Time",
+            "weekly_activity": "Weekly Activity",
+            "recent_practice_records": "Recent Practice Records",
+            "monthly_learning_progress": "Monthly Learning Progress",
+            "tech_interview": "Tech Interview",
+            "personality_interview": "Personality Interview",
+            "english_interview": "English Interview",
+            "current_progress": "Current Progress",
+            "tech_strength": "Strong in algorithms",
+            "tech_weakness": "Weak in system design",
+            "personality_strength": "Good communication skills",
+            "personality_weakness": "Needs to improve storytelling",
+            "english_strength": "Fluent in daily conversation",
+            "english_weakness": "Needs to improve technical vocabulary",
+            "learning_pattern_analysis": "Learning Pattern Analysis",
+            "optimal_learning_time": "Evenings (7-10 PM)",
+            "optimal_learning_time_value": "Evenings (7-10 PM)",
+            "average_concentration_time": "Average Concentration Time",
+            "average_concentration_time_value": "45 minutes",
+            "preferred_difficulty": "Preferred Difficulty",
+            "preferred_difficulty_value": "Medium",
+            "retry_rate": "Retry Rate",
+            "retry_rate_value": "70%",
+            "improvement_suggestions": "Improvement Suggestions",
+            "suggestion1_title": "Focus on System Design",
+            "suggestion1_description": "Allocate more time to system design questions.",
+            "suggestion2_title": "Practice Storytelling",
+            "suggestion2_description": "Develop more compelling narratives for behavioral questions.",
+            "suggestion3_title": "Expand Technical Vocabulary",
+            "suggestion3_description": "Learn industry-specific terms for English interviews.",
+            "this_week_goals": "This Week's Goals",
+            "system_design": "System Design",
+            "leadership_questions": "Leadership Questions",
+            "answer_completion": "Answer Completion",
+            "achievement_list": "Achievement List",
+            "account_settings": "Account Settings"
         },
         "my_page": {
             "title": "My Page"
@@ -277,20 +341,40 @@
             "title": "Job Interests"
         },
         "military": {
+            "title": "Military Service",
+            "period": "Period",
+            "branch": "Branch",
+            "branch_placeholder": "Enter branch of service",
+            "rank": "Rank",
+            "rank_placeholder": "Enter rank",
+            "start_date": "Start Date",
+            "start_date_placeholder": "YYYY-MM-DD",
+            "end_date": "End Date",
+            "end_date_placeholder": "YYYY-MM-DD",
             "no_data": "No military service information registered.",
             "status": {
-                "exempted": "Exempted",
+                "title": "Status",
                 "not_served": "Not Served",
                 "served": "Served",
-                "serving": "Serving"
-            },
-            "title": "Military Service"
+                "serving": "Serving",
+                "exempted": "Exempted"
+            }
         },
         "patriot": {
             "no_data": "No patriot information registered.",
             "patriot_code": "Patriot Code",
             "patriot_code_placeholder": "Enter patriot code",
-            "title": "Patriot Information"
+            "title": "Patriot Information",
+            "is_patriot": "Is Patriot?",
+            "relation": "Relation",
+            "relation_placeholder": "Enter relation to patriot"
+        },
+        "personal_info": {
+            "title": "Personal Information",
+            "overview": "Overview",
+            "learning_progress": "Learning Progress",
+            "achievements": "Achievements",
+            "settings": "Settings"
         }
     },
     "resume": {

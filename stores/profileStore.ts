@@ -101,11 +101,10 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
   // --- Military Service ---
   fetchMilitaryService: async () => {
     try {
-      set({ loading: true, error: null });
       const data = await militaryServiceApi.getAll();
-      set({ militaryService: data[0] || null, loading: false });
+      set({ militaryService: data[0] || null });
     } catch (error) {
-      set({ error, loading: false, militaryService: null });
+      set({ error, militaryService: null });
     }
   },
   createMilitaryService: async (data) => {
@@ -141,11 +140,10 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
   // --- Patriot ---
   fetchPatriot: async () => {
     try {
-      set({ loading: true, error: null });
       const data = await patriotApi.getAll();
-      set({ patriot: data[0] || null, loading: false });
+      set({ patriot: data[0] || null });
     } catch (error) {
-      set({ error, loading: false, patriot: null });
+      set({ error, patriot: null });
     }
   },
   createPatriot: async (data) => {
@@ -181,11 +179,10 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
   // --- Disabilities ---
   fetchDisabilities: async () => {
     try {
-      set({ loading: true, error: null });
       const data = await disabilityApi.getAll();
-      set({ disabilities: data, loading: false });
+      set({ disabilities: data });
     } catch (error) {
-      set({ error, loading: false });
+      set({ error });
     }
   },
   createDisability: async (data) => {
@@ -232,11 +229,10 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
   // --- Educations ---
   fetchEducations: async () => {
     try {
-      set({ loading: true, error: null });
       const data = await educationApi.getAll();
-      set({ educations: data, loading: false });
+      set({ educations: data });
     } catch (error) {
-      set({ error, loading: false });
+      set({ error });
     }
   },
   createEducation: async (data) => {
@@ -281,11 +277,10 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
   // --- Careers ---
   fetchCareers: async () => {
     try {
-      set({ loading: true, error: null });
       const data = await careerApi.getAll();
-      set({ careers: data, loading: false });
+      set({ careers: data });
     } catch (error) {
-      set({ error, loading: false });
+      set({ error });
     }
   },
   createCareer: async (data) => {
@@ -327,11 +322,10 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
   // --- Job Interests ---
   fetchJobInterests: async () => {
     try {
-      set({ loading: true, error: null });
       const data = await jobInterestApi.getAll();
-      set({ jobInterests: data, loading: false });
+      set({ jobInterests: data });
     } catch (error) {
-      set({ error, loading: false });
+      set({ error });
     }
   },
   createJobInterest: async (data) => {

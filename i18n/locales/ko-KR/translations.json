@@ -9,7 +9,23 @@
         "save": "저장",
         "select_day": "일 선택",
         "select_month": "월 선택",
-        "select_year": "년도 선택"
+        "select_year": "년도 선택",
+        "day": "일",
+        "count": "회",
+        "view_all": "모두 보기",
+        "minute": "분",
+        "completed": "완료",
+        "strength": "강점",
+        "weakness": "약점",
+        "practice": "연습",
+        "current": "현재",
+        "in_progress": "진행 중",
+        "progress_rate": "진행률",
+        "name": "이름",
+        "email": "이메일",
+        "logout": "로그아웃",
+        "yes": "예",
+        "no": "아니오"
     },
     "components": {
         "footer": {
@@ -98,8 +114,53 @@
             "subtitle": "실제 면접관처럼 질문하고 분석하는 가장 정교한 AI 면접 연습 서비스",
             "title": "AI 면접 연습의 새로운 기준"
         },
-        "my_page": {
-            "title": "마이페이지"
+        "dashboard": {
+            "title": "마이페이지",
+            "subtitle": "환영합니다, {{name}}님!",
+            "next_level": "다음 레벨",
+            "overview": "개요",
+            "learning_progress": "학습 진도",
+            "achievements": "성취",
+            "settings": "설정",
+            "total_practice_count": "총 연습 횟수",
+            "average_score": "평균 점수",
+            "consecutive_learning": "연속 학습일",
+            "total_learning_time": "총 학습 시간",
+            "weekly_activity": "주간 활동",
+            "recent_practice_records": "최근 연습 기록",
+            "monthly_learning_progress": "월별 학습 진도",
+            "tech_interview": "기술 면접",
+            "personality_interview": "인성 면접",
+            "english_interview": "영어 면접",
+            "current_progress": "현재 진도",
+            "tech_strength": "알고리즘 강점",
+            "tech_weakness": "시스템 설계 약점",
+            "personality_strength": "뛰어난 의사소통 능력",
+            "personality_weakness": "스토리텔링 개선 필요",
+            "english_strength": "일상 회화 유창함",
+            "english_weakness": "기술 용어 어휘력 개선 필요",
+            "learning_pattern_analysis": "학습 패턴 분석",
+            "optimal_learning_time": "최적 학습 시간",
+            "optimal_learning_time_value": "저녁 (7-10시)",
+            "average_concentration_time": "평균 집중 시간",
+            "average_concentration_time_value": "45분",
+            "preferred_difficulty": "선호 난이도",
+            "preferred_difficulty_value": "중간",
+            "retry_rate": "재시도율",
+            "retry_rate_value": "70%",
+            "improvement_suggestions": "개선 제안",
+            "suggestion1_title": "시스템 설계에 집중",
+            "suggestion1_description": "시스템 설계 질문에 더 많은 시간을 할애하세요.",
+            "suggestion2_title": "스토리텔링 연습",
+            "suggestion2_description": "행동 질문에 대한 설득력 있는 이야기를 만드세요.",
+            "suggestion3_title": "기술 어휘 확장",
+            "suggestion3_description": "영어 면접을 위한 산업별 용어를 학습하세요.",
+            "this_week_goals": "이번 주 목표",
+            "system_design": "시스템 설계",
+            "leadership_questions": "리더십 질문",
+            "answer_completion": "답변 완료",
+            "achievement_list": "성취 목록",
+            "account_settings": "계정 설정"
         },
         "pricing": {
             "basic": {
@@ -277,20 +338,40 @@
             "title": "관심 직무"
         },
         "military": {
+            "title": "병역",
+            "period": "기간",
+            "branch": "병과",
+            "branch_placeholder": "병과를 입력하세요",
+            "rank": "계급",
+            "rank_placeholder": "계급을 입력하세요",
+            "start_date": "입대일",
+            "start_date_placeholder": "YYYY-MM-DD",
+            "end_date": "전역일",
+            "end_date_placeholder": "YYYY-MM-DD",
             "no_data": "등록된 병역 정보가 없습니다.",
             "status": {
-                "exempted": "면제",
+                "title": "복무 상태",
                 "not_served": "미필",
                 "served": "군필",
-                "serving": "복무중"
-            },
-            "title": "병역"
+                "serving": "복무 중",
+                "exempted": "면제"
+            }
         },
         "patriot": {
             "no_data": "등록된 보훈 정보가 없습니다.",
             "patriot_code": "보훈 코드",
             "patriot_code_placeholder": "보훈 코드를 입력하세요",
-            "title": "보훈 정보"
+            "title": "보훈 정보",
+            "is_patriot": "보훈 대상 여부",
+            "relation": "관계",
+            "relation_placeholder": "보훈 대상자와의 관계를 입력하세요"
+        },
+        "personal_info": {
+            "title": "개인 정보",
+            "overview": "개요",
+            "learning_progress": "학습진도",
+            "achievements": "성취",
+            "settings": "설정"
         }
     },
     "resume": {

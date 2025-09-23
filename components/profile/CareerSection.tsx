@@ -1,5 +1,5 @@
 import { Picker } from "@react-native-picker/picker";
-import { Button, Card, CheckBox, Icon, Input, Text } from "@rneui/themed";
+import { Button, CheckBox, Icon, Input, Text } from "@rneui/themed";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -146,80 +146,50 @@ const CareerForm = ({
   };
 
   return (
-    <ScrollView style={styles.formContainer}>
-      <Input
-        label={t("profile.career.company_name")}
-        value={companyName}
-        onChangeText={setCompanyName}
-        placeholder={t("profile.career.company_name_placeholder")}
-        placeholderTextColor="#aaa"
-        containerStyle={styles.inputContainer}
-      />
-      <Text style={styles.pickerLabel}>
-        {t("profile.career.experience_type")}
-      </Text>
-      <Picker
-        selectedValue={experienceType}
-        onValueChange={(itemValue) => setExperienceType(itemValue)}
-        style={styles.picker}
-      >
-        {experienceTypeOptions.map((opt) => (
-          <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
-        ))}
-      </Picker>
-      <CheckBox
-        title={t("profile.career.is_attending")}
-        checked={isAttending}
-        onPress={() => setIsAttending(!isAttending)}
-        containerStyle={styles.inputContainer}
-      />
-      {/* 입사일 선택 */}
-      <Text style={styles.pickerLabel}>
-        {t("profile.career.start_date")}
-      </Text>
-      <View style={styles.datePickerContainer}>
-        <Picker
-          selectedValue={startYear}
-          onValueChange={(itemValue) => setStartYear(itemValue)}
-          style={styles.datePicker}
-        >
-          <Picker.Item label={t("common.select_year")} value="" />
-          {yearOptions.map((opt) => (
-            <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
-          ))}
-        </Picker>
-        <Picker
-          selectedValue={startMonth}
-          onValueChange={(itemValue) => setStartMonth(itemValue)}
-          style={styles.datePicker}
-        >
-          <Picker.Item label={t("common.select_month")} value="" />
-          {monthOptions.map((opt) => (
-            <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
-          ))}
-        </Picker>
-        <Picker
-          selectedValue={startDay}
-          onValueChange={(itemValue) => setStartDay(itemValue)}
-          style={styles.datePicker}
-        >
-          <Picker.Item label={t("common.select_day")} value="" />
-          {startDayOptions.map((opt) => (
-            <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
-          ))}
-        </Picker>
-      </View>
-
-      {/* 퇴사일 선택 (재직중이 아닌 경우에만) */}
-      {!isAttending && (
-        <>
+    <View style={styles.formContainer}>
+      <View style={styles.formRow}>
+        <Input
+          label={t("profile.career.company_name")}
+          value={companyName}
+          onChangeText={setCompanyName}
+          placeholder={t("profile.career.company_name_placeholder")}
+          placeholderTextColor="#aaa"
+          containerStyle={styles.inputFieldContainer}
+          inputContainerStyle={styles.inputUnderline}
+        />
+        <View style={styles.pickerFieldContainer}>
           <Text style={styles.pickerLabel}>
-            {t("profile.career.end_date")}
+            {t("profile.career.experience_type")}
+          </Text>
+          <Picker
+            selectedValue={experienceType}
+            onValueChange={(itemValue) => setExperienceType(itemValue)}
+            style={styles.picker}
+          >
+            {experienceTypeOptions.map((opt) => (
+              <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+            ))}
+          </Picker>
+        </View>
+      </View>
+      <View style={styles.formRow}>
+        <View style={styles.checkboxFieldContainer}>
+          <CheckBox
+            title={t("profile.career.is_attending")}
+            checked={isAttending}
+            onPress={() => setIsAttending(!isAttending)}
+            containerStyle={styles.checkboxContainer}
+            textStyle={styles.checkboxText}
+          />
+        </View>
+        <View style={styles.datePickerRowContainer}>
+          <Text style={styles.pickerLabel}>
+            {t("profile.career.start_date")}
           </Text>
           <View style={styles.datePickerContainer}>
             <Picker
-              selectedValue={endYear}
-              onValueChange={(itemValue) => setEndYear(itemValue)}
+              selectedValue={startYear}
+              onValueChange={(itemValue) => setStartYear(itemValue)}
               style={styles.datePicker}
             >
               <Picker.Item label={t("common.select_year")} value="" />
@@ -228,8 +198,8 @@ const CareerForm = ({
               ))}
             </Picker>
             <Picker
-              selectedValue={endMonth}
-              onValueChange={(itemValue) => setEndMonth(itemValue)}
+              selectedValue={startMonth}
+              onValueChange={(itemValue) => setStartMonth(itemValue)}
               style={styles.datePicker}
             >
               <Picker.Item label={t("common.select_month")} value="" />
@@ -238,35 +208,90 @@ const CareerForm = ({
               ))}
             </Picker>
             <Picker
-              selectedValue={endDay}
-              onValueChange={(itemValue) => setEndDay(itemValue)}
+              selectedValue={startDay}
+              onValueChange={(itemValue) => setStartDay(itemValue)}
               style={styles.datePicker}
             >
               <Picker.Item label={t("common.select_day")} value="" />
-              {endDayOptions.map((opt) => (
+              {startDayOptions.map((opt) => (
                 <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
               ))}
             </Picker>
           </View>
-        </>
+        </View>
+      </View>
+
+      {!isAttending && (
+        <View style={styles.formRow}>
+          <View style={styles.datePickerRowContainer}>
+            <Text style={styles.pickerLabel}>
+              {t("profile.career.end_date")}
+            </Text>
+            <View style={styles.datePickerContainer}>
+              <Picker
+                selectedValue={endYear}
+                onValueChange={(itemValue) => setEndYear(itemValue)}
+                style={styles.datePicker}
+              >
+                <Picker.Item label={t("common.select_year")} value="" />
+                {yearOptions.map((opt) => (
+                  <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+                ))}
+              </Picker>
+              <Picker
+                selectedValue={endMonth}
+                onValueChange={(itemValue) => setEndMonth(itemValue)}
+                style={styles.datePicker}
+              >
+                <Picker.Item label={t("common.select_month")} value="" />
+                {monthOptions.map((opt) => (
+                  <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+                ))}
+              </Picker>
+              <Picker
+                selectedValue={endDay}
+                onValueChange={(itemValue) => setEndDay(itemValue)}
+                style={styles.datePicker}
+              >
+                <Picker.Item label={t("common.select_day")} value="" />
+                {endDayOptions.map((opt) => (
+                  <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+                ))}
+              </Picker>
+            </View>
+          </View>
+          <Input
+            label={t("profile.career.reason_for_leaving")}
+            value={reasonForLeaving}
+            onChangeText={setReasonForLeaving}
+            placeholder={t("profile.career.reason_for_leaving_placeholder")}
+            placeholderTextColor="#aaa"
+            containerStyle={styles.inputFieldContainer}
+            inputContainerStyle={styles.inputUnderline}
+          />
+        </View>
       )}
-      <Input
-        label={t("profile.career.department")}
-        value={department}
-        onChangeText={setDepartment}
-        placeholder={t("profile.career.department_placeholder")}
-        placeholderTextColor="#aaa"
-        containerStyle={styles.inputContainer}
-      />
-      <Input
-        label={t("profile.career.responsibilities")}
-        value={responsibilities}
-        onChangeText={setResponsibilities}
-        placeholder={t("profile.career.responsibilities_placeholder")}
-        placeholderTextColor="#aaa"
-        containerStyle={styles.inputContainer}
-      />
-      <Text style={styles.inputLabel}>{t("profile.career.task")}</Text>
+      <View style={styles.formRow}>
+        <Input
+          label={t("profile.career.department")}
+          value={department}
+          onChangeText={setDepartment}
+          placeholder={t("profile.career.department_placeholder")}
+          placeholderTextColor="#aaa"
+          containerStyle={styles.inputFieldContainer}
+          inputContainerStyle={styles.inputUnderline}
+        />
+        <Input
+          label={t("profile.career.responsibilities")}
+          value={responsibilities}
+          onChangeText={setResponsibilities}
+          placeholder={t("profile.career.responsibilities_placeholder")}
+          placeholderTextColor="#aaa"
+          containerStyle={styles.inputFieldContainer}
+          inputContainerStyle={styles.inputUnderline}
+        />
+      </View>
+      <Text style={styles.pickerLabel}>{t("profile.career.task")}</Text>
       <TextInput
         value={task}
         onChangeText={setTask}
@@ -275,37 +300,26 @@ const CareerForm = ({
         placeholderTextColor="#aaa"
         style={[styles.input, styles.textArea]}
       />
-      {!isAttending && endYear && endMonth && endDay && (
-        <>
-          <Text style={styles.inputLabel}>
-            {t("profile.career.reason_for_leaving")}
-          </Text>
-          <TextInput
-            value={reasonForLeaving}
-            onChangeText={setReasonForLeaving}
-            multiline
-            placeholder={t("profile.career.reason_for_leaving_placeholder")}
-            placeholderTextColor="#aaa"
-            style={[styles.input, styles.textArea]}
-          />
-        </>
-      )}
 
       <View style={styles.formButtonGroup}>
         <Button
           title={t("common.save")}
           onPress={handleSave}
           disabled={!companyName.trim() || !startYear || !startMonth || !startDay}
-          containerStyle={styles.formButton}
+          containerStyle={styles.formButtonContainer}
+          buttonStyle={styles.primaryButton}
+          titleStyle={styles.primaryButtonTitle}
         />
         <Button
           title={t("common.cancel")}
           onPress={onCancel}
           type="outline"
-          containerStyle={styles.formButton}
+          containerStyle={styles.formButtonContainer}
+          buttonStyle={styles.secondaryButton}
+          titleStyle={styles.secondaryButtonTitle}
         />
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -332,13 +346,15 @@ const CareerSection = () => {
   };
 
   if (loading) {
-    return <ActivityIndicator />;
+    return <ActivityIndicator style={styles.activityIndicator} />;
   }
 
   return (
-    <Card>
-      <Card.Title>{t("profile.career.title")}</Card.Title>
-      <Card.Divider />
+    <View style={styles.sectionContainer}>
+      <Text style={styles.sectionTitle}>{t("profile.career.title")}</Text>
+      {careers.length === 0 && !editingCareerId && (
+        <Text style={styles.noDataText}>{t("profile.career.no_data")}</Text>
+      )}
       {careers.map((c) =>
         editingCareerId === c.id ? (
           <CareerForm
@@ -350,24 +366,37 @@ const CareerSection = () => {
         ) : (
           <View key={c.id} style={styles.itemContainer}>
             <View>
-              <Text style={styles.itemTextBold}>{c.company_name}</Text>
-              <Text>
-                {c.department} / {c.responsibilities}
-              </Text>
-              <View style={styles.taskContainer}>{c.task && <Text>{c.task}</Text>}</View>
-              <Text>
+              <Text style={styles.itemValue}>{c.company_name}</Text>
+              {c.department && c.responsibilities && (
+                <Text style={styles.itemLabel}>
+                  {c.department} / {c.responsibilities}
+                </Text>
+              )}
+              {c.task && <Text style={styles.itemLabel}>{c.task}</Text>}
+              <Text style={styles.itemLabel}>
                 {getDisplayDate(c.start_date)} ~{" "}
                 {c.is_attending
                   ? t("profile.career.is_attending_true")
                   : getDisplayDate(c.end_date || "")}
               </Text>
+              {c.reason_for_leaving && !c.is_attending && (
+                <Text style={styles.itemLabel}>
+                  {t("profile.career.reason_for_leaving")}: {c.reason_for_leaving}
+                </Text>
+              )}
             </View>
             <View style={styles.buttonGroup}>
-              <TouchableOpacity onPress={() => setEditingCareerId(c.id)}>
-                <Icon name="edit" type="material" />
+              <TouchableOpacity
+                onPress={() => setEditingCareerId(c.id)}
+                style={styles.iconButton}
+              >
+                <Icon name="edit" type="material" color="#4b5563" />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDelete(c.id)}>
-                <Icon name="delete" type="material" color="error" />
+              <TouchableOpacity
+                onPress={() => handleDelete(c.id)}
+                style={styles.iconButton}
+              >
+                <Icon name="delete" type="material" color="#dc2626" />
               </TouchableOpacity>
             </View>
           </View>
@@ -385,90 +414,202 @@ const CareerSection = () => {
           title={t("profile.career.add_button")}
           onPress={() => setEditingCareerId("new")}
           containerStyle={styles.addButton}
+          buttonStyle={styles.addButtonInner}
+          titleStyle={styles.addButtonTitle}
         />
       )}
-    </Card>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  sectionContainer: {
+    marginBottom: 0, // Managed by parent gap
+    width: '48%', // Will be constrained by parent flexWrap
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 16,
+  },
+  activityIndicator: {
+    marginTop: 20,
+  },
+  noDataText: {
+    fontSize: 16,
+    color: '#6b7280',
+    textAlign: 'center',
+    marginTop: 10,
+    marginBottom: 20,
+  },
   itemContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
-    padding: 8,
+    marginBottom: 12,
+    padding: 16,
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 5,
+    borderColor: "#e5e7eb",
+    borderRadius: 8,
+    backgroundColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
-  taskContainer: {
-    marginVertical: 16,
+  itemLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#4b5563',
   },
-  itemTextBold: {
+  itemValue: {
     fontSize: 16,
-    fontWeight: "bold",
+    color: '#111827',
+    marginBottom: 4,
   },
   buttonGroup: {
     flexDirection: "row",
-    gap: 15,
+    gap: 10,
+  },
+  iconButton: {
+    padding: 8,
   },
   addButton: {
     marginTop: 16,
   },
+  addButtonInner: {
+    backgroundColor: '#2563eb',
+    borderRadius: 8,
+    paddingVertical: 10,
+  },
+  addButtonTitle: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   formContainer: {
     paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: '#f9fafb',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    marginBottom: 16,
   },
-  inputContainer: {
-    marginVertical: 8,
+  formRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 0,
+  },
+  inputFieldContainer: {
+    width: '48%',
+    marginBottom: 8,
+  },
+  pickerFieldContainer: {
+    width: '48%',
+    marginBottom: 8,
+  },
+  checkboxFieldContainer: {
+    width: '48%',
+    marginBottom: 8,
+    justifyContent: 'center',
+  },
+  checkboxContainer: {
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    padding: 0,
+    marginLeft: 0,
+  },
+  checkboxText: {
+    fontWeight: 'normal',
+    color: '#111827',
+  },
+  inputUnderline: {
+    borderBottomWidth: 0,
+    backgroundColor: '#ffffff',
+  },
+  pickerLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#4b5563",
+    marginLeft: 10,
+    marginBottom: 5,
+  },
+  picker: {
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: '#d1d5db',
+    backgroundColor: '#ffffff',
+    height: 40,
+  },
+  formButtonGroup: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 16,
+  },
+  formButtonContainer: {
+    flex: 1,
+    marginHorizontal: 8,
+  },
+  primaryButton: {
+    backgroundColor: '#2563eb',
+    borderRadius: 8,
+    paddingVertical: 10,
+  },
+  primaryButtonTitle: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  secondaryButton: {
+    backgroundColor: '#e5e7eb',
+    borderRadius: 8,
+    paddingVertical: 10,
+  },
+  secondaryButtonTitle: {
+    color: '#4b5563',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  datePickerRowContainer: {
+    width: '48%',
+    marginBottom: 8,
+  },
+  datePickerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  datePicker: {
+    flex: 1,
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: '#d1d5db',
+    backgroundColor: '#ffffff',
+    height: 40,
   },
   inputLabel: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#86939e",
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#4b5563",
     marginLeft: 10,
     marginBottom: 5,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 5,
+    borderColor: "#d1d5db",
+    borderRadius: 8,
     padding: 10,
     marginHorizontal: 10,
     marginBottom: 10,
+    color: '#111827',
   },
   textArea: {
     height: 100,
     textAlignVertical: "top",
-  },
-  pickerLabel: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#86939e",
-    marginLeft: 10,
-    marginTop: 8,
-  },
-  picker: {
-    marginVertical: 8,
-    marginHorizontal: 10,
-  },
-  datePickerContainer: {
-    flexDirection: "row",
-    marginVertical: 8,
-    marginHorizontal: 10,
-    gap: 8,
-  },
-  datePicker: {
-    flex: 1,
-  },
-  formButtonGroup: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginVertical: 16,
-  },
-  formButton: {
-    flex: 1,
-    marginHorizontal: 8,
   },
 });
 
