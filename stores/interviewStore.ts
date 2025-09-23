@@ -110,18 +110,31 @@ export const useInterviewSettingsStore = create<InterviewSettingsState>((set, ge
   },
 }));
 
+import { TextAnalysisReportData } from '@/schemas/analysis';
+import { VideoAnalysis, VoiceScores } from '@/components/interview/AnalysisResultPanel';
+
 // --- Interview Session Store ---
 
 interface InterviewSessionData {
   session_id: string | null;
   current_question: string | null;
   turn_label: string | null;
+  finalResults: { voice: VoiceScores | null; video: VideoAnalysis | null } | null;
+  aiAdvice: string | null;
+  percentileAnalysis: any | null;
+  textAnalysis: TextAnalysisReportData | null;
+  isAnalysisComplete: boolean; // Added
 }
 
 interface InterviewSessionState extends InterviewSessionData {
   loadSession: () => Promise<void>;
   startSession: (sessionData: Partial<InterviewSessionData>) => void;
   setNextQuestion: (question: string | null) => void;
+  setFinalResults: (updater: ((prev: { voice: VoiceScores | null; video: VideoAnalysis | null } | null) => { voice: VoiceScores | null; video: VideoAnalysis | null } | null) | ({ voice: VoiceScores | null; video: VideoAnalysis | null } | null)) => void;
+  setAiAdvice: (updater: ((prev: string | null) => string | null) | (string | null)) => void;
+  setPercentileAnalysis: (updater: ((prev: any | null) => any | null) | (any | null)) => void;
+  setTextAnalysis: (updater: ((prev: TextAnalysisReportData | null) => TextAnalysisReportData | null) | (TextAnalysisReportData | null)) => void;
+  setIsAnalysisComplete: (status: boolean) => void; // Added
   endSession: () => void;
   clearSession: () => void;
 }
@@ -130,6 +143,11 @@ const initialSessionState: InterviewSessionData = {
   session_id: null,
   current_question: null,
   turn_label: null,
+  finalResults: null,
+  aiAdvice: null,
+  percentileAnalysis: null,
+  textAnalysis: null,
+  isAnalysisComplete: false, // Added
 };
 
 export const useInterviewSessionStore = create<InterviewSessionState>((set, get) => ({
@@ -151,6 +169,11 @@ export const useInterviewSessionStore = create<InterviewSessionState>((set, get)
         session_id: newState.session_id,
         current_question: newState.current_question,
         turn_label: newState.turn_label,
+        finalResults: newState.finalResults,
+        aiAdvice: newState.aiAdvice,
+        percentileAnalysis: newState.percentileAnalysis,
+        textAnalysis: newState.textAnalysis,
+        isAnalysisComplete: newState.isAnalysisComplete, // Added
       };
       interviewStorage.setItem(INTERVIEW_SESSION_KEY, JSON.stringify(dataToStore));
       return newState;
@@ -161,6 +184,45 @@ export const useInterviewSessionStore = create<InterviewSessionState>((set, get)
       const newState = { ...state, current_question: question };
       interviewStorage.setItem(INTERVIEW_SESSION_KEY, JSON.stringify(newState));
       return { current_question: question };
+    });
+  },
+  setFinalResults: (updater) => {
+    set((state) => {
+      const newFinalResults = typeof updater === 'function' ? updater(state.finalResults) : updater;
+      const newState = { ...state, finalResults: newFinalResults };
+      interviewStorage.setItem(INTERVIEW_SESSION_KEY, JSON.stringify(newState));
+      return newState;
+    });
+  },
+  setAiAdvice: (updater) => {
+    set((state) => {
+      const newAiAdvice = typeof updater === 'function' ? updater(state.aiAdvice) : updater;
+      const newState = { ...state, aiAdvice: newAiAdvice };
+      interviewStorage.setItem(INTERVIEW_SESSION_KEY, JSON.stringify(newState));
+      return newState;
+    });
+  },
+  setPercentileAnalysis: (updater) => {
+    set((state) => {
+      const newPercentileAnalysis = typeof updater === 'function' ? updater(state.percentileAnalysis) : updater;
+      const newState = { ...state, percentileAnalysis: newPercentileAnalysis };
+      interviewStorage.setItem(INTERVIEW_SESSION_KEY, JSON.stringify(newState));
+      return newState;
+    });
+  },
+  setTextAnalysis: (updater) => {
+    set((state) => {
+      const newTextAnalysis = typeof updater === 'function' ? updater(state.textAnalysis) : updater;
+      const newState = { ...state, textAnalysis: newTextAnalysis };
+      interviewStorage.setItem(INTERVIEW_SESSION_KEY, JSON.stringify(newState));
+      return newState;
+    });
+  },
+  setIsAnalysisComplete: (status) => { // Added
+    set((state) => {
+      const newState = { ...state, isAnalysisComplete: status };
+      interviewStorage.setItem(INTERVIEW_SESSION_KEY, JSON.stringify(newState));
+      return newState;
     });
   },
   endSession: () => {

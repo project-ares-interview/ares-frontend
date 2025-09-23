@@ -1,10 +1,4 @@
-import { AIAdvicePanel } from '@/components/interview/AIAdvicePanel';
-import { VideoAnalysisPanel } from '@/components/interview/VideoAnalysisPanel';
-import { VoiceAnalysisPanel } from '@/components/interview/VoiceAnalysisPanel';
-import { PercentileAnalysisPanel } from '@/components/interview/PercentileAnalysisPanel';
 import { RealtimeFeedbackPanel } from '@/components/interview/RealtimeFeedbackPanel';
-import { TextAnalysisReport } from '@/components/interview/TextAnalysisReport';
-import { TextAnalysisLoading } from '@/components/interview/TextAnalysisLoading';
 import Avatar, { AvatarRef } from '@/components/interview/Avatar';
 import { useInterview } from '@/hooks/useInterview';
 import { useInterviewSessionStore } from '@/stores/interviewStore';
@@ -21,19 +15,11 @@ const InterviewScreen = () => {
     status,
     transcript,
     realtimeFeedback,
-    finalResults,
     cameraRef,
     startAnalysis,
     stopAnalysis,
     startRecording,
     stopRecording,
-    aiAdvice,
-    isFetchingAdvice,
-    getAIAdvice,
-    percentileAnalysis,
-    isFetchingPercentiles,
-    getPercentileAnalysis,
-    textAnalysis,
     isFetchingNextQuestion,
   } = useInterview();
   const { current_question } = useInterviewSessionStore();
@@ -71,13 +57,6 @@ const InterviewScreen = () => {
       avatarRef.current.stopSpeaking();
     }
   }, [isRecording]);
-
-  // This effect fetches AI advice once the analysis results are available
-  useEffect(() => {
-    if (finalResults.voice && finalResults.video && !aiAdvice && !isFetchingAdvice) {
-      getAIAdvice();
-    }
-  }, [finalResults.voice, finalResults.video, aiAdvice, isFetchingAdvice, getAIAdvice]);
 
   if (!hasPermission) {
     return (
@@ -172,43 +151,7 @@ const InterviewScreen = () => {
               <RealtimeFeedbackPanel feedback={realtimeFeedback} />
             </View>
           </View>
-        ) : ( // After interview, show full analysis report in a ScrollView
-          <ScrollView style={styles.analysisReportScrollView}>
-            {/* Show loading indicator if analysis is done but text report is not yet ready */}
-            {!isAnalyzing && finalResults.voice && !textAnalysis && <TextAnalysisLoading />}
-
-            {/* Show the report when it's ready */}
-            {textAnalysis && <TextAnalysisReport report={textAnalysis} style={{ marginBottom: 24 }} />}
-
-            {finalResults.voice && finalResults.video && (
-              <View style={styles.panel}>
-                <Text style={styles.mainTitle}>비언어적 표현 분석 결과</Text>
-                <View style={styles.analysisResultsRow}> {/* New container for two columns */}
-                  <View style={styles.analysisResultsColumn}> {/* Left column for Voice and Percentile */}
-                    <VoiceAnalysisPanel voiceScores={finalResults.voice} />
-            {finalResults.voice && percentileAnalysis && (
-              <View style={styles.percentilePanelWrapper}> {/* Apply new style */}
-                <PercentileAnalysisPanel 
-                  percentileData={percentileAnalysis}
-                  isLoading={isFetchingPercentiles}
-                  onUpdateAnalysis={getPercentileAnalysis}
-                />
-              </View>
-            )}                  </View>
-                  <View style={styles.verticalDottedDivider} /> {/* Dotted line divider */}
-                  <View style={styles.analysisResultsColumn}> {/* Right column for Video and AI Advice */}
-                    <VideoAnalysisPanel videoAnalysis={finalResults.video} />
-                    {aiAdvice && (
-                      <AIAdvicePanel advice={aiAdvice} isLoading={isFetchingAdvice} />
-                    )}
-                  </View>
-                </View>
-              </View>
-            )}
-
-
-          </ScrollView>
-        )}
+        ) : null }
 
       </View>
     </ScrollView>
@@ -216,30 +159,6 @@ const InterviewScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  panel: {
-    backgroundColor: '#ffffff', // White background
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
-  },
-  percentilePanelWrapper: { // New style for PercentileAnalysisPanel
-    backgroundColor: "#f7fafc", // Reverted to previous light gray background
-    borderRadius: 12,
-    padding: 20,
-    marginTop: 20, 
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-    marginBottom: 20, // To match other panels
-  },
-  mainTitle: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  adviceButtonContainer: {
-    marginTop: 20,
-  },
   container: {
     flex: 1,
     padding: 16,
@@ -353,29 +272,7 @@ const styles = StyleSheet.create({
   rightColumn: {
     flex: 1,
     marginLeft: 8,
-  },
-  analysisReportScrollView: {
-    flex: 1,
-    marginTop: 16,
-  },
-  analysisResultsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-  },
-  analysisResultsColumn: {
-    flex: 1,
-    marginHorizontal: 15, // Further increased spacing between columns
-    padding: 20, // Increased padding to further reduce graph size visually
-  },
-  verticalDottedDivider: {
-    width: 1, // Thin line
-    backgroundColor: 'transparent', // Transparent background
-    borderWidth: 1,
-    borderColor: '#ccc', // Light gray color
-    borderStyle: 'dotted', // Dotted style
-    marginVertical: 10, // Vertical margin to align with content
-  },
+  }
 });
 
 export default InterviewScreen;
