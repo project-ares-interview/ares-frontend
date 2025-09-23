@@ -42,13 +42,6 @@ const InterviewAnalysisScreen = () => {
     }
   }, [finalResults, aiAdvice, isFetchingAdvice, getAIAdvice]); // Updated dependencies
 
-  // This effect fetches percentile analysis once finalResults are available
-  useEffect(() => {
-    if (finalResults?.voice && finalResults?.video) { // Added optional chaining
-      getPercentileAnalysis();
-    }
-  }, [finalResults, getPercentileAnalysis]); // Updated dependencies
-
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.mainTitle}>면접 분석 결과</Text>

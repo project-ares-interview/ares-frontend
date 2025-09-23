@@ -43,12 +43,6 @@ export interface AnalysisResult {
   };
 }
 
-export interface ResumeFeedback {
-  job_fit_assessment: string;
-  strengths_and_opportunities: string;
-  gaps_and_improvements: string;
-}
-
 export interface StrengthsMatrixItem {
   theme: string;
   evidence: string[];
@@ -74,15 +68,88 @@ export interface QuestionEvaluation {
   evidence_quote?: string;
 }
 
-export interface QuestionByQuestionFeedbackItem {
-  question_id: string;
-  stage: string;
-  objective: string;
+export interface NcsItem {
+  major_code: string;
+  ability_level: string;
+  detail_code: string;
+  ability_name: string;
+  element_name: string;
+  middle_code: string;
+  ability_code: string;
+  knowledge: string | null;
+  element_code: string;
+  skills: string | null;
+  minor_code: string;
+  attitudes: string | null;
+  source: string;
+  doc_id: string;
+  criteria_text: string;
+  content_concat: string;
+  updated_at: string;
+  '@search.score': number;
+  '@search.reranker_score': number | null;
+  '@search.highlights': string | null;
+  '@search.captions': string | null;
+  _score: number | null;
+}
+
+export interface NcsContext {
+  ncs: NcsItem[];
+  ncs_query: string;
+  jd_keywords: string[];
+}
+
+export interface FullResumeAnalysis {
+  "심층분석": string;
+  "교차분석": string;
+  "정합성점검": string;
+  "NCS요약": string;
+  ncs_context: NcsContext;
+}
+
+export interface OriginalSourceDocuments {
+  jd_context: string;
+  resume_context: string;
+  research_context: string;
+}
+
+export interface RubricItem {
+  label: string;
+  score: number;
+  desc: string;
+}
+
+export interface InterviewPlanItem {
+  question_type: string;
   question: string;
-  question_intent: string;
+  followups: string[];
+  expected_points: string[];
+  rubric: RubricItem[];
+  kpi?: string[];
+}
+
+export interface InterviewPlanStage {
+  items: InterviewPlanItem[];
+  stage: string;
+}
+
+export interface OriginalInterviewPlan {
+  interview_plan: InterviewPlanStage[];
+}
+
+export interface QuestionFeedbackDetail {
+  question_id: string;
+  question: string;
+  question_intent: string | null;
   evaluation: QuestionEvaluation;
-  model_answer?: string;
-  additional_followups: string[];
+  model_answer: string;
+  coaching: Record<string, any>;
+}
+
+export interface QuestionByQuestionFeedbackItem {
+  main_question_id: string;
+  thematic_summary: string;
+  details: QuestionFeedbackDetail[];
 }
 
 export interface TextAnalysisReportData {
@@ -93,8 +160,10 @@ export interface TextAnalysisReportData {
   score_aggregation: ScoreAggregation;
   missed_opportunities: string[];
   potential_followups_global: string[];
-  resume_feedback: ResumeFeedback;
+  full_resume_analysis: FullResumeAnalysis;
   hiring_recommendation: string;
   next_actions: string[];
   question_by_question_feedback: QuestionByQuestionFeedbackItem[];
+  original_source_documents: OriginalSourceDocuments;
+  original_interview_plan: OriginalInterviewPlan;
 }

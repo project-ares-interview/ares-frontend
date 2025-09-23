@@ -2,6 +2,7 @@ import { TextAnalysisReportData } from '@/schemas/analysis';
 import { Card, Chip, Divider, ListItem, Text } from '@rneui/themed';
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import Markdown from 'react-native-markdown-display';
 
 interface Props {
   report: TextAnalysisReportData;
@@ -14,6 +15,69 @@ const severityChip = (severity: string) => {
   else if (severity === 'low') color = '#4CAF50';
   return <Chip title={`심각도: ${severity}`} buttonStyle={{ backgroundColor: color }} />;
 };
+
+const markdownStyle = StyleSheet.create({
+  body: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: '#333',
+  },
+  heading1: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginTop: 10,
+    marginBottom: 5,
+    borderBottomWidth: 1,
+    borderColor: '#eee',
+    paddingBottom: 5,
+  },
+  heading2: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  heading3: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 6,
+    marginBottom: 3,
+  },
+  table: {
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 4,
+    marginBottom: 15,
+  },
+  th: {
+    fontWeight: 'bold',
+    padding: 8,
+    backgroundColor: '#f7f7f7',
+  },
+  td: {
+    padding: 8,
+  },
+  tr: {
+    borderBottomWidth: 1,
+    borderColor: '#eee',
+  },
+  list_item: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 5,
+  },
+  bullet_list_icon: {
+    marginRight: 5,
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  ordered_list_icon: {
+    marginRight: 5,
+    fontSize: 15,
+    lineHeight: 22,
+  },
+});
+
 
 export const TextAnalysisReport: React.FC<Props> = ({ report }) => {
   const [expanded, setExpanded] = useState<Record<number, boolean>>({});
@@ -109,23 +173,25 @@ export const TextAnalysisReport: React.FC<Props> = ({ report }) => {
           </Card>
         )}
 
-        {/* Resume Feedback */}
-        <Card containerStyle={[styles.card, styles.reportColumnItem]}>
-          <Card.Title style={styles.cardTitle}>이력서 기반 피드백</Card.Title>
-          <Card.Divider />
-          <View style={styles.resumeSection}>
-              <Text style={styles.subHeader}>직무 적합도</Text>
-              <Text style={styles.bodyText}>{report.resume_feedback.job_fit_assessment}</Text>
-          </View>
-          <View style={styles.resumeSection}>
-              <Text style={styles.subHeader}>강점 및 기회</Text>
-              <Text style={styles.bodyText}>{report.resume_feedback.strengths_and_opportunities}</Text>
-          </View>
-          <View style={styles.resumeSection}>
-              <Text style={styles.subHeader}>약점 및 개선점</Text>
-              <Text style={styles.bodyText}>{report.resume_feedback.gaps_and_improvements}</Text>
-          </View>
-        </Card>
+        {/* Full Resume Analysis */}
+        {report.full_resume_analysis && (
+            <Card containerStyle={[styles.card, styles.reportColumnItem]}>
+              <Card.Title style={styles.cardTitle}>이력서 종합 분석</Card.Title>
+              <Card.Divider />
+              <View style={styles.resumeSection}>
+                  <Text style={styles.subHeader}>심층 분석</Text>
+                  <Markdown style={markdownStyle}>{report.full_resume_analysis["심층분석"]}</Markdown>
+              </View>
+              <View style={styles.resumeSection}>
+                  <Text style={styles.subHeader}>교차 분석</Text>
+                  <Markdown style={markdownStyle}>{report.full_resume_analysis["교차분석"]}</Markdown>
+              </View>
+              <View style={styles.resumeSection}>
+                  <Text style={styles.subHeader}>NCS 요약</Text>
+                  <Markdown style={markdownStyle}>{report.full_resume_analysis["NCS요약"]}</Markdown>
+              </View>
+            </Card>
+        )}
 
         {/* Hiring Recommendation */}
         {'hiring_recommendation' in report && (
@@ -155,40 +221,45 @@ export const TextAnalysisReport: React.FC<Props> = ({ report }) => {
       <Card containerStyle={styles.card}>
         <Card.Title style={styles.cardTitle}>질문별 상세 피드백</Card.Title>
         <Card.Divider />
-        {report.question_by_question_feedback.map((item, index) => (
+        {report.question_by_question_feedback.map((q_item, index) => (
           <ListItem.Accordion
             key={index}
             content={
               <ListItem.Content>
-                <ListItem.Title style={styles.questionTitle}>{`Q${index + 1}. ${item.question}`}</ListItem.Title>
+                <ListItem.Title style={styles.questionTitle}>{`질문 그룹 ${index + 1}: ${q_item.thematic_summary}`}</ListItem.Title>
               </ListItem.Content>
             }
             isExpanded={expanded[index] || false}
             onPress={() => toggleExpand(index)}
             containerStyle={styles.accordionContainer}
           >
-            <View style={styles.feedbackContainer}>
-                <Text style={styles.feedbackLabel}>적용된 프레임워크: <Chip title={item.evaluation.applied_framework || 'N/A'} size="sm" /></Text>
+            {q_item.details.map((detail, detailIndex) => (
+              <View key={detailIndex} style={styles.feedbackContainer}>
+                  <Text style={styles.questionTitle}>{`Q${index + 1}.${detailIndex + 1}. ${detail.question}`}</Text>
+                  <Divider style={styles.feedbackDivider}/>
 
-                {item.evaluation.evidence_quote ? (
-                  <>
-                    <Text style={styles.feedbackLabel}>근거 발췌:</Text>
-                    <Text style={styles.answerText}>{item.evaluation.evidence_quote}</Text>
-                    <Divider style={styles.feedbackDivider}/>
-                  </>
-                ) : null}
+                  <Text style={styles.feedbackLabel}>적용된 프레임워크: <Chip title={detail.evaluation.applied_framework || 'N/A'} size="sm" /></Text>
 
-                {!!item.model_answer && (
-                  <>
-                    <Text style={styles.feedbackLabel}>모범 답안:</Text>
-                    <Text style={styles.answerText}>{item.model_answer}</Text>
-                    <Divider style={styles.feedbackDivider}/>
-                  </>
-                )}
+                  {detail.evaluation.evidence_quote ? (
+                    <>
+                      <Text style={styles.feedbackLabel}>근거 발췌:</Text>
+                      <Text style={styles.answerText}>{detail.evaluation.evidence_quote}</Text>
+                      <Divider style={styles.feedbackDivider}/>
+                    </>
+                  ) : null}
 
-                <Text style={styles.feedbackLabel}>상세 피드백:</Text>
-                <Text style={styles.feedbackText}>{item.evaluation.feedback}</Text>
-            </View>
+                  {!!detail.model_answer && (
+                    <>
+                      <Text style={styles.feedbackLabel}>모범 답안:</Text>
+                      <Text style={styles.answerText}>{detail.model_answer}</Text>
+                      <Divider style={styles.feedbackDivider}/>
+                    </>
+                  )}
+
+                  <Text style={styles.feedbackLabel}>상세 피드백:</Text>
+                  <Text style={styles.feedbackText}>{detail.evaluation.feedback}</Text>
+              </View>
+            ))}
           </ListItem.Accordion>
         ))}
       </Card>
