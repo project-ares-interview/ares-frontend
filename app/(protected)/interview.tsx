@@ -1,4 +1,3 @@
-import { RealtimeFeedbackPanel } from '@/components/interview/RealtimeFeedbackPanel';
 import Avatar, { AvatarRef } from '@/components/interview/Avatar';
 import { useInterview } from '@/hooks/useInterview';
 import { useInterviewSessionStore } from '@/stores/interviewStore';
@@ -67,142 +66,125 @@ const InterviewScreen = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>AI 면접 코칭</Text>
+    <View style={styles.mainContainer}>
+      {/* Left 70% for Avatar */}
+      <View style={styles.leftPanel}>
+        {Platform.OS === 'web' ?
+          <Avatar ref={avatarRef} /> :
+          <Text style={{ color: 'white', textAlign: 'center', marginTop: '50%' }}>아바타는 웹에서만 지원됩니다.</Text>
+        }
+      </View>
 
-      <View style={styles.cameraAndAvatarContainer}>
-        <View style={styles.avatarPlaceholder}>
-          {Platform.OS === 'web' ? 
-            <Avatar ref={avatarRef} /> :
-            <Text style={{ color: 'white', textAlign: 'center', marginTop: '50%' }}>아바타는 웹에서만 지원됩니다.</Text>
-          }
-        </View>
-        <View style={styles.cameraViewWrapper}>
+      {/* Right 30% for Camera, Question, Answer, Buttons */}
+      <View style={styles.rightPanel}>
+        {/* User's Camera */}
+        <View style={styles.cameraViewWrapperSmall}>
           <CameraView
             style={styles.camera}
             ref={cameraRef}
           />
         </View>
-      </View>
 
-      {/* --- Main Controls --- */}
-      {!isAnalyzing ? (
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.startButton}
-            onPress={handleStartAnalysis}
-            disabled={isAnalyzing}
-          >
-            <Text style={styles.startButtonText}>AI 면접 시작</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <View style={styles.controlsContainer}>
-          <View style={styles.buttonWrapper}>
-            <Button
-              title="답변 시작하기"
-              onPress={startRecording}
-              disabled={isRecording || !current_question || isFetchingNextQuestion}
-            />
-          </View>
-          <View style={styles.buttonWrapper}>
-            <Button
-              title="답변 끝내기"
-              onPress={stopRecording}
-              disabled={!isRecording}
-              color="#f44336"
-            />
-          </View>
-          <View style={styles.buttonWrapper}>
-            <Button
-              title="면접 종료하기"
-              onPress={stopAnalysis}
-              disabled={!isAnalyzing}
-              color="#4CAF50"
-            />
-          </View>
-        </View>
-      )}
-
-      <View>
-        {isAnalyzing ? ( // During interview/analysis
-          <View style={styles.twoColumnContainer}>
-            <View style={styles.leftColumn}>
-              {(current_question || isFetchingNextQuestion) && (
-                <View style={styles.questionPanel}>
-                  <Text style={styles.panelTitle}>질문</Text>
-                  <Text style={styles.questionText}>
-                    {isFetchingNextQuestion
-                      ? "다음 질문을 생성중입니다. 잠시만 기다려주세요..."
-                      : current_question}
-                  </Text>
-                </View>
-              )}
-              <View style={styles.transcriptionPanel}>
-                <Text style={styles.panelTitle}>실시간 답변</Text>
-                <Text style={styles.transcriptionText}>
-                  {isAnalyzing && !isRecording && !transcript
-                    ? "답변 시작하기 버튼을 눌러주세요."
-                    : transcript || status}
+        {/* Question and Answer Panels */}
+        {isAnalyzing ? (
+          <>
+            {(current_question || isFetchingNextQuestion) && (
+              <View style={styles.questionPanelSmall}>
+                <Text style={styles.panelTitle}>질문</Text>
+                <Text style={styles.questionText}>
+                  {isFetchingNextQuestion
+                    ? "다음 질문을 생성중입니다. 잠시만 기다려주세요..."
+                    : current_question}
                 </Text>
               </View>
+            )}
+            <View style={styles.transcriptionPanelSmall}>
+              <Text style={styles.panelTitle}>실시간 답변</Text>
+              <Text style={styles.transcriptionText}>
+                {isAnalyzing && !isRecording && !transcript
+                  ? "답변 시작하기 버튼을 눌러주세요."
+                  : transcript || status}
+              </Text>
             </View>
-            <View style={styles.rightColumn}>
-              <RealtimeFeedbackPanel feedback={realtimeFeedback} />
+          </>
+        ) : null}
+
+        {/* Control Buttons */}
+        {!isAnalyzing ? (
+          <View style={styles.buttonContainerSmall}>
+            <TouchableOpacity
+              style={styles.startButton}
+              onPress={handleStartAnalysis}
+              disabled={isAnalyzing}
+            >
+              <Text style={styles.startButtonText}>AI 면접 시작</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.controlsContainerSmall}>
+            <View style={styles.buttonWrapper}>
+              <Button
+                title="답변 시작하기"
+                onPress={startRecording}
+                disabled={isRecording || !current_question || isFetchingNextQuestion}
+              />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <Button
+                title="답변 끝내기"
+                onPress={stopRecording}
+                disabled={!isRecording}
+                color="#f44336"
+              />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <Button
+                title="면접 종료하기"
+                onPress={stopAnalysis}
+                disabled={!isAnalyzing}
+                color="#4CAF50"
+              />
             </View>
           </View>
-        ) : null }
-
+        )}
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  mainContainer: {
     flex: 1,
+    flexDirection: 'row',
     padding: 16,
     backgroundColor: '#f4f7f9',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  cameraAndAvatarContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    width: '75%', // This container will take 75% of the screen width
-    alignSelf: 'center', // Center the container itself
-    marginBottom: 16,
-  },
-  avatarPlaceholder: {
-    width: '50%', // Each child takes 50% of cameraAndAvatarContainer's width
-    aspectRatio: 16 / 9,
-    backgroundColor: '#333', // A different background for placeholder
+  leftPanel: {
+    flex: 7, // 70% width
+    marginRight: 8,
+    justifyContent: 'center', // Center avatar vertically
+    alignItems: 'center', // Center avatar horizontally
+    backgroundColor: '#333', // Background for avatar area
     borderRadius: 8,
     overflow: 'hidden',
-    marginRight: 8, // Space between avatar and camera
   },
-  cameraViewWrapper: { // This will replace the old videoContainer style
-    width: '50%', // Each child takes 50% of cameraAndAvatarContainer's width
+  rightPanel: {
+    flex: 3, // 30% width
+    marginLeft: 8,
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  cameraViewWrapperSmall: {
+    width: '100%',
     aspectRatio: 16 / 9,
     backgroundColor: '#000',
     borderRadius: 8,
     overflow: 'hidden',
+    marginBottom: 16,
   },
   camera: {
     flex: 1,
-  },
-  transcriptionPanel: {
-    backgroundColor: '#f7fafc',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    borderRadius: 8,
-    padding: 16,
-    minHeight: 80,
-    marginBottom: 20,
   },
   panelTitle: {
     fontSize: 18,
@@ -214,41 +196,53 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: '#2d3748',
   },
-  questionPanel: {
+  questionPanelSmall: {
     backgroundColor: '#e6f7ff',
     borderWidth: 1,
     borderColor: '#91d5ff',
     borderRadius: 8,
-    padding: 16,
-    marginBottom: 20,
+    padding: 10, // Adjusted padding
+    marginBottom: 10, // Adjusted margin
+    width: '100%',
   },
   questionText: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 14, // Adjusted font size
+    lineHeight: 20, // Adjusted line height
     color: '#0050b3',
   },
-  controlsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginVertical: 16,
+  transcriptionPanelSmall: {
+    backgroundColor: '#f7fafc',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 8,
+    padding: 10, // Adjusted padding
+    minHeight: 60, // Adjusted min height
+    marginBottom: 10, // Adjusted margin
+    width: '100%',
   },
-  buttonContainer: {
-    width: '15%',
+  buttonContainerSmall: {
+    width: '100%',
     alignSelf: 'center',
     marginVertical: 16,
   },
+  controlsContainerSmall: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 16,
+    width: '100%',
+  },
   buttonWrapper: {
-    marginHorizontal: 8,
+    marginHorizontal: 4, // Adjusted margin
   },
   startButton: {
-    backgroundColor: '#4CAF50', // A pleasant green
+    backgroundColor: '#4CAF50',
     paddingVertical: 11,
     paddingHorizontal: 22,
-    borderRadius: 25, // Rounded corners
+    borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 5, // Android shadow
-    shadowColor: '#000', // iOS shadow
+    elevation: 5,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -257,21 +251,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  twoColumnContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 16,
-    width: '75%',
-    alignSelf: 'center',
-  },
-  leftColumn: {
-    flex: 1,
-    marginRight: 8,
-  },
-  rightColumn: {
-    flex: 1,
-    marginLeft: 8,
   }
 });
 
