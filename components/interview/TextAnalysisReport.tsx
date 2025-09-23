@@ -24,133 +24,134 @@ export const TextAnalysisReport: React.FC<Props> = ({ report }) => {
 
   return (
     <View style={styles.container}>
-      <Text h3 style={styles.mainTitle}>종합 분석 리포트</Text>
 
-      {/* Overall Summary */}
-      <Card containerStyle={styles.card}>
-        <Card.Title style={styles.cardTitle}>총평</Card.Title>
-        <Card.Divider />
-        <Text style={styles.bodyText}>{report.overall_summary}</Text>
-      </Card>
-
-      {/* Interview Flow Rationale */}
-      <Card containerStyle={styles.card}>
-        <Card.Title style={styles.cardTitle}>면접 진행 근거</Card.Title>
-        <Card.Divider />
-        <Text style={styles.bodyText}>{report.interview_flow_rationale}</Text>
-      </Card>
-
-      {/* Strengths Matrix */}
-      {report.strengths_matrix?.length > 0 && (
-        <Card containerStyle={styles.card}>
-          <Card.Title style={styles.cardTitle}>강점 매트릭스</Card.Title>
+      <View style={styles.twoColumnReportContainer}>
+        {/* Overall Summary */}
+        <Card containerStyle={[styles.card, styles.reportColumnItem]}>
+          <Card.Title style={styles.cardTitle}>총평</Card.Title>
           <Card.Divider />
-          {report.strengths_matrix.map((item, index) => (
-            <View key={`strength-${index}`} style={styles.competencyItem}>
-              <Text style={styles.competencyTitle}>{item.theme}</Text>
-              <Text style={styles.evidenceText}>
-                └ 근거: {item.evidence.join(', ')}
-              </Text>
-              {index < report.strengths_matrix.length - 1 && <Divider style={styles.itemDivider} />}
-            </View>
-          ))}
+          <Text style={styles.bodyText}>{report.overall_summary}</Text>
         </Card>
-      )}
 
-      {/* Weaknesses Matrix */}
-      {report.weaknesses_matrix?.length > 0 && (
-        <Card containerStyle={styles.card}>
-          <Card.Title style={styles.cardTitle}>약점 매트릭스</Card.Title>
+        {/* Interview Flow Rationale */}
+        <Card containerStyle={[styles.card, styles.reportColumnItem]}>
+          <Card.Title style={styles.cardTitle}>면접 진행 근거</Card.Title>
           <Card.Divider />
-          {report.weaknesses_matrix.map((item, index) => (
-            <View key={`weakness-${index}`} style={styles.competencyItem}>
-              <View style={styles.competencyHeader}>
+          <Text style={styles.bodyText}>{report.interview_flow_rationale}</Text>
+        </Card>
+
+        {/* Strengths Matrix */}
+        {report.strengths_matrix?.length > 0 && (
+          <Card containerStyle={[styles.card, styles.reportColumnItem]}>
+            <Card.Title style={styles.cardTitle}>강점 매트릭스</Card.Title>
+            <Card.Divider />
+            {report.strengths_matrix.map((item, index) => (
+              <View key={`strength-${index}`} style={styles.competencyItem}>
                 <Text style={styles.competencyTitle}>{item.theme}</Text>
-                {severityChip(item.severity)}
+                <Text style={styles.evidenceText}>
+                  └ 근거: {item.evidence.join(', ')}
+                </Text>
+                {index < report.strengths_matrix.length - 1 && <Divider style={styles.itemDivider} />}
               </View>
-              <Text style={styles.evidenceText}>
-                └ 근거: {item.evidence.join(', ')}
-              </Text>
-              {index < report.weaknesses_matrix.length - 1 && <Divider style={styles.itemDivider} />}
-            </View>
-          ))}
-        </Card>
-      )}
+            ))}
+          </Card>
+        )}
 
-      {/* Score Aggregation */}
-      {report.score_aggregation && (
-        <Card containerStyle={styles.card}>
-          <Card.Title style={styles.cardTitle}>점수 집계</Card.Title>
+        {/* Weaknesses Matrix */}
+        {report.weaknesses_matrix?.length > 0 && (
+          <Card containerStyle={[styles.card, styles.reportColumnItem]}>
+            <Card.Title style={styles.cardTitle}>약점 매트릭스</Card.Title>
+            <Card.Divider />
+            {report.weaknesses_matrix.map((item, index) => (
+              <View key={`weakness-${index}`} style={styles.competencyItem}>
+                <View style={styles.competencyHeader}>
+                  <Text style={styles.competencyTitle}>{item.theme}</Text>
+                  {severityChip(item.severity)}
+                </View>
+                <Text style={styles.evidenceText}>
+                  └ 근거: {item.evidence.join(', ')}
+                </Text>
+                {index < report.weaknesses_matrix.length - 1 && <Divider style={styles.itemDivider} />}
+              </View>
+            ))}
+          </Card>
+        )}
+
+        {/* Score Aggregation */}
+        {report.score_aggregation && (
+          <Card containerStyle={[styles.card, styles.reportColumnItem]}>
+            <Card.Title style={styles.cardTitle}>점수 집계</Card.Title>
+            <Card.Divider />
+            <Text style={styles.subHeader}>캘리브레이션</Text>
+            <Text style={styles.bodyText}>{report.score_aggregation.calibration}</Text>
+          </Card>
+        )}
+
+        {/* Missed Opportunities */}
+        {report.missed_opportunities?.length > 0 && (
+          <Card containerStyle={[styles.card, styles.reportColumnItem]}>
+            <Card.Title style={styles.cardTitle}>놓친 기회</Card.Title>
+            <Card.Divider />
+            {report.missed_opportunities.map((op, i) => (
+              <Text key={`missed-${i}`} style={styles.bodyText}>• {op}</Text>
+            ))}
+          </Card>
+        )}
+
+        {/* Potential Global Follow-ups */}
+        {report.potential_followups_global?.length > 0 && (
+          <Card containerStyle={[styles.card, styles.reportColumnItem]}>
+            <Card.Title style={styles.cardTitle}>추가 팔로업 제안</Card.Title>
+            <Card.Divider />
+            {report.potential_followups_global.map((f, i) => (
+              <Text key={`followup-${i}`} style={styles.bodyText}>• {f}</Text>
+            ))}
+          </Card>
+        )}
+
+        {/* Resume Feedback */}
+        <Card containerStyle={[styles.card, styles.reportColumnItem]}>
+          <Card.Title style={styles.cardTitle}>이력서 기반 피드백</Card.Title>
           <Card.Divider />
-          <Text style={styles.subHeader}>캘리브레이션</Text>
-          <Text style={styles.bodyText}>{report.score_aggregation.calibration}</Text>
+          <View style={styles.resumeSection}>
+              <Text style={styles.subHeader}>직무 적합도</Text>
+              <Text style={styles.bodyText}>{report.resume_feedback.job_fit_assessment}</Text>
+          </View>
+          <View style={styles.resumeSection}>
+              <Text style={styles.subHeader}>강점 및 기회</Text>
+              <Text style={styles.bodyText}>{report.resume_feedback.strengths_and_opportunities}</Text>
+          </View>
+          <View style={styles.resumeSection}>
+              <Text style={styles.subHeader}>약점 및 개선점</Text>
+              <Text style={styles.bodyText}>{report.resume_feedback.gaps_and_improvements}</Text>
+          </View>
         </Card>
-      )}
 
-      {/* Missed Opportunities */}
-      {report.missed_opportunities?.length > 0 && (
-        <Card containerStyle={styles.card}>
-          <Card.Title style={styles.cardTitle}>놓친 기회</Card.Title>
-          <Card.Divider />
-          {report.missed_opportunities.map((op, i) => (
-            <Text key={`missed-${i}`} style={styles.bodyText}>• {op}</Text>
-          ))}
-        </Card>
-      )}
+        {/* Hiring Recommendation */}
+        {'hiring_recommendation' in report && (
+          <Card containerStyle={[styles.card, styles.reportColumnItem]}>
+            <Card.Title style={styles.cardTitle}>채용 추천</Card.Title>
+            <Card.Divider />
+            <Chip
+              title={report.hiring_recommendation === 'hire' ? '채용 추천' : '채용 비추천'}
+              buttonStyle={{ backgroundColor: report.hiring_recommendation === 'hire' ? '#4CAF50' : '#F44336' }}
+            />
+          </Card>
+        )}
 
-      {/* Potential Global Follow-ups */}
-      {report.potential_followups_global?.length > 0 && (
-        <Card containerStyle={styles.card}>
-          <Card.Title style={styles.cardTitle}>추가 팔로업 제안</Card.Title>
-          <Card.Divider />
-          {report.potential_followups_global.map((f, i) => (
-            <Text key={`followup-${i}`} style={styles.bodyText}>• {f}</Text>
-          ))}
-        </Card>
-      )}
+        {/* Next Actions */}
+        {report.next_actions?.length > 0 && (
+          <Card containerStyle={[styles.card, styles.reportColumnItem]}>
+            <Card.Title style={styles.cardTitle}>다음 액션</Card.Title>
+            <Card.Divider />
+            {report.next_actions.map((n, i) => (
+              <Text key={`next-${i}`} style={styles.bodyText}>• {n}</Text>
+            ))}
+          </Card>
+        )}
+      </View>
 
-      {/* Resume Feedback */}
-      <Card containerStyle={styles.card}>
-        <Card.Title style={styles.cardTitle}>이력서 기반 피드백</Card.Title>
-        <Card.Divider />
-        <View style={styles.resumeSection}>
-            <Text style={styles.subHeader}>직무 적합도</Text>
-            <Text style={styles.bodyText}>{report.resume_feedback.job_fit_assessment}</Text>
-        </View>
-        <View style={styles.resumeSection}>
-            <Text style={styles.subHeader}>강점 및 기회</Text>
-            <Text style={styles.bodyText}>{report.resume_feedback.strengths_and_opportunities}</Text>
-        </View>
-        <View style={styles.resumeSection}>
-            <Text style={styles.subHeader}>약점 및 개선점</Text>
-            <Text style={styles.bodyText}>{report.resume_feedback.gaps_and_improvements}</Text>
-        </View>
-      </Card>
-
-      {/* Hiring Recommendation */}
-      {'hiring_recommendation' in report && (
-        <Card containerStyle={styles.card}>
-          <Card.Title style={styles.cardTitle}>채용 추천</Card.Title>
-          <Card.Divider />
-          <Chip
-            title={report.hiring_recommendation === 'hire' ? '채용 추천' : '채용 비추천'}
-            buttonStyle={{ backgroundColor: report.hiring_recommendation === 'hire' ? '#4CAF50' : '#F44336' }}
-          />
-        </Card>
-      )}
-
-      {/* Next Actions */}
-      {report.next_actions?.length > 0 && (
-        <Card containerStyle={styles.card}>
-          <Card.Title style={styles.cardTitle}>다음 액션</Card.Title>
-          <Card.Divider />
-          {report.next_actions.map((n, i) => (
-            <Text key={`next-${i}`} style={styles.bodyText}>• {n}</Text>
-          ))}
-        </Card>
-      )}
-
-      {/* Question by Question Feedback */}
+      {/* Question by Question Feedback (single column) */}
       <Card containerStyle={styles.card}>
         <Card.Title style={styles.cardTitle}>질문별 상세 피드백</Card.Title>
         <Card.Divider />
@@ -278,5 +279,16 @@ const styles = StyleSheet.create({
   feedbackText: {
       fontSize: 14,
       lineHeight: 20,
-  }
+  },
+  // New styles for two-column layout
+  twoColumnReportContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8, // Adjust padding to match container
+  },
+  reportColumnItem: {
+    width: '48%', // Slightly less than 50% to allow for spacing
+    marginBottom: 16, // Spacing between rows
+  },
 });

@@ -4,6 +4,7 @@ import { RealtimeFeedbackData } from '@/components/interview/RealtimeFeedbackPan
 import { fetchAIAdviceAPI, fetchPercentilesAPI } from '@/services/api';
 import { interviewService } from '@/services/interviewService';
 import { useInterviewSessionStore } from '@/stores/interviewStore';
+import { router } from 'expo-router';
 import { decode } from 'base-64';
 import { Audio } from 'expo-av';
 import { Camera, CameraView } from 'expo-camera';
@@ -39,7 +40,22 @@ function resampleBuffer(inputBuffer: Float32Array, sourceSampleRate: number, tar
 }
 
 export const useInterview = () => {
-  const { session_id, current_question, setNextQuestion, endSession } = useInterviewSessionStore();
+  const {
+    session_id,
+    current_question,
+    setNextQuestion,
+    endSession,
+    finalResults, // From store
+    aiAdvice, // From store
+    percentileAnalysis, // From store
+    textAnalysis, // From store
+    setFinalResults, // From store
+    setAiAdvice, // From store
+    setPercentileAnalysis, // From store
+    setTextAnalysis, // From store
+    isAnalysisComplete, // From store
+    setIsAnalysisComplete, // From store
+  } = useInterviewSessionStore();
 
   const [hasPermission, setHasPermission] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false); // Is the overall session active
@@ -47,14 +63,9 @@ export const useInterview = () => {
   const [status, setStatus] = useState('카메라 및 마이크 권한을 허용해주세요...');
   const [transcript, setTranscript] = useState('');
   const [realtimeFeedback, setRealtimeFeedback] = useState<RealtimeFeedbackData | null>(null);
-  const [finalResults, setFinalResults] = useState<{ voice: VoiceScores | null; video: VideoAnalysis | null }>({ voice: null, video: null });
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-
-  const [aiAdvice, setAiAdvice] = useState<string | null>(null);
-  const [isFetchingAdvice, setIsFetchingAdvice] = useState(false);
-  const [percentileAnalysis, setPercentileAnalysis] = useState<any | null>(null);
-  const [isFetchingPercentiles, setIsFetchingPercentiles] = useState(false);
-  const [textAnalysis, setTextAnalysis] = useState<TextAnalysisReportData | null>(null);
+  const [isFetchingAdvice, setIsFetchingAdvice] = useState(false); // Still local for fetching status
+  const [isFetchingPercentiles, setIsFetchingPercentiles] = useState(false); // Still local for fetching status
   const [isFetchingNextQuestion, setIsFetchingNextQuestion] = useState(false);
 
   const cameraRef = useRef<CameraView>(null);
@@ -62,6 +73,7 @@ export const useInterview = () => {
   const videoFrameSender = useRef<ReturnType<typeof setInterval> | null>(null);
   const fullTranscript = useRef('');
   const isRecordingRef = useRef(isRecording);
+  const analysisCompletionStatus = useRef({ voice: false, video: false }); // Added
 
   const audioRecording = useRef<Audio.Recording | null>(null);
   const audioLastReadPosition = useRef(0);
@@ -177,13 +189,24 @@ export const useInterview = () => {
         setStatus(content.data.message);
         break;
       case 'voice_scores_update':
-        setFinalResults(prev => ({ ...prev, voice: content.data }));
+        // Use functional update to ensure we get the latest state from the store
+        useInterviewSessionStore.getState().setFinalResults(prev => ({ ...(prev || {}), voice: content.data }));
+        analysisCompletionStatus.current.voice = true;
+        if (analysisCompletionStatus.current.video) {
+          setIsAnalysisComplete(true);
+        }
         break;
       case 'video_analysis_update':
-        setFinalResults(prev => ({ ...prev, video: content.data }));
+        // Use functional update to ensure we get the latest state from the store
+        useInterviewSessionStore.getState().setFinalResults(prev => ({ ...(prev || {}), video: content.data }));
+        analysisCompletionStatus.current.video = true;
+        if (analysisCompletionStatus.current.voice) {
+          setIsAnalysisComplete(true);
+        }
         break;
       case 'text_analysis_update':
-        setTextAnalysis(content.data);
+        console.log('handleSocketEvent: text_analysis_update received:', content.data); // Log
+        setTextAnalysis(content.data); // Use store's setter
         break;
       case 'error':
         setStatus(`오류: ${content.data.message}`);
@@ -348,14 +371,40 @@ export const useInterview = () => {
       console.error("startAnalysis called without a session_id.");
       return;
     }
+
+    if (!current_question) {
+      setIsFetchingNextQuestion(true);
+      try {
+        const firstQuestionResponse = await interviewService.getNextQuestion({ session_id });
+        if (firstQuestionResponse.done) {
+          setStatus('면접 질문을 불러오지 못했습니다. 면접을 종료합니다.');
+          endSession();
+          return;
+        } else {
+          setNextQuestion(firstQuestionResponse.question);
+        }
+      } catch (error) {
+        console.error("Failed to fetch first question:", error);
+        setStatus("오류: 첫 질문을 불러오지 못했습니다.");
+        return;
+      } finally {
+        setIsFetchingNextQuestion(false);
+      }
+    }
+
     setIsAnalyzing(true);
-    setFinalResults({ voice: null, video: null });
-    setTranscript('');
-    fullTranscript.current = '';
-    setStatus('면접 세션을 시작합니다...');
+    // Clear previous analysis data from store
+    setFinalResults(null);
     setAiAdvice(null);
     setPercentileAnalysis(null);
     setTextAnalysis(null);
+    setIsAnalysisComplete(false); // Reset analysis completion status for new session
+    analysisCompletionStatus.current = { voice: false, video: false }; // Reset ref
+    console.log('startAnalysis: Analysis session started, data cleared.'); // Log
+
+    setTranscript('');
+    fullTranscript.current = '';
+    setStatus('면접 세션을 시작합니다...');
 
     setupWebSockets(session_id);
 
@@ -376,6 +425,9 @@ export const useInterview = () => {
     stopSendingVideoFrames();
     await stopAudioProcessing();
     sendJsonMessage(sockets.current.results, 'finish_analysis_signal', {});
+    console.log('stopAnalysis: finish_analysis_signal sent.'); // Log
+    setIsAnalysisComplete(false); // Reset analysis complete status
+    // Navigation will be triggered by useEffect when analysis is truly complete
   };
 
   const startRecording = () => {
@@ -472,11 +524,19 @@ export const useInterview = () => {
   };
 
   useEffect(() => {
-    if (finalResults.voice && finalResults.video) {
-      setStatus('분석이 완료되었습니다!');
+    if (finalResults?.voice && finalResults?.video) {
       getPercentileAnalysis();
     }
   }, [finalResults]);
+
+  useEffect(() => { // Added useEffect for navigation
+    if (isAnalysisComplete) {
+      console.log('useEffect: Navigating to interviewanalysis.'); // Log
+      router.push('/(protected)/interviewanalysis');
+      // Reset isAnalysisComplete immediately after navigation is triggered
+      setIsAnalysisComplete(false); // This is the key
+    }
+  }, [isAnalysisComplete, router, setIsAnalysisComplete]); // Added setIsAnalysisComplete to dependencies
 
   return {
     hasPermission,
@@ -485,19 +545,19 @@ export const useInterview = () => {
     status,
     transcript,
     realtimeFeedback,
-    finalResults,
+    finalResults, // From store
     cameraRef,
     startAnalysis,
     stopAnalysis,
     startRecording,
     stopRecording,
-    aiAdvice,
+    aiAdvice, // From store
     isFetchingAdvice,
     getAIAdvice,
-    percentileAnalysis,
+    percentileAnalysis, // From store
     isFetchingPercentiles,
     getPercentileAnalysis,
-    textAnalysis,
+    textAnalysis, // From store
     isFetchingNextQuestion,
   };
 };
