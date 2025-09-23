@@ -194,11 +194,11 @@ export default function InterviewStartPage() {
       <View style={styles.twoColumnLayout}> {/* Main two-column container */}
         <View style={styles.leftColumn}> {/* Left column for Interview Settings */}
           <Card containerStyle={styles.card}>
-            <RNEText h4 style={styles.title}>면접 설정</RNEText>
+            <RNEText style={styles.title}>면접 설정</RNEText>
 
             <Text style={styles.label}>이름 (필수)</Text>
             <Controller control={control} name="name" render={({ field: { onChange, onBlur, value } }) => (
-              <Input placeholder="홍길동" value={value} onBlur={onBlur} onChangeText={onChange} errorMessage={errors.name?.message} />
+              <Input inputContainerStyle={styles.inputField} placeholder="홍길동" value={value} onBlur={onBlur} onChangeText={onChange} errorMessage={errors.name?.message} />
             )} />
 
             <Text style={styles.label}>성별 (필수)</Text>
@@ -206,66 +206,73 @@ export default function InterviewStartPage() {
 
             <Text style={styles.label}>지원회사명 (필수)</Text>
             <Controller control={control} name="company" render={({ field: { onChange, onBlur, value } }) => (
-              <Input placeholder="(주)아레스" value={value} onBlur={onBlur} onChangeText={onChange} errorMessage={errors.company?.message} />
+              <Input inputContainerStyle={styles.inputField} placeholder="(주)아레스" value={value} onBlur={onBlur} onChangeText={onChange} errorMessage={errors.company?.message} />
             )} />
 
             <Text style={styles.label}>지원직무 (필수)</Text>
             <Controller control={control} name="job_title" render={({ field: { onChange, onBlur, value } }) => (
-              <Input placeholder="프론트엔드 개발자" value={value} onBlur={onBlur} onChangeText={onChange} errorMessage={errors.job_title?.message} />
+              <Input inputContainerStyle={styles.inputField} placeholder="프론트엔드 개발자" value={value} onBlur={onBlur} onChangeText={onChange} errorMessage={errors.job_title?.message} />
             )} />
 
             <Text style={styles.label}>면접 모드 (필수)</Text>
             {renderSelectButtons(interviewerMode, setInterviewerMode, [{ label: '실무 면접', value: 'team_lead' }, { label: '임원 면접', value: 'executive' }])}
 
             <Text style={styles.label}>난이도 (필수)</Text>
-            {renderSelectButtons(difficulty, setDifficulty, [{ label: '보통', value: 'normal' }, { label: '어려움', value: 'hard' }])}
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+              {renderSelectButtons(difficulty, setDifficulty, [{ label: '보통', value: 'normal' }, { label: '어려움', value: 'hard' }])}
+              <Text style={{ fontSize: 12, color: '#666', marginLeft: 10, flexShrink: 1 }}>
+                보통 난이도: 기본적인 역량 평가, 어려움 난이도: 심층적인 역량과 압박 상황에서의 대처 능력 평가
+              </Text>
+            </View>
 
             <Text style={styles.label}>부서 (선택)</Text>
             <Controller control={control} name="department" render={({ field: { onChange, onBlur, value } }) => (
-              <Input placeholder="개발팀" value={value} onBlur={onBlur} onChangeText={onChange} />
+              <Input inputContainerStyle={styles.inputField} placeholder="개발팀" value={value} onBlur={onBlur} onChangeText={onChange} />
             )} />
 
             <Text style={styles.label}>기술 스택 (선택, 쉼표로 구분)</Text>
             <Controller control={control} name="skills" render={({ field: { onChange, onBlur, value } }) => (
-              <Input placeholder="React, TypeScript" value={value} onBlur={onBlur} onChangeText={onChange} />
+              <Input inputContainerStyle={styles.inputField} placeholder="React, TypeScript" value={value} onBlur={onBlur} onChangeText={onChange} />
             )} />
 
             <Text style={styles.label}>자격증 (선택)</Text>
             <Controller control={control} name="certifications" render={({ field: { onChange, onBlur, value } }) => (
-              <Input placeholder="정보처리기사" value={value} onBlur={onBlur} onChangeText={onChange} />
+              <Input inputContainerStyle={styles.inputField} placeholder="정보처리기사" value={value} onBlur={onBlur} onChangeText={onChange} />
             )} />
 
             <Text style={styles.label}>기타 활동 (선택)</Text>
             <Controller control={control} name="activities" render={({ field: { onChange, onBlur, value } }) => (
-              <Input placeholder="오픈소스 프로젝트 참여" value={value} onBlur={onBlur} onChangeText={onChange} />
+              <Input inputContainerStyle={styles.inputField} placeholder="오픈소스 프로젝트 참여" value={value} onBlur={onBlur} onChangeText={onChange} />
             )} />
           </Card>
         </View>
 
         <View style={styles.rightColumn}> {/* Right column for JD and Resume */}
           <Card containerStyle={styles.card}>
-            <Card.Title>Job Description (JD)</Card.Title>
+            <Card.Title>직무기술서(JD, 필수)</Card.Title>
             <Card.Divider />
-            {renderFileInput('JD', jdFile, () => pickDocument(setJdFile))}
-            <Controller name="jd_text" control={control} render={({ field: { onChange, onBlur, value } }) => <Input label="Or Paste JD Text" placeholder="Paste the job description here..." value={value} onChangeText={onChange} onBlur={onBlur} multiline numberOfLines={6} style={styles.textArea} />} />
+            {renderFileInput('직무기술서(JD)', jdFile, () => pickDocument(setJdFile))}
+            <Controller name="jd_text" control={control} render={({ field: { onChange, onBlur, value } }) => <Input label="또는 텍스트로 붙여넣기" placeholder="이곳에 직무기술서 내용을 붙여넣거나, 파일이 없는 경우 '없음'이라고 입력하세요." value={value} onChangeText={onChange} onBlur={onBlur} multiline numberOfLines={6} style={styles.textArea} />} />
           </Card>
 
           <Card containerStyle={styles.card}>
-            <Card.Title>Resume</Card.Title>
+            <Card.Title>이력서(필수)</Card.Title>
             <Card.Divider />
-            {renderFileInput('Resume', resumeFile, () => pickDocument(setResumeFile))}
-            <Controller name="resume_text" control={control} render={({ field: { onChange, onBlur, value } }) => <Input label="Or Paste Resume Text" placeholder="Paste your resume here..." value={value} onChangeText={onChange} onBlur={onBlur} multiline numberOfLines={6} style={styles.textArea} />} />
+            {renderFileInput('이력서', resumeFile, () => pickDocument(setResumeFile))}
+            <Controller control={control} name="resume_text" render={({ field: { onChange, onBlur, value } }) => <Input label="또는 텍스트로 붙여넣기" placeholder="이곳에 이력서 내용을 붙여넣거나, 파일이 없는 경우 '없음'이라고 입력하세요." value={value} onChangeText={onChange} onBlur={onBlur} multiline numberOfLines={6} style={styles.textArea} />} />
           </Card>
+
+          <Button
+            title={isAnalyzing ? "Starting Interview..." : "면접 시작하기"}
+            onPress={handleSubmit(onSubmit)}
+            disabled={!isValid || !gender || isAnalyzing}
+            containerStyle={styles.buttonContainer}
+            buttonStyle={styles.startButton}
+            titleStyle={styles.startButtonText}
+            icon={isAnalyzing ? <ActivityIndicator color="white" style={{ marginRight: 8 }} /> : null}
+          />
         </View>
       </View>
-
-      <Button
-        title={isAnalyzing ? "Starting Interview..." : "면접 시작하기"}
-        onPress={handleSubmit(onSubmit)}
-        disabled={!isValid || !gender || isAnalyzing}
-        containerStyle={styles.buttonContainer}
-        icon={isAnalyzing ? <ActivityIndicator color="white" style={{ marginRight: 8 }} /> : null}
-      />
     </ScrollView>
   );
 }
@@ -273,6 +280,7 @@ export default function InterviewStartPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f4f7f9', // Consistent with home screen's neutral background
   },
   contentContainer: {
     padding: 16,
@@ -281,56 +289,77 @@ const styles = StyleSheet.create({
   twoColumnLayout: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    flex: 1, // Take up available space
-    paddingHorizontal: 16, // Match contentContainer padding
+    flex: 1,
+    paddingHorizontal: 16,
   },
   leftColumn: {
     flex: 1,
-    marginRight: 8, // Space between columns
+    marginRight: 8,
   },
   rightColumn: {
     flex: 1,
-    marginLeft: 8, // Space between columns
+    marginLeft: 8,
   },
   card: {
-    borderRadius: 8,
+    borderRadius: 12, // Slightly more rounded
     marginBottom: 16,
+    backgroundColor: '#ffffff', // Explicitly white background for cards
+    shadowColor: '#000', // Add shadow for depth
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3, // Android shadow
+    borderWidth: 0, // Remove default border if RNEUI adds one
   },
   title: {
+    fontSize: 28, // Larger title
+    fontWeight: 'bold',
     marginBottom: 24,
     textAlign: 'center',
+    color: '#333', // Darker text for titles on light background
   },
   label: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 15, // Slightly smaller for labels
+    fontWeight: '600', // Medium bold
     marginBottom: 8,
-    color: '#333',
+    color: '#444', // Softer dark color
     marginLeft: 10,
   },
   buttonContainer: {
-    marginTop: 16,
-    marginBottom: 32, // Add some bottom margin
+    marginTop: 24, // More spacing
+    marginBottom: 32,
+    paddingHorizontal: 16, // Match column padding
   },
   selectContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    marginBottom: 16,
+    marginBottom: 16, // Added marginBottom
     marginLeft: 10,
   },
   selectButtonContainer: {
     marginRight: 10,
+    borderRadius: 8, // Rounded buttons
   },
   selectedButton: {
-    backgroundColor: '#000000',
+    backgroundColor: '#34495e', // Darker, modern blue-gray
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
   },
   unselectedButton: {
-    borderColor: '#000000',
+    borderColor: '#bdc3c7', // Softer gray border
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
   },
   selectedButtonText: {
     color: '#FFFFFF',
+    fontWeight: 'bold',
   },
   unselectedButtonText: {
-    color: '#000000',
+    color: '#34495e', // Match selected button text color
+    fontWeight: '600',
   },
   fileInputContainer: {
     marginBottom: 16,
@@ -345,9 +374,39 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 4,
-    padding: 8,
-    height: 120,
+    borderRadius: 8, // Consistent with cards
+    padding: 12, // More padding
+    height: 300,
     marginTop: 8,
+    fontSize: 15,
+    color: '#333',
+  },
+  inputField: { // New style for regular Input fields
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8, // Reduced height
+    marginBottom: 16,
+    fontSize: 15,
+    color: '#333',
+  },
+  startButton: {
+    backgroundColor: '#2ecc71', // A vibrant green, slightly different from #4CAF50
+    paddingVertical: 14, // Larger button
+    paddingHorizontal: 25,
+    borderRadius: 10, // Rounded corners
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 6, // Android shadow
+    shadowColor: '#000', // iOS shadow
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+  startButtonText: {
+    color: '#fff',
+    fontSize: 18, // Larger text
+    fontWeight: 'bold',
   },
 });
