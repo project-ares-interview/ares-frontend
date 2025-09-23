@@ -14,7 +14,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View
+  View,
 } from "react-native";
 
 const ResumeDetailPage = () => {
@@ -49,36 +49,44 @@ const ResumeDetailPage = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Pressable onPress={() => router.back()} style={styles.backButton}>
-        <Text style={styles.backButtonText}>
-          {"<"} {t("resume.back_to_list")}
-        </Text>
-      </Pressable>
+    <ScrollView style={styles.outerContainer}>
+      <View style={styles.mainContentContainer}>
+        <Pressable onPress={() => router.back()} style={styles.backButton}>
+          <Text style={styles.backButtonText}>
+            {"<"} {t("resume.back_to_list")}
+          </Text>
+        </Pressable>
 
-      <ResumeHeader resume={selectedResume} />
+        <ResumeHeader resume={selectedResume} />
 
-      <EducationSection
-        resumeId={resumeId}
-        educations={selectedResume.educations}
-      />
-      <CareerSection resumeId={resumeId} careers={selectedResume.careers} />
+        <EducationSection
+          resumeId={resumeId}
+          educations={selectedResume.educations}
+        />
+        <CareerSection resumeId={resumeId} careers={selectedResume.careers} />
 
-      <AwardSection resumeId={resumeId} awards={selectedResume.awards} />
+        <AwardSection resumeId={resumeId} awards={selectedResume.awards} />
 
-      <LanguageSection
-        resumeId={resumeId}
-        languages={selectedResume.languages}
-      />
-      <LinkSection resumeId={resumeId} links={selectedResume.links} />
+        <LanguageSection
+          resumeId={resumeId}
+          languages={selectedResume.languages}
+        />
+        <LinkSection resumeId={resumeId} links={selectedResume.links} />
+      </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  outerContainer: {
     flex: 1,
     backgroundColor: "#f5f5f5",
+  },
+  mainContentContainer: {
+    width: "70%",
+    maxWidth: 1280,
+    alignSelf: "center",
+    paddingVertical: 20,
   },
   centered: {
     flex: 1,
@@ -94,19 +102,8 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 16,
-    color: "#007bff",
-  },
-  section: {
-    backgroundColor: "white",
-    marginHorizontal: 16,
-    marginVertical: 8,
-    padding: 16,
-    borderRadius: 8,
-  },
-  sectionTitle: {
-    fontSize: 20,
+    color: "#4972c3ff",
     fontWeight: "bold",
-    marginBottom: 12,
   },
 });
 

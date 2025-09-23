@@ -1,11 +1,11 @@
 import {
-    getMonthOptions,
-    getYearOptions,
-    parseYearMonthString,
+  getMonthOptions,
+  getYearOptions,
+  parseYearMonthString,
 } from "@/utils/dateUtils";
 import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 
 interface YearMonthPickerProps {
   date: string | null | undefined;
@@ -37,45 +37,31 @@ const YearMonthPicker: React.FC<YearMonthPickerProps> = ({
   const yearOptions = getYearOptions();
   const monthOptions = getMonthOptions();
 
-  const handleYearChange = (newYear: string) => {
-    const updatedYear = newYear || "";
-    setYear(updatedYear);
-    onDateChange(`${updatedYear}-${month}`);
-  };
-
-  const handleMonthChange = (newMonth: string) => {
-    const updatedMonth = newMonth || "";
-    setMonth(updatedMonth);
-    onDateChange(`${year}-${updatedMonth}`);
+  const handleDateChange = (newYear: string, newMonth: string) => {
+    setYear(newYear);
+    setMonth(newMonth);
+    onDateChange(`${newYear}-${newMonth}`);
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.label}>
         {label}
-        {required && <Text style={styles.asterisk}>*</Text>}
+        {required && <Text style={styles.requiredAsterisk}> *</Text>}
       </Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={year}
-          onValueChange={handleYearChange}
-          style={styles.picker}
-        >
-          <Picker.Item label="년" value="" />
-          {yearOptions.map((opt) => (
-            <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
-          ))}
-        </Picker>
-        <Picker
-          selectedValue={month}
-          onValueChange={handleMonthChange}
-          style={styles.picker}
-        >
-          <Picker.Item label="월" value="" />
-          {monthOptions.map((opt) => (
-            <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
-          ))}
-        </Picker>
+      <View style={styles.pickerRow}>
+        <View style={styles.pickerContainer}>
+          <Picker selectedValue={year} onValueChange={(itemValue) => handleDateChange(itemValue, month)} style={styles.picker}>
+            <Picker.Item label="년" value="" />
+            {yearOptions.map((opt) => <Picker.Item key={opt.value} label={opt.label} value={opt.value} />)}
+          </Picker>
+        </View>
+        <View style={styles.pickerContainer}>
+          <Picker selectedValue={month} onValueChange={(itemValue) => handleDateChange(year, itemValue)} style={styles.picker}>
+            <Picker.Item label="월" value="" />
+            {monthOptions.map((opt) => <Picker.Item key={opt.value} label={opt.label} value={opt.value} />)}
+          </Picker>
+        </View>
       </View>
     </View>
   );
@@ -86,21 +72,42 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   label: {
-    fontSize: 14,
-    fontWeight: "bold",
+    fontSize: 16,
     marginBottom: 5,
+    color: "#555",
+    fontWeight: "500",
   },
-  asterisk: {
-    color: "red",
-    marginLeft: 8,
+  requiredAsterisk: {
+    color: "#ff4d4f",
   },
-  pickerContainer: {
+  pickerRow: {
     flexDirection: "row",
     gap: 8,
   },
-  picker: {
+  pickerContainer: {
     flex: 1,
-    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    backgroundColor: "white",
+    ...Platform.select({
+      ios: {
+        paddingVertical: 0,
+      },
+      android: {
+        paddingVertical: 0,
+      },
+    }),
+  },
+  picker: {
+    ...Platform.select({
+        ios: {
+            height: 150,
+        },
+        android: {
+            height: 50,
+        }
+    })
   },
 });
 

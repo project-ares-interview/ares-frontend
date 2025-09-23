@@ -474,6 +474,7 @@
                 "title": "Delete Resume"
             },
             "last_updated": "Last Updated",
+            "my_resumes": "My Resumes",
             "new_title_placeholder": "New Resume Title",
             "no_data": "No resumes created yet.",
             "page_title": "Manage Resumes",

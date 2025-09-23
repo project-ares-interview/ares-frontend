@@ -1,10 +1,10 @@
 import { Language, LanguageCreate, LanguageUpdate } from "@/schemas/resume";
 import { resumeService } from "@/services/resumeService";
 import { useResumeStore } from "@/stores/resumeStore";
-import { Icon } from "@rneui/themed";
+import { FontAwesome5 } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { showConfirmation } from "../../../utils/alert";
 import LanguageCard from "./LanguageCard";
 import LanguageForm from "./LanguageForm";
@@ -29,7 +29,7 @@ const LanguageSection: React.FC<LanguageSectionProps> = ({
         await resumeService.languages.update(
           resumeId,
           editingLanguage.id,
-          data,
+          data
         );
       } else {
         await resumeService.languages.create(resumeId, data as LanguageCreate);
@@ -72,27 +72,27 @@ const LanguageSection: React.FC<LanguageSectionProps> = ({
   };
 
   return (
-    <View style={styles.section}>
-      <View style={styles.header}>
+    <View style={styles.sectionContainer}>
+      <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>
           {t("resume.language.section_title")}
         </Text>
-        <Pressable style={styles.addButton} onPress={handleAddNew}>
-          <Icon name="add" color="white" style={{ pointerEvents: "none" }} />
-        </Pressable>
+        <TouchableOpacity style={styles.addButton} onPress={handleAddNew}>
+          <FontAwesome5 name="plus" size={16} color="#fff" />
+        </TouchableOpacity>
       </View>
 
-      {languages.length > 0 ? (
-        languages.map((language) => (
-          <LanguageCard
-            key={language.id}
-            language={language}
-            onEdit={() => handleEdit(language)}
-            onDelete={() => handleDelete(language.id)}
-          />
-        ))
-      ) : (
-        !isFormVisible && <Text>{t("resume.language.no_data")}</Text>
+      {languages.length > 0 && (
+        <View style={styles.cardContainer}>
+          {languages.map((language) => (
+            <LanguageCard
+              key={language.id}
+              language={language}
+              onEdit={() => handleEdit(language)}
+              onDelete={() => handleDelete(language.id)}
+            />
+          ))}
+        </View>
       )}
 
       {isFormVisible && (
@@ -105,19 +105,24 @@ const LanguageSection: React.FC<LanguageSectionProps> = ({
           }}
         />
       )}
+
+      {languages.length === 0 && !isFormVisible && (
+        <Text style={styles.noDataText}>{t("resume.language.no_data")}</Text>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  section: {
-    backgroundColor: "white",
-    marginHorizontal: 16,
+  sectionContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
     marginVertical: 8,
     padding: 16,
-    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
   },
-  header: {
+  sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -126,15 +131,20 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
+    color: "#333",
   },
   addButton: {
-    backgroundColor: "#007bff",
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    justifyContent: "center",
-    alignItems: "center",
-    cursor: "pointer",
+    backgroundColor: "#4972c3ff",
+    padding: 8,
+    borderRadius: 8,
+  },
+  cardContainer: {
+    marginTop: 8,
+  },
+  noDataText: {
+    textAlign: "center",
+    color: "#888",
+    paddingVertical: 16,
   },
 });
 

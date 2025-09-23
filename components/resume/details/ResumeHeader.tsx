@@ -44,15 +44,16 @@ const ResumeHeader: React.FC<ResumeHeaderProps> = ({ resume }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
-    marginHorizontal: 16,
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 8,
+    backgroundColor: "#fff",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
   },
   input: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: "bold",
+    color: "#333",
   },
 });
 
