@@ -1,10 +1,37 @@
 import React from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import Markdown from 'react-native-markdown-display';
 
 type Props = {
   advice: string | null;
   isLoading: boolean;
 };
+
+const markdownStyle = StyleSheet.create({
+  body: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: "#4a5568",
+  },
+  heading1: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 10,
+    marginBottom: 5,
+    color: "#2d3748",
+  },
+  list_item: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 5,
+  },
+  bullet_list_icon: {
+    marginRight: 5,
+    fontSize: 16,
+    lineHeight: 24,
+    color: "#4a5568",
+  },
+});
 
 export const AIAdvicePanel = ({ advice, isLoading }: Props) => {
   return (
@@ -16,7 +43,7 @@ export const AIAdvicePanel = ({ advice, isLoading }: Props) => {
           <Text style={styles.loadingText}>AI 종합 조언을 생성 중입니다. 잠시만 기다려주세요...</Text>
         </View>
       ) : (
-        <Text style={styles.adviceText}>{advice || "조언을 받아오지 못했습니다."}</Text>
+        <Markdown style={markdownStyle}>{advice || "조언을 받아오지 못했습니다."}</Markdown>
       )}
     </View>
   );
@@ -38,11 +65,6 @@ const styles = StyleSheet.create({
     color: "#2d3748",
     textAlign: "center",
   },
-  adviceText: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: "#4a5568",
-  },
   loadingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -53,4 +75,5 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 16,
     color: '#4a5568',
-  },});
+  },
+});

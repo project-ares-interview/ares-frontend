@@ -9,7 +9,7 @@ import { decode } from 'base-64';
 import { Audio } from 'expo-av';
 import { Camera, CameraView } from 'expo-camera';
 import * as FileSystem from 'expo-file-system';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Platform } from 'react-native';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
@@ -73,6 +73,7 @@ export const useInterview = () => {
   const videoFrameSender = useRef<ReturnType<typeof setInterval> | null>(null);
   const fullTranscript = useRef('');
   const isRecordingRef = useRef(isRecording);
+  const isAnalyzingRef = useRef(isAnalyzing);
   const analysisCompletionStatus = useRef({ voice: false, video: false }); // Added
 
   const audioRecording = useRef<Audio.Recording | null>(null);
@@ -83,6 +84,10 @@ export const useInterview = () => {
   useEffect(() => {
     isRecordingRef.current = isRecording;
   }, [isRecording]);
+
+  useEffect(() => {
+    isAnalyzingRef.current = isAnalyzing;
+  }, [isAnalyzing]);
 
   useEffect(() => {
     const requestPermissions = async () => {
@@ -217,7 +222,7 @@ export const useInterview = () => {
   const startSendingVideoFrames = () => {
     stopSendingVideoFrames();
     videoFrameSender.current = setInterval(async () => {
-      if (!cameraRef.current || sockets.current.video?.readyState !== WebSocket.OPEN) return;
+      if (!isAnalyzingRef.current || !cameraRef.current || sockets.current.video?.readyState !== WebSocket.OPEN) return;
       try {
         const photo = await cameraRef.current.takePictureAsync({ quality: 0.5 });
         if (photo && photo.uri) {
@@ -265,7 +270,7 @@ export const useInterview = () => {
     const targetSampleRate = 16000;
 
     audioProcessor.onaudioprocess = (e) => {
-      if (!isRecordingRef.current || sockets.current.audio?.readyState !== WebSocket.OPEN) return;
+      if (!isAnalyzingRef.current || !isRecordingRef.current || sockets.current.audio?.readyState !== WebSocket.OPEN) return;
       
       const inputData = e.inputBuffer.getChannelData(0);
       const sourceSampleRate = audioContext.sampleRate;
@@ -298,7 +303,7 @@ export const useInterview = () => {
       audioLastReadPosition.current = 0;
 
       recording.setOnRecordingStatusUpdate(async (status) => {
-        if (!isRecordingRef.current || !status.isRecording) return;
+        if (!isAnalyzingRef.current || !isRecordingRef.current || !status.isRecording) return;
         
         const uri = status.uri;
         if (!uri || sockets.current.audio?.readyState !== WebSocket.OPEN) return;
@@ -509,8 +514,8 @@ export const useInterview = () => {
     }
   };
 
-  const getPercentileAnalysis = async (filters = {}) => {
-    if (!finalResults.voice) return;
+  const getPercentileAnalysis = useCallback(async (filters = {}) => {
+    if (!finalResults?.voice) return;
     setIsFetchingPercentiles(true);
     try {
       const data = await fetchPercentilesAPI(finalResults.voice, filters);
@@ -521,7 +526,7 @@ export const useInterview = () => {
     } finally {
       setIsFetchingPercentiles(false);
     }
-  };
+  }, [finalResults, setPercentileAnalysis, setIsFetchingPercentiles]);
 
   useEffect(() => {
     if (finalResults?.voice && finalResults?.video) {
