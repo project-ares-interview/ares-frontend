@@ -94,7 +94,7 @@ export default function TermsPage() {
             </Text>
           </View>
         </View>
-        <Text style={styles.footer}>시행일자: 2025년 9월 10일</Text>
+        <Text style={styles.footer}>시행일자: 2025년 9월 15일</Text>
       </View>
     </ScrollView>
   );
