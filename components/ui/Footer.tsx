@@ -47,10 +47,10 @@ export default function Footer() {
       <View style={[styles.topSection, isMobile && styles.topSectionMobile]}>
         <View style={styles.logoContainer}>
           <Image
-            source={require("@/assets/images/react-logo.png")}
+            source={require("@/assets/images/Gemini_Generated_Image_yci72qyci72qyci7.png")}
             style={styles.logo}
           />
-          <Text style={styles.companyName}>Project</Text>
+          <Text style={styles.companyName}>JobAI</Text>
         </View>
 
         <View
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   companyName: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: "bold",
   },
   rightSection: {
