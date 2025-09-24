@@ -1,18 +1,16 @@
-import { TextAnalysisReportData } from '@/schemas/analysis';
-import { VideoAnalysis, VoiceScores } from '@/components/interview/AnalysisResultPanel';
-import { RealtimeFeedbackData } from '@/components/interview/RealtimeFeedbackPanel';
+// import { TextAnalysisReportData } from '@/schemas/analysis';
 import { fetchAIAdviceAPI, fetchPercentilesAPI } from '@/services/api';
 import { interviewService } from '@/services/interviewService';
 import { useInterviewSessionStore } from '@/stores/interviewStore';
-import { router } from 'expo-router';
+// import { generateInterviewPDF } from '@/utils/pdfGenerator';
 import { decode } from 'base-64';
 import { Audio } from 'expo-av';
 import { Camera, CameraView } from 'expo-camera';
 import * as FileSystem from 'expo-file-system';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { router } from 'expo-router';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import 'react-native-get-random-values';
-import { v4 as uuidv4 } from 'uuid';
 
 const WS_URL = process.env.EXPO_PUBLIC_WS_URL;
 
@@ -62,7 +60,7 @@ export const useInterview = () => {
   const [isRecording, setIsRecording] = useState(false);   // Is audio being sent
   const [status, setStatus] = useState('카메라 및 마이크 권한을 허용해주세요...');
   const [transcript, setTranscript] = useState('');
-  const [realtimeFeedback, setRealtimeFeedback] = useState<RealtimeFeedbackData | null>(null);
+  const [realtimeFeedback, setRealtimeFeedback] = useState<any | null>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [isFetchingAdvice, setIsFetchingAdvice] = useState(false); // Still local for fetching status
   const [isFetchingPercentiles, setIsFetchingPercentiles] = useState(false); // Still local for fetching status
@@ -195,7 +193,10 @@ export const useInterview = () => {
         break;
       case 'voice_scores_update':
         // Use functional update to ensure we get the latest state from the store
-        useInterviewSessionStore.getState().setFinalResults(prev => ({ ...(prev || {}), voice: content.data }));
+        useInterviewSessionStore.getState().setFinalResults(prev => ({ 
+          voice: content.data, 
+          video: prev?.video || null 
+        }));
         analysisCompletionStatus.current.voice = true;
         if (analysisCompletionStatus.current.video) {
           setIsAnalysisComplete(true);
@@ -203,7 +204,10 @@ export const useInterview = () => {
         break;
       case 'video_analysis_update':
         // Use functional update to ensure we get the latest state from the store
-        useInterviewSessionStore.getState().setFinalResults(prev => ({ ...(prev || {}), video: content.data }));
+        useInterviewSessionStore.getState().setFinalResults(prev => ({ 
+          voice: prev?.voice || null, 
+          video: content.data 
+        }));
         analysisCompletionStatus.current.video = true;
         if (analysisCompletionStatus.current.voice) {
           setIsAnalysisComplete(true);
@@ -496,7 +500,7 @@ export const useInterview = () => {
   };
 
   const getAIAdvice = async () => {
-    if (!finalResults.voice || !finalResults.video) return;
+    if (!finalResults?.voice || !finalResults?.video) return;
     setIsFetchingAdvice(true);
     setAiAdvice(null);
     try {
@@ -537,6 +541,7 @@ export const useInterview = () => {
   useEffect(() => { // Added useEffect for navigation
     if (isAnalysisComplete) {
       console.log('useEffect: Navigating to interviewanalysis.'); // Log
+      
       router.push('/(protected)/interviewanalysis');
       // Reset isAnalysisComplete immediately after navigation is triggered
       setIsAnalysisComplete(false); // This is the key

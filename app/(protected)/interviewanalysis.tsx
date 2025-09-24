@@ -1,13 +1,15 @@
 import { AIAdvicePanel } from '@/components/interview/AIAdvicePanel';
+import { PercentileAnalysisPanel } from '@/components/interview/PercentileAnalysisPanel';
+import { TextAnalysisLoading } from '@/components/interview/TextAnalysisLoading';
+import { TextAnalysisReport } from '@/components/interview/TextAnalysisReport';
 import { VideoAnalysisPanel } from '@/components/interview/VideoAnalysisPanel';
 import { VoiceAnalysisPanel } from '@/components/interview/VoiceAnalysisPanel';
-import { PercentileAnalysisPanel } from '@/components/interview/PercentileAnalysisPanel';
-import { TextAnalysisReport } from '@/components/interview/TextAnalysisReport';
-import { TextAnalysisLoading } from '@/components/interview/TextAnalysisLoading';
 import { useInterview } from '@/hooks/useInterview'; // Keep useInterview
 import { useInterviewSessionStore } from '@/stores/interviewStore'; // Import the store
-import React, { useEffect } from 'react'; // Keep useEffect
-import { ScrollView, StyleSheet, Text, View, ActivityIndicator } from 'react-native'; // Added ActivityIndicator
+import { generateInterviewPDF } from '@/utils/pdfGenerator';
+import { Feather } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react'; // Keep useEffect
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'; // Added ActivityIndicator
 import Markdown from 'react-native-markdown-display'; // Import Markdown
 
 const voiceGuidePart1 = `# 🎤 음성 점수 향상 가이드
@@ -291,8 +293,10 @@ const InterviewAnalysisScreen = () => {
     aiAdvice,
     percentileAnalysis,
     textAnalysis,
-    isAnalysisComplete, // This is true when navigating here
+    session_id,
   } = useInterviewSessionStore();
+
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   // Determine if analysis results are still loading
   const isLoadingAnalysis = !finalResults?.voice || !finalResults?.video;
@@ -310,9 +314,54 @@ const InterviewAnalysisScreen = () => {
     }
   }, [finalResults, aiAdvice, isFetchingAdvice, getAIAdvice]); // Updated dependencies
 
+  const handleDownloadPDF = async () => {
+    if (isGeneratingPDF) return;
+    
+    setIsGeneratingPDF(true);
+    try {
+      const analysisData = {
+        voiceScores: finalResults?.voice,
+        videoAnalysis: finalResults?.video,
+        textAnalysis: textAnalysis,
+        aiAdvice: aiAdvice,
+        percentileAnalysis: percentileAnalysis,
+        sessionId: session_id,
+        timestamp: new Date().toISOString()
+      };
+
+      await generateInterviewPDF(analysisData);
+      Alert.alert('성공', 'PDF가 성공적으로 생성되었습니다.');
+    } catch (error) {
+      console.error('PDF 생성 오류:', error);
+      const errorMessage = error instanceof Error ? error.message : 'PDF 생성 중 오류가 발생했습니다.';
+      Alert.alert('오류', errorMessage);
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.mainTitle}>면접 분석 결과</Text>
+    <>
+      <ScrollView style={styles.container}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.mainTitle}>면접 분석 결과</Text>
+          {!isLoadingAnalysis && textAnalysis && (
+            <TouchableOpacity
+              style={[styles.downloadButton, isGeneratingPDF && styles.downloadButtonDisabled]}
+              onPress={handleDownloadPDF}
+              disabled={isGeneratingPDF}
+            >
+              <Feather 
+                name={isGeneratingPDF ? "loader" : "download"} 
+                size={20} 
+                color={isGeneratingPDF ? "#999" : "#fff"} 
+              />
+              <Text style={styles.downloadButtonText}>
+                {isGeneratingPDF ? 'PDF 생성 중...' : 'PDF 다운로드'}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
       {isLoadingAnalysis ? (
         <View style={styles.loadingContainer}>
@@ -372,7 +421,8 @@ const InterviewAnalysisScreen = () => {
           </Markdown>
         </View>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </>
   );
 };
 
@@ -381,6 +431,34 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#f4f7f9',
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  downloadButton: {
+    backgroundColor: '#2563eb',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  downloadButtonDisabled: {
+    backgroundColor: '#9ca3af',
+  },
+  downloadButtonText: {
+    color: '#fff',
+    marginLeft: 8,
+    fontSize: 14,
+    fontWeight: '500',
   },
   panel: {
     backgroundColor: '#ffffff', // White background

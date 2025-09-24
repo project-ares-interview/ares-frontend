@@ -2,6 +2,9 @@ import { Platform } from 'react-native';
 import { create } from 'zustand';
 import { storage as secureStorage } from '../utils/storage';
 
+import { VideoAnalysis, VoiceScores } from '@/components/interview/AnalysisResultPanel';
+import { TextAnalysisReportData } from '@/schemas/analysis';
+
 // --- Storage Abstraction ---
 const INTERVIEW_SETTINGS_KEY = 'interview-settings';
 const INTERVIEW_SESSION_KEY = 'interview-session';
@@ -15,10 +18,15 @@ const interviewStorage = {
     }
   },
   async getItem(key: string): Promise<string | null> {
-    if (Platform.OS === 'web') {
-      return localStorage.getItem(key);
+    try {
+      if (Platform.OS === 'web' && typeof localStorage !== 'undefined') {
+        return localStorage.getItem(key);
+      }
+      return await secureStorage.getItem(key);
+    } catch (error) {
+      console.warn('Storage getItem error:', error);
+      return null;
     }
-    return await secureStorage.getItem(key);
   },
   async removeItem(key: string): Promise<void> {
     if (Platform.OS === 'web') {
@@ -109,9 +117,6 @@ export const useInterviewSettingsStore = create<InterviewSettingsState>((set, ge
     interviewStorage.removeItem(INTERVIEW_SETTINGS_KEY);
   },
 }));
-
-import { TextAnalysisReportData } from '@/schemas/analysis';
-import { VideoAnalysis, VoiceScores } from '@/components/interview/AnalysisResultPanel';
 
 // --- Interview Session Store ---
 
