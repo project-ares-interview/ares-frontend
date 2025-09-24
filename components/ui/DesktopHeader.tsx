@@ -48,7 +48,7 @@ export default function DesktopHeader({ showNav = true }: DesktopHeaderProps) {
       <View style={styles.leftSection}>
         <Link href={"/" as Href} style={styles.logoContainer}>
           <Image
-            source={require("@/assets/images/react-logo.png")}
+            source={require("@/assets/images/Gemini_Generated_Image_yci72qyci72qyci7.png")}
             style={styles.logo}
           />
           <Text h4 style={styles.heading}>
