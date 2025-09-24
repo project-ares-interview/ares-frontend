@@ -1,13 +1,13 @@
-
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, View, TouchableOpacity } from 'react-native';
-import { Text, Card, Button } from '@rneui/themed';
-import { MaterialIcons } from '@expo/vector-icons';
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { ScrollView, StyleSheet, View, TouchableOpacity } from "react-native";
+import { Text, Card, Button } from "@rneui/themed";
+import { MaterialIcons } from "@expo/vector-icons";
+import { Link } from "expo-router";
 
 type FaqItemProps = {
   question: string;
-  answer: string;
+  answer: React.ReactNode;
 };
 
 const FaqItem: React.FC<FaqItemProps> = ({ question, answer }) => {
@@ -21,7 +21,7 @@ const FaqItem: React.FC<FaqItemProps> = ({ question, answer }) => {
       >
         <Text style={styles.question}>{question}</Text>
         <MaterialIcons
-          name={isOpen ? 'keyboard-arrow-up' : 'keyboard-arrow-down'}
+          name={isOpen ? "keyboard-arrow-up" : "keyboard-arrow-down"}
           size={24}
           color="black"
         />
@@ -40,41 +40,75 @@ export default function Faq() {
 
   const faqData = [
     {
-      question: t('pages.faq.q1.question'),
-      answer: t('pages.faq.q1.answer'),
+      question: t("pages.faq.q1.question"),
+      answer: t("pages.faq.q1.answer"),
     },
     {
-      question: t('pages.faq.q2.question'),
-      answer: t('pages.faq.q2.answer'),
+      question: t("pages.faq.q2.question"),
+      answer: t("pages.faq.q2.answer"),
     },
     {
-      question: t('pages.faq.q3.question'),
-      answer: t('pages.faq.q3.answer'),
+      question: t("pages.faq.q3.question"),
+      answer: t("pages.faq.q3.answer"),
     },
     {
-      question: t('pages.faq.q4.question'),
-      answer: t('pages.faq.q4.answer'),
+      question: t("pages.faq.q4.question"),
+      answer: (
+        <Text>
+          {t("pages.faq.q4.answer_part1")}
+          <Link href="/pricing">
+            <Text style={styles.link}>{t("pages.faq.q4.answer_link")}</Text>
+          </Link>
+          {t("pages.faq.q4.answer_part2")}
+        </Text>
+      ),
     },
     {
-        question: t('pages.faq.q5.question'),
-        answer: t('pages.faq.q5.answer'),
+      question: t("pages.faq.q5.question"),
+      answer: (
+        <Text>
+          {t("pages.faq.q5.answer_part1")}
+          <Link href="/privacy">
+            <Text style={styles.link}>{t("pages.faq.q5.answer_link")}</Text>
+          </Link>
+          {t("pages.faq.q5.answer_part2")}
+        </Text>
+      ),
+    },
+    {
+      question: t("pages.faq.q6.question"),
+      answer: t("pages.faq.q6.answer"),
+    },
+    {
+      question: t("pages.faq.q7.question"),
+      answer: t("pages.faq.q7.answer"),
+    },
+    {
+      question: t("pages.faq.q8.question"),
+      answer: t("pages.faq.q8.answer"),
+    },
+    {
+      question: t("pages.faq.q9.question"),
+      answer: t("pages.faq.q9.answer"),
     },
   ];
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.mainTitle}>{t('pages.faq.title')}</Text>
-      {faqData.map((faq, index) => (
-        <FaqItem key={index} question={faq.question} answer={faq.answer} />
-      ))}
-      <View style={styles.ctaContainer}>
-        <Text style={styles.ctaTitle}>{t('pages.faq.cta.title')}</Text>
-        <Text style={styles.ctaSubtitle}>{t('pages.faq.cta.subtitle')}</Text>
-        <Button
-          title={t('pages.faq.cta.button')}
-          buttonStyle={styles.ctaButton}
-          titleStyle={styles.ctaButtonText}
-        />
+      <View style={styles.contentWrapper}>
+        <Text style={styles.mainTitle}>{t("pages.faq.title")}</Text>
+        {faqData.map((faq, index) => (
+          <FaqItem key={index} question={faq.question} answer={faq.answer} />
+        ))}
+        <View style={styles.ctaContainer}>
+          <Text style={styles.ctaTitle}>{t("pages.faq.cta.title")}</Text>
+          <Text style={styles.ctaSubtitle}>{t("pages.faq.cta.subtitle")}</Text>
+          <Button
+            title={t("pages.faq.cta.button")}
+            buttonStyle={styles.ctaButton}
+            titleStyle={styles.ctaButtonText}
+          />
+        </View>
       </View>
     </ScrollView>
   );
@@ -84,12 +118,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  contentWrapper: {
+    width: "70%",
+    alignSelf: "center",
+  },
   mainTitle: {
     fontSize: 40,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 40,
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   card: {
     borderRadius: 10,
@@ -97,48 +135,52 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   questionContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   question: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     flex: 1,
   },
   answerContainer: {
     marginTop: 10,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: "#eee",
   },
   answer: {
     fontSize: 16,
   },
   ctaContainer: {
-    backgroundColor: '#f8f8f8',
+    backgroundColor: "#f8f8f8",
     padding: 30,
     margin: 15,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   ctaTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   ctaSubtitle: {
     fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
     marginBottom: 20,
   },
   ctaButton: {
-    backgroundColor: 'black',
+    backgroundColor: "black",
     borderRadius: 5,
     paddingHorizontal: 30,
   },
   ctaButtonText: {
-    color: 'white',
+    color: "white",
+  },
+  link: {
+    color: "#007BFF",
+    textDecorationLine: "underline",
   },
 });

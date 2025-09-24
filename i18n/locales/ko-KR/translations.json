@@ -1,482 +1,502 @@
 {
-    "common": {
-        "add": "추가",
-        "cancel": "취소",
-        "create": "생성",
-        "delete": "삭제",
-        "edit": "수정",
-        "error": "오류",
-        "save": "저장",
-        "select_day": "일 선택",
-        "select_month": "월 선택",
-        "select_year": "년도 선택",
-        "day": "일",
-        "count": "회",
-        "view_all": "모두 보기",
-        "minute": "분",
-        "completed": "완료",
-        "strength": "강점",
-        "weakness": "약점",
-        "practice": "연습",
-        "current": "현재",
-        "in_progress": "진행 중",
-        "progress_rate": "진행률",
-        "name": "이름",
-        "email": "이메일",
-        "logout": "로그아웃",
-        "yes": "예",
-        "no": "아니오"
+  "common": {
+    "add": "추가",
+    "cancel": "취소",
+    "create": "생성",
+    "delete": "삭제",
+    "edit": "수정",
+    "error": "오류",
+    "save": "저장",
+    "select_day": "일 선택",
+    "select_month": "월 선택",
+    "select_year": "년도 선택",
+    "day": "일",
+    "count": "회",
+    "view_all": "모두 보기",
+    "minute": "분",
+    "completed": "완료",
+    "strength": "강점",
+    "weakness": "약점",
+    "practice": "연습",
+    "current": "현재",
+    "in_progress": "진행 중",
+    "progress_rate": "진행률",
+    "name": "이름",
+    "email": "이메일",
+    "logout": "로그아웃",
+    "yes": "예",
+    "no": "아니오"
+  },
+  "components": {
+    "footer": {
+      "navigation": {
+        "privacy": "개인정보처리방침",
+        "terms": "이용약관"
+      }
     },
-    "components": {
-        "footer": {
-            "navigation": {
-                "privacy": "개인정보처리방침",
-                "terms": "이용약관"
-            }
-        },
-        "header": {
-            "navigation": {
-                "calendar": "채용 달력",
-                "cover_letter": "자기소개서",
-                "home": "JAI",
-                "interview": "가상 면접",
-                "my_page": "마이페이지",
-                "pricing": "가격",
-                "resume": "이력서",
-                "sign_in": "로그인",
-                "sign_out": "로그아웃"
-            }
-        }
-    },
-    "cover_letter": {
-        "add_button": "새 자기소개서 작성",
-        "created_date": "작성일",
-        "delete_confirm": {
-            "message": "정말로 이 자기소개서를 삭제하시겠습니까?",
-            "title": "자기소개서 삭제"
-        },
-        "form": {
-            "content": "내용",
-            "content_placeholder": "자기소개서 내용을 입력하세요",
-            "edit_title": "자기소개서 수정",
-            "new_title": "새 자기소개서 작성",
-            "saving": "저장 중...",
-            "title": "제목",
-            "title_placeholder": "자기소개서 제목을 입력하세요"
-        },
-        "loading": "자기소개서를 불러오는 중...",
-        "my_letters": "내 자기소개서",
-        "no_data": "작성된 자기소개서가 없습니다.",
-        "page_title": "자기소개서 관리"
-    },
-    "errors": {
-        "birth": {
-            "invalid": "유효하지 않은 날짜 형식입니다. YYYY-MM-DD 형식으로 입력해주세요.",
-            "required": "생년월일을 입력해주세요."
-        },
-        "confirm_password": {
-            "mismatch": "비밀번호가 일치하지 않습니다.",
-            "required": "검증용 비밀번호를 입력해주세요."
-        },
-        "date": {
-            "invalid_format": "올바른 날짜 형식을 입력해주세요.",
-            "required": "날짜를 선택해주세요."
-        },
-        "email": {
-            "invalid": "유효한 이메일 형식이 아닙니다.",
-            "required": "이메일을 입력해주세요."
-        },
-        "gender": {
-            "required": "성별을 선택해주세요."
-        },
-        "name": {
-            "required": "이름을 입력해주세요."
-        },
-        "password": {
-            "min_length": "비밀번호는 8자 이상이어야 합니다.",
-            "required": "비밀번호를 입력해주세요.",
-            "special_char": "비밀번호에는 특수문자가 하나 이상 포함되어야 합니다."
-        },
-        "phone_number": {
-            "required": "전화번호를 입력해주세요."
-        },
-        "terms": {
-            "required": "이용약관에 동의해야 합니다."
-        }
-    },
-    "pages": {
-        "index": {
-            "features": {
-                "box1_description": "직무 맞춤형",
-                "box1_title": "AI 맞춤 질문 생성",
-                "box2_description": "음성과 표정",
-                "box2_title": "실시간 분석",
-                "box3_description": "상세 답변 분석",
-                "box3_title": "STAR 피드백",
-                "title": "주요 기능"
-            },
-            "subtitle": "실제 면접관처럼 질문하고 분석하는 가장 정교한 AI 면접 연습 서비스",
-            "title": "AI 면접 연습의 새로운 기준"
-        },
-        "dashboard": {
-            "title": "마이페이지",
-            "subtitle": "환영합니다, {{name}}님!",
-            "next_level": "다음 레벨",
-            "overview": "개요",
-            "learning_progress": "학습 진도",
-            "achievements": "성취",
-            "settings": "설정",
-            "total_practice_count": "총 연습 횟수",
-            "average_score": "평균 점수",
-            "consecutive_learning": "연속 학습일",
-            "total_learning_time": "총 학습 시간",
-            "weekly_activity": "주간 활동",
-            "recent_practice_records": "최근 연습 기록",
-            "monthly_learning_progress": "월별 학습 진도",
-            "tech_interview": "기술 면접",
-            "personality_interview": "인성 면접",
-            "english_interview": "영어 면접",
-            "current_progress": "현재 진도",
-            "tech_strength": "알고리즘 강점",
-            "tech_weakness": "시스템 설계 약점",
-            "personality_strength": "뛰어난 의사소통 능력",
-            "personality_weakness": "스토리텔링 개선 필요",
-            "english_strength": "일상 회화 유창함",
-            "english_weakness": "기술 용어 어휘력 개선 필요",
-            "learning_pattern_analysis": "학습 패턴 분석",
-            "optimal_learning_time": "최적 학습 시간",
-            "optimal_learning_time_value": "저녁 (7-10시)",
-            "average_concentration_time": "평균 집중 시간",
-            "average_concentration_time_value": "45분",
-            "preferred_difficulty": "선호 난이도",
-            "preferred_difficulty_value": "중간",
-            "retry_rate": "재시도율",
-            "retry_rate_value": "70%",
-            "improvement_suggestions": "개선 제안",
-            "suggestion1_title": "시스템 설계에 집중",
-            "suggestion1_description": "시스템 설계 질문에 더 많은 시간을 할애하세요.",
-            "suggestion2_title": "스토리텔링 연습",
-            "suggestion2_description": "행동 질문에 대한 설득력 있는 이야기를 만드세요.",
-            "suggestion3_title": "기술 어휘 확장",
-            "suggestion3_description": "영어 면접을 위한 산업별 용어를 학습하세요.",
-            "this_week_goals": "이번 주 목표",
-            "system_design": "시스템 설계",
-            "leadership_questions": "리더십 질문",
-            "answer_completion": "답변 완료",
-            "achievement_list": "성취 목록",
-            "account_settings": "계정 설정"
-        },
-        "pricing": {
-            "basic": {
-                "buttonText": "구독하기",
-                "features": {
-                    "feature1": "이력서 분석 10회",
-                    "feature2": "자기소개서 생성 10회",
-                    "feature3": "기본 면접 시뮬레이션"
-                },
-                "price": "월 10,000원",
-                "title": "베이직"
-            },
-            "enterprise": {
-                "buttonText": "문의하기",
-                "features": {
-                    "feature1": "프로 플랜의 모든 기능",
-                    "feature2": "팀을 위한 맞춤형 솔루션",
-                    "feature3": "전담 지원",
-                    "feature4": "기업 시스템 연동"
-                },
-                "price": "별도 문의",
-                "title": "엔터프라이즈"
-            },
-            "pro": {
-                "buttonText": "구독하기",
-                "features": {
-                    "feature1": "이력서 분석 무제한",
-                    "feature2": "자기소개서 생성 무제한",
-                    "feature3": "고급 면접 시뮬레이션",
-                    "feature4": "심층 분석 및 피드백"
-                },
-                "price": "월 20,000원",
-                "title": "프로"
-            },
-            "title": "요금제"
-        },
-        "sign_in": {
-            "email": "이메일",
-            "password": "비밀번호",
-            "sign_in": "로그인",
-            "sign_up": "이메일로 회원가입",
-            "sign_up_notice": "계정이 없으신가요?"
-        },
-        "sign_up": {
-            "birth": "생년월일",
-            "confirm_password": "비밀번호 확인",
-            "day": "일",
-            "email": "이메일",
-            "gender": "성별",
-            "gender_female": "여성",
-            "gender_male": "남성",
-            "month": "월",
-            "name": "이름",
-            "password": "비밀번호",
-            "phone_number": "전화번호 (01012345678)",
-            "sign_up_button": "회원가입",
-            "terms_agreement": "이용약관 동의",
-            "terms_of_service": "이용약관",
-            "title": "회원가입",
-            "year": "년"
-        },
-        "faq": {
-            "title": "FAQ",
-            "q1": {
-                "question": "JAI는 어떤 서비스인가요?",
-                "answer": "JAI는 AI 기술을 활용하여 실제 면접과 유사한 환경을 제공하는 가상 면접 시뮬레이션 서비스입니다. 사용자는 AI 면접관의 질문에 답하며 면접 능력을 향상시킬 수 있습니다."
-            },
-            "q2": {
-                "question": "어떤 종류의 면접을 연습할 수 있나요?",
-                "answer": "JAI는 직무별 맞춤 질문, 인성 질문 등 다양한 종류의 면접 질문을 제공합니다. 사용자는 자신의 지원 분야에 맞춰 면접을 연습할 수 있습니다."
-            },
-            "q3": {
-                "question": "면접 결과에 대한 피드백을 받을 수 있나요?",
-                "answer": "네, JAI는 사용자의 답변 내용, 음성, 표정 등을 종합적으로 분석하여 STAR 기법에 근거한 상세한 피드백을 제공합니다. 이를 통해 자신의 강점과 약점을 파악하고 개선할 수 있습니다."
-            },
-            "q4": {
-                "question": "서비스 이용 요금은 어떻게 되나요?",
-                "answer": "JAI는 기능에 따라 다양한 요금제를 제공합니다. 자세한 내용은 '가격' 페이지에서 확인하실 수 있습니다."
-            },
-            "q5": {
-                "question": "개인정보는 안전하게 관리되나요?",
-                "answer": "네, JAI는 사용자의 개인정보를 소중하게 생각하며, 관련 법규를 준수하여 안전하게 관리하고 있습니다. 자세한 내용은 '개인정보처리방침'을 참고해주세요."
-            },
-            "cta": {
-                "title": "더 궁금한 점이 있으신가요?",
-                "subtitle": "아래 버튼을 눌러 문의하시면 최대한 빠르게 답변해드리겠습니다.",
-                "button": "문의하기"
-            }
-        }
-    },
-    "profile": {
-        "career": {
-            "add_button": "경력 추가",
-            "add_title": "경력 추가",
-            "company_name": "회사명",
-            "company_name_placeholder": "회사명을 입력하세요",
-            "department": "부서",
-            "department_placeholder": "부서명을 입력하세요",
-            "edit_title": "경력 수정",
-            "end_date": "퇴사일 (YYYY-MM-DD)",
-            "experience_type": "신입/경력",
-            "experience_type_options": {
-                "experienced": "경력",
-                "newcomer": "신입"
-            },
-            "is_attending": "재직중",
-            "is_attending_true": "재직중",
-            "no_data": "등록된 경력 정보가 없습니다.",
-            "reason_for_leaving": "퇴사 사유",
-            "reason_for_leaving_placeholder": "퇴사 사유를 입력하세요",
-            "responsibilities": "직위 / 직책",
-            "responsibilities_placeholder": "담당했던 직위나 직책을 입력하세요",
-            "start_date": "입사일 (YYYY-MM-DD)",
-            "task": "담당 업무",
-            "task_placeholder": "담당했던 주요 업무를 입력하세요",
-            "title": "경력"
-        },
-        "disability": {
-            "add_button": "장애 정보 추가",
-            "add_title": "장애 정보 추가",
-            "disability_type": "장애 종류",
-            "disability_type_placeholder": "장애 종류를 입력하세요",
-            "edit_title": "장애 정보 수정",
-            "no_data": "등록된 장애 정보가 없습니다.",
-            "severity": {
-                "mild": "경증",
-                "severe": "중증",
-                "title": "중증도"
-            },
-            "title": "장애 정보"
-        },
-        "education": {
-            "add_button": "학력 추가",
-            "add_title": "학력 추가",
-            "admission_date": "입학일 (YYYY-MM)",
-            "degree": "학위",
-            "degree_options": {
-                "associate": "전문학사",
-                "bachelor": "학사",
-                "doctorate": "박사",
-                "master": "석사"
-            },
-            "degree_placeholder": "학위 선택",
-            "edit_title": "학력 수정",
-            "graduation_date": "졸업일 (YYYY-MM)",
-            "major": "전공",
-            "major_placeholder": "전공명을 입력하세요",
-            "no_data": "등록된 학력 정보가 없습니다.",
-            "school_name": "학교명",
-            "school_name_placeholder": "학교명을 입력하세요",
-            "school_type": "학교 종류",
-            "school_type_options": {
-                "elementary_school": "초등학교",
-                "high_school": "고등학교",
-                "junior_college": "대학교 (2-3년제)",
-                "middle_school": "중학교",
-                "university": "대학교 (4년제)"
-            },
-            "status": "재학 여부",
-            "status_options": {
-                "attending": "재학중",
-                "completed": "수료",
-                "dropout": "중퇴",
-                "graduated": "졸업"
-            },
-            "title": "학력"
-        },
-        "job_interest": {
-            "add_button": "관심 직무 추가",
-            "add_title": "관심 직무 추가",
-            "edit_title": "관심 직무 수정",
-            "job_title": "직무명",
-            "job_title_placeholder": "관심 있는 직무명을 입력하세요",
-            "no_data": "등록된 관심 직무가 없습니다.",
-            "title": "관심 직무"
-        },
-        "military": {
-            "title": "병역",
-            "period": "기간",
-            "branch": "병과",
-            "branch_placeholder": "병과를 입력하세요",
-            "rank": "계급",
-            "rank_placeholder": "계급을 입력하세요",
-            "start_date": "입대일",
-            "start_date_placeholder": "YYYY-MM-DD",
-            "end_date": "전역일",
-            "end_date_placeholder": "YYYY-MM-DD",
-            "no_data": "등록된 병역 정보가 없습니다.",
-            "status": {
-                "title": "복무 상태",
-                "not_served": "미필",
-                "served": "군필",
-                "serving": "복무 중",
-                "exempted": "면제"
-            }
-        },
-        "patriot": {
-            "no_data": "등록된 보훈 정보가 없습니다.",
-            "patriot_code": "보훈 코드",
-            "patriot_code_placeholder": "보훈 코드를 입력하세요",
-            "title": "보훈 정보",
-            "is_patriot": "보훈 대상 여부",
-            "relation": "관계",
-            "relation_placeholder": "보훈 대상자와의 관계를 입력하세요"
-        },
-        "personal_info": {
-            "title": "개인 정보",
-            "overview": "개요",
-            "learning_progress": "학습진도",
-            "achievements": "성취",
-            "settings": "설정"
-        }
-    },
-    "resume": {
-        "award": {
-            "date_awarded": "취득일",
-            "issuer": "발급기관",
-            "issuer_placeholder": "발급기관명을 입력하세요",
-            "no_data": "등록된 수상/자격증이 없습니다.",
-            "section_title": "수상/자격증",
-            "title": "수상/자격증명",
-            "title_placeholder": "수상 또는 자격증명을 입력하세요"
-        },
-        "back_to_list": "이력서 목록으로",
-        "career": {
-            "company_name": "회사명",
-            "company_name_placeholder": "회사명을 입력하세요",
-            "department": "부서",
-            "department_placeholder": "부서명을 입력하세요",
-            "end_date": "퇴사일",
-            "experience_type": "경력 구분",
-            "experience_type_options": {
-                "experienced": "경력",
-                "newcomer": "신입"
-            },
-            "is_current": "현재 재직 중",
-            "no_data": "등록된 경력 사항이 없습니다.",
-            "reason_for_leaving": "퇴사 사유",
-            "reason_for_leaving_placeholder": "퇴사 사유를 입력하세요",
-            "responsibilities": "직위/직책",
-            "responsibilities_placeholder": "담당했던 직위나 직책을 입력하세요",
-            "section_title": "경력",
-            "start_date": "입사일",
-            "task": "담당 업무",
-            "task_placeholder": "담당했던 주요 업무를 입력하세요"
-        },
-        "delete_confirm": {
-            "message": "정말로 삭제하시겠습니까?",
-            "title": "삭제 확인"
-        },
-        "education": {
-            "admission_date": "입학일",
-            "degree": "학위",
-            "degree_options": {
-                "associate": "전문학사",
-                "bachelor": "학사",
-                "doctorate": "박사",
-                "master": "석사"
-            },
-            "degree_placeholder": "학위 선택",
-            "graduation_date": "졸업일",
-            "major": "전공",
-            "major_placeholder": "전공명을 입력하세요",
-            "no_data": "등록된 학력 사항이 없습니다.",
-            "school_name": "학교명",
-            "school_name_placeholder": "학교명을 입력하세요",
-            "school_type": "학교 구분",
-            "school_type_options": {
-                "elementary_school": "초등학교",
-                "high_school": "고등학교",
-                "junior_college": "대학교 (2-3년제)",
-                "middle_school": "중학교",
-                "university": "대학교 (4년제)"
-            },
-            "section_title": "학력",
-            "status": "졸업 상태",
-            "status_options": {
-                "attending": "재학중",
-                "completed": "수료",
-                "dropout": "중퇴",
-                "graduated": "졸업"
-            }
-        },
-        "language": {
-            "language": "언어",
-            "language_placeholder": "예: 영어",
-            "no_data": "등록된 외국어 능력이 없습니다.",
-            "proficiency": "능숙도",
-            "proficiency_placeholder": "예: 원어민 수준",
-            "section_title": "어학"
-        },
-        "link": {
-            "no_data": "등록된 링크가 없습니다.",
-            "section_title": "링크",
-            "title": "링크 제목",
-            "title_placeholder": "예: GitHub, 포트폴리오",
-            "url": "URL",
-            "url_placeholder": "https://..."
-        },
-        "list": {
-            "add_button": "새 이력서 작성",
-            "delete_confirm": {
-                "message": "정말로 이 이력서를 삭제하시겠습니까?",
-                "title": "이력서 삭제"
-            },
-            "last_updated": "최근 수정",
-            "my_resumes": "내 이력서",
-            "new_title_placeholder": "새 이력서 제목",
-            "no_data": "작성된 이력서가 없습니다.",
-            "page_title": "이력서 관리",
-            "title_placeholder": "이력서 제목",
-            "title_required_alert": "이력서 제목을 입력해주세요."
-        }
+    "header": {
+      "navigation": {
+        "calendar": "채용 달력",
+        "cover_letter": "자기소개서",
+        "home": "JAI",
+        "interview": "가상 면접",
+        "my_page": "마이페이지",
+        "pricing": "가격",
+        "resume": "이력서",
+        "sign_in": "로그인",
+        "sign_out": "로그아웃"
+      }
     }
+  },
+  "cover_letter": {
+    "add_button": "새 자기소개서 작성",
+    "created_date": "작성일",
+    "delete_confirm": {
+      "message": "정말로 이 자기소개서를 삭제하시겠습니까?",
+      "title": "자기소개서 삭제"
+    },
+    "form": {
+      "content": "내용",
+      "content_placeholder": "자기소개서 내용을 입력하세요",
+      "edit_title": "자기소개서 수정",
+      "new_title": "새 자기소개서 작성",
+      "saving": "저장 중...",
+      "title": "제목",
+      "title_placeholder": "자기소개서 제목을 입력하세요"
+    },
+    "loading": "자기소개서를 불러오는 중...",
+    "my_letters": "내 자기소개서",
+    "no_data": "작성된 자기소개서가 없습니다.",
+    "page_title": "자기소개서 관리"
+  },
+  "errors": {
+    "birth": {
+      "invalid": "유효하지 않은 날짜 형식입니다. YYYY-MM-DD 형식으로 입력해주세요.",
+      "required": "생년월일을 입력해주세요."
+    },
+    "confirm_password": {
+      "mismatch": "비밀번호가 일치하지 않습니다.",
+      "required": "검증용 비밀번호를 입력해주세요."
+    },
+    "date": {
+      "invalid_format": "올바른 날짜 형식을 입력해주세요.",
+      "required": "날짜를 선택해주세요."
+    },
+    "email": {
+      "invalid": "유효한 이메일 형식이 아닙니다.",
+      "required": "이메일을 입력해주세요."
+    },
+    "gender": {
+      "required": "성별을 선택해주세요."
+    },
+    "name": {
+      "required": "이름을 입력해주세요."
+    },
+    "password": {
+      "min_length": "비밀번호는 8자 이상이어야 합니다.",
+      "required": "비밀번호를 입력해주세요.",
+      "special_char": "비밀번호에는 특수문자가 하나 이상 포함되어야 합니다."
+    },
+    "phone_number": {
+      "required": "전화번호를 입력해주세요."
+    },
+    "terms": {
+      "required": "이용약관에 동의해야 합니다."
+    }
+  },
+  "pages": {
+    "index": {
+      "features": {
+        "box1_description": "직무 맞춤형",
+        "box1_title": "AI 맞춤 질문 생성",
+        "box2_description": "음성과 표정",
+        "box2_title": "실시간 분석",
+        "box3_description": "상세 답변 분석",
+        "box3_title": "STAR 피드백",
+        "title": "주요 기능"
+      },
+      "subtitle": "실제 면접관처럼 질문하고 분석하는 가장 정교한 AI 면접 연습 서비스",
+      "title": "AI 면접 연습의 새로운 기준"
+    },
+    "dashboard": {
+      "title": "마이페이지",
+      "subtitle": "환영합니다, {{name}}님!",
+      "next_level": "다음 레벨",
+      "overview": "개요",
+      "learning_progress": "학습 진도",
+      "achievements": "성취",
+      "settings": "설정",
+      "total_practice_count": "총 연습 횟수",
+      "average_score": "평균 점수",
+      "consecutive_learning": "연속 학습일",
+      "total_learning_time": "총 학습 시간",
+      "weekly_activity": "주간 활동",
+      "recent_practice_records": "최근 연습 기록",
+      "monthly_learning_progress": "월별 학습 진도",
+      "tech_interview": "기술 면접",
+      "personality_interview": "인성 면접",
+      "english_interview": "영어 면접",
+      "current_progress": "현재 진도",
+      "tech_strength": "알고리즘 강점",
+      "tech_weakness": "시스템 설계 약점",
+      "personality_strength": "뛰어난 의사소통 능력",
+      "personality_weakness": "스토리텔링 개선 필요",
+      "english_strength": "일상 회화 유창함",
+      "english_weakness": "기술 용어 어휘력 개선 필요",
+      "learning_pattern_analysis": "학습 패턴 분석",
+      "optimal_learning_time": "최적 학습 시간",
+      "optimal_learning_time_value": "저녁 (7-10시)",
+      "average_concentration_time": "평균 집중 시간",
+      "average_concentration_time_value": "45분",
+      "preferred_difficulty": "선호 난이도",
+      "preferred_difficulty_value": "중간",
+      "retry_rate": "재시도율",
+      "retry_rate_value": "70%",
+      "improvement_suggestions": "개선 제안",
+      "suggestion1_title": "시스템 설계에 집중",
+      "suggestion1_description": "시스템 설계 질문에 더 많은 시간을 할애하세요.",
+      "suggestion2_title": "스토리텔링 연습",
+      "suggestion2_description": "행동 질문에 대한 설득력 있는 이야기를 만드세요.",
+      "suggestion3_title": "기술 어휘 확장",
+      "suggestion3_description": "영어 면접을 위한 산업별 용어를 학습하세요.",
+      "this_week_goals": "이번 주 목표",
+      "system_design": "시스템 설계",
+      "leadership_questions": "리더십 질문",
+      "answer_completion": "답변 완료",
+      "achievement_list": "성취 목록",
+      "account_settings": "계정 설정"
+    },
+    "pricing": {
+      "basic": {
+        "buttonText": "구독하기",
+        "features": {
+          "feature1": "이력서 분석 10회",
+          "feature2": "자기소개서 생성 10회",
+          "feature3": "기본 면접 시뮬레이션"
+        },
+        "price": "월 10,000원",
+        "title": "베이직"
+      },
+      "enterprise": {
+        "buttonText": "문의하기",
+        "features": {
+          "feature1": "프로 플랜의 모든 기능",
+          "feature2": "팀을 위한 맞춤형 솔루션",
+          "feature3": "전담 지원",
+          "feature4": "기업 시스템 연동"
+        },
+        "price": "별도 문의",
+        "title": "엔터프라이즈"
+      },
+      "pro": {
+        "buttonText": "구독하기",
+        "features": {
+          "feature1": "이력서 분석 무제한",
+          "feature2": "자기소개서 생성 무제한",
+          "feature3": "고급 면접 시뮬레이션",
+          "feature4": "심층 분석 및 피드백"
+        },
+        "price": "월 20,000원",
+        "title": "프로"
+      },
+      "title": "요금제"
+    },
+    "sign_in": {
+      "email": "이메일",
+      "password": "비밀번호",
+      "sign_in": "로그인",
+      "sign_up": "이메일로 회원가입",
+      "sign_up_notice": "계정이 없으신가요?"
+    },
+    "sign_up": {
+      "birth": "생년월일",
+      "confirm_password": "비밀번호 확인",
+      "day": "일",
+      "email": "이메일",
+      "gender": "성별",
+      "gender_female": "여성",
+      "gender_male": "남성",
+      "month": "월",
+      "name": "이름",
+      "password": "비밀번호",
+      "phone_number": "전화번호 (01012345678)",
+      "sign_up_button": "회원가입",
+      "terms_agreement": "이용약관 동의",
+      "terms_of_service": "이용약관",
+      "title": "회원가입",
+      "year": "년"
+    },
+    "faq": {
+      "title": "FAQ",
+      "q1": {
+        "question": "✨JAI는 어떤 서비스인가요?",
+        "answer": "JAI는 AI 기술을 활용하여 실제 면접과 유사한 환경을 제공하는 가상 면접 시뮬레이션 서비스입니다.\n사용자는 AI 면접관의 질문에 답하며 면접 능력을 향상시킬 수 있습니다."
+      },
+      "q2": {
+        "question": "💻어떤 종류의 면접을 연습할 수 있나요?",
+        "answer": "JAI는 직무별 맞춤 질문, 인성 질문 등 다양한 종류의 면접 질문을 제공합니다.\n사용자는 자신의 지원 분야에 맞춰 면접을 연습할 수 있습니다.\n더불어 난이도를 설정하여 자신에게 맞춘 면접을 진행할 수 있습니다."
+      },
+      "q3": {
+        "question": "📝면접 결과에 대한 피드백을 받을 수 있나요?",
+        "answer": "네, JAI는 사용자의 답변 내용, 음성, 표정 등을 종합적으로 분석하여 STAR 기법에 근거한 상세한 피드백을 제공합니다.\n이를 통해 자신의 강점과 약점을 파악하고 개선할 수 있습니다."
+      },
+      "q4": {
+        "question": "💲서비스 이용 요금은 어떻게 되나요?",
+        "answer_part1": "JAI는 기능에 따라 다양한 요금제를 제공합니다. 자세한 내용은 '",
+        "answer_link": "가격",
+        "answer_part2": "' 페이지에서 확인하실 수 있습니다."
+      },
+      "q5": {
+        "question": "🤵🏻개인정보는 안전하게 관리되나요?",
+        "answer_part1": "네, JAI는 사용자의 개인정보를 소중하게 생각하며, 관련 법규를 준수하여 안전하게 관리하고 있습니다.\n자세한 내용은 '",
+        "answer_link": "개인정보처리방침",
+        "answer_part2": "'을 참고해주세요."
+      },
+      "q6": {
+        "question": "💸유료 구독은 어떻게 하나요?",
+        "answer": "현재 JAI는 베타 서비스로 무료로 제공되고 있습니다.\n향후 정식 서비스 출시 시 다양한 구독 플랜을 제공할 예정이며, 기존 사용자에게는 특별 혜택을 드릴 계획입니다.\n구독 관련 최신 정보는 이메일과 웹사이트를 통해 안내드리겠습니다."
+      },
+      "q7": {
+        "question": "🗃️면접 연습 결과는 얼마나 보관되나요?",
+        "answer": "면접 연습 기록과 분석 결과는 계정 활성화 상태에서 영구 보관됩니다.\n사용자가 직접 기록을 삭제하거나 계정을 탈퇴하는 경우에만 데이터가 삭제됩니다.\n음성 데이터는 분석 완료 후 즉시 삭제되어 개인정보를 보호합니다."
+      },
+      "q8": {
+        "question": "📞고객 지원은 어떻게 받을 수 있나요?",
+        "answer": "다음과 같은 방법으로 고객 지원을 받으실 수 있습니다:\n• 이메일: support@jai.com\n• 전화: 02-1234-5678\n• 운영시간: 평일 09:00-18:00 (주말 및 공휴일 제외)\n• 평균 응답 시간: 이메일 24시간 이내, 전화 즉시 연결\n• FAQ에서 해결되지 않는 문제는 상세히 문의해 주세요."
+      },
+      "q9": {
+        "question": "🛠️서비스 개선 제안이나 피드백은 어디로 보내나요?",
+        "answer": "사용자의 소중한 의견을 적극 환영합니다!\n• 이메일: feedback@jai.com\n• 웹사이트 내 피드백 버튼 활용\n• 정기 사용자 설문조사 참여\n\n제안해 주신 아이디어는 서비스 개선에 적극 반영하며, 채택된 제안에는 특별 혜택을 제공합니다."
+      },
+      "cta": {
+        "title": "🤔더 궁금한 점이 있으신가요?",
+        "subtitle": "아래 버튼을 눌러 문의하시면 최대한 빠르게 답변해드리겠습니다.",
+        "button": "문의하기"
+      }
+    }
+  },
+  "profile": {
+    "career": {
+      "add_button": "경력 추가",
+      "add_title": "경력 추가",
+      "company_name": "회사명",
+      "company_name_placeholder": "회사명을 입력하세요",
+      "department": "부서",
+      "department_placeholder": "부서명을 입력하세요",
+      "edit_title": "경력 수정",
+      "end_date": "퇴사일 (YYYY-MM-DD)",
+      "experience_type": "신입/경력",
+      "experience_type_options": {
+        "experienced": "경력",
+        "newcomer": "신입"
+      },
+      "is_attending": "재직중",
+      "is_attending_true": "재직중",
+      "no_data": "등록된 경력 정보가 없습니다.",
+      "reason_for_leaving": "퇴사 사유",
+      "reason_for_leaving_placeholder": "퇴사 사유를 입력하세요",
+      "responsibilities": "직위 / 직책",
+      "responsibilities_placeholder": "담당했던 직위나 직책을 입력하세요",
+      "start_date": "입사일 (YYYY-MM-DD)",
+      "task": "담당 업무",
+      "task_placeholder": "담당했던 주요 업무를 입력하세요",
+      "title": "경력"
+    },
+    "disability": {
+      "add_button": "장애 정보 추가",
+      "add_title": "장애 정보 추가",
+      "disability_type": "장애 종류",
+      "disability_type_placeholder": "장애 종류를 입력하세요",
+      "edit_title": "장애 정보 수정",
+      "no_data": "등록된 장애 정보가 없습니다.",
+      "severity": {
+        "mild": "경증",
+        "severe": "중증",
+        "title": "중증도"
+      },
+      "title": "장애 정보"
+    },
+    "education": {
+      "add_button": "학력 추가",
+      "add_title": "학력 추가",
+      "admission_date": "입학일 (YYYY-MM)",
+      "degree": "학위",
+      "degree_options": {
+        "associate": "전문학사",
+        "bachelor": "학사",
+        "doctorate": "박사",
+        "master": "석사"
+      },
+      "degree_placeholder": "학위 선택",
+      "edit_title": "학력 수정",
+      "graduation_date": "졸업일 (YYYY-MM)",
+      "major": "전공",
+      "major_placeholder": "전공명을 입력하세요",
+      "no_data": "등록된 학력 정보가 없습니다.",
+      "school_name": "학교명",
+      "school_name_placeholder": "학교명을 입력하세요",
+      "school_type": "학교 종류",
+      "school_type_options": {
+        "elementary_school": "초등학교",
+        "high_school": "고등학교",
+        "junior_college": "대학교 (2-3년제)",
+        "middle_school": "중학교",
+        "university": "대학교 (4년제)"
+      },
+      "status": "재학 여부",
+      "status_options": {
+        "attending": "재학중",
+        "completed": "수료",
+        "dropout": "중퇴",
+        "graduated": "졸업"
+      },
+      "title": "학력"
+    },
+    "job_interest": {
+      "add_button": "관심 직무 추가",
+      "add_title": "관심 직무 추가",
+      "edit_title": "관심 직무 수정",
+      "job_title": "직무명",
+      "job_title_placeholder": "관심 있는 직무명을 입력하세요",
+      "no_data": "등록된 관심 직무가 없습니다.",
+      "title": "관심 직무"
+    },
+    "military": {
+      "title": "병역",
+      "period": "기간",
+      "branch": "병과",
+      "branch_placeholder": "병과를 입력하세요",
+      "rank": "계급",
+      "rank_placeholder": "계급을 입력하세요",
+      "start_date": "입대일",
+      "start_date_placeholder": "YYYY-MM-DD",
+      "end_date": "전역일",
+      "end_date_placeholder": "YYYY-MM-DD",
+      "no_data": "등록된 병역 정보가 없습니다.",
+      "status": {
+        "title": "복무 상태",
+        "not_served": "미필",
+        "served": "군필",
+        "serving": "복무 중",
+        "exempted": "면제"
+      }
+    },
+    "patriot": {
+      "no_data": "등록된 보훈 정보가 없습니다.",
+      "patriot_code": "보훈 코드",
+      "patriot_code_placeholder": "보훈 코드를 입력하세요",
+      "title": "보훈 정보",
+      "is_patriot": "보훈 대상 여부",
+      "relation": "관계",
+      "relation_placeholder": "보훈 대상자와의 관계를 입력하세요"
+    },
+    "personal_info": {
+      "title": "개인 정보",
+      "overview": "개요",
+      "learning_progress": "학습진도",
+      "achievements": "성취",
+      "settings": "설정"
+    }
+  },
+  "resume": {
+    "award": {
+      "date_awarded": "취득일",
+      "issuer": "발급기관",
+      "issuer_placeholder": "발급기관명을 입력하세요",
+      "no_data": "등록된 수상/자격증이 없습니다.",
+      "section_title": "수상/자격증",
+      "title": "수상/자격증명",
+      "title_placeholder": "수상 또는 자격증명을 입력하세요"
+    },
+    "back_to_list": "이력서 목록으로",
+    "career": {
+      "company_name": "회사명",
+      "company_name_placeholder": "회사명을 입력하세요",
+      "department": "부서",
+      "department_placeholder": "부서명을 입력하세요",
+      "end_date": "퇴사일",
+      "experience_type": "경력 구분",
+      "experience_type_options": {
+        "experienced": "경력",
+        "newcomer": "신입"
+      },
+      "is_current": "현재 재직 중",
+      "no_data": "등록된 경력 사항이 없습니다.",
+      "reason_for_leaving": "퇴사 사유",
+      "reason_for_leaving_placeholder": "퇴사 사유를 입력하세요",
+      "responsibilities": "직위/직책",
+      "responsibilities_placeholder": "담당했던 직위나 직책을 입력하세요",
+      "section_title": "경력",
+      "start_date": "입사일",
+      "task": "담당 업무",
+      "task_placeholder": "담당했던 주요 업무를 입력하세요"
+    },
+    "delete_confirm": {
+      "message": "정말로 삭제하시겠습니까?",
+      "title": "삭제 확인"
+    },
+    "education": {
+      "admission_date": "입학일",
+      "degree": "학위",
+      "degree_options": {
+        "associate": "전문학사",
+        "bachelor": "학사",
+        "doctorate": "박사",
+        "master": "석사"
+      },
+      "degree_placeholder": "학위 선택",
+      "graduation_date": "졸업일",
+      "major": "전공",
+      "major_placeholder": "전공명을 입력하세요",
+      "no_data": "등록된 학력 사항이 없습니다.",
+      "school_name": "학교명",
+      "school_name_placeholder": "학교명을 입력하세요",
+      "school_type": "학교 구분",
+      "school_type_options": {
+        "elementary_school": "초등학교",
+        "high_school": "고등학교",
+        "junior_college": "대학교 (2-3년제)",
+        "middle_school": "중학교",
+        "university": "대학교 (4년제)"
+      },
+      "section_title": "학력",
+      "status": "졸업 상태",
+      "status_options": {
+        "attending": "재학중",
+        "completed": "수료",
+        "dropout": "중퇴",
+        "graduated": "졸업"
+      }
+    },
+    "language": {
+      "language": "언어",
+      "language_placeholder": "예: 영어",
+      "no_data": "등록된 외국어 능력이 없습니다.",
+      "proficiency": "능숙도",
+      "proficiency_placeholder": "예: 원어민 수준",
+      "section_title": "어학"
+    },
+    "link": {
+      "no_data": "등록된 링크가 없습니다.",
+      "section_title": "링크",
+      "title": "링크 제목",
+      "title_placeholder": "예: GitHub, 포트폴리오",
+      "url": "URL",
+      "url_placeholder": "https://..."
+    },
+    "list": {
+      "add_button": "새 이력서 작성",
+      "delete_confirm": {
+        "message": "정말로 이 이력서를 삭제하시겠습니까?",
+        "title": "이력서 삭제"
+      },
+      "last_updated": "최근 수정",
+      "my_resumes": "내 이력서",
+      "new_title_placeholder": "새 이력서 제목",
+      "no_data": "작성된 이력서가 없습니다.",
+      "page_title": "이력서 관리",
+      "title_placeholder": "이력서 제목",
+      "title_required_alert": "이력서 제목을 입력해주세요."
+    }
+  }
 }
