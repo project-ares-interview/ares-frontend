@@ -48,7 +48,7 @@ export default function DesktopHeader({ showNav = true }: DesktopHeaderProps) {
       <View style={styles.leftSection}>
         <Link href={"/" as Href} style={styles.logoContainer}>
           <Image
-            source={require("@/assets/images/Gemini_Generated_Image_yci72qyci72qyci7.png")}
+            source={require("@/assets/images/symbol.png")}
             style={styles.logo}
           />
           <Text h4 style={styles.heading}>
@@ -124,9 +124,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logo: {
-    width: 30,
-    height: 30,
-    marginRight: 8,
+    width: 70,
+    height: 70,
+    marginRight: 6,
   },
   heading: {
     color: "white",

@@ -39,31 +39,69 @@ export default function Index() {
         </View>
       </View>
       <View style={styles.featuresSection}>
-        <Text style={styles.featuresTitle}>{t("pages.index.features.title")}</Text>
+        <Text style={styles.featuresTitle}>
+          {t("pages.index.features.title")}
+        </Text>
         <View style={styles.featuresContainer}>
           <View style={styles.featureBox}>
             <Image
-              source={require('@/assets/images/feature-1.png')}
+              source={require("@/assets/images/new_transparent.png")}
               style={styles.featureImage}
             />
-            <Text style={styles.featureBoxTitle}>{t("pages.index.features.box1_title")}</Text>
-            <Text style={styles.featureBoxDescription}>{t("pages.index.features.box1_description")}</Text>
+            <View
+              style={{
+                height: 1,
+                width: "80%",
+                backgroundColor: "#818080ff",
+                marginVertical: 12,
+              }}
+            />
+            <Text style={styles.featureBoxTitle}>
+              {t("pages.index.features.box1_title")}
+            </Text>
+            <Text style={styles.featureBoxDescription}>
+              {t("pages.index.features.box1_description")}
+            </Text>
           </View>
           <View style={styles.featureBox}>
             <Image
-              source={require('@/assets/images/feature-2.png')}
+              source={require("@/assets/images/new_transparent_icon_1.png")}
               style={styles.featureImage}
             />
-            <Text style={styles.featureBoxTitle}>{t("pages.index.features.box2_title")}</Text>
-            <Text style={styles.featureBoxDescription}>{t("pages.index.features.box2_description")}</Text>
+            <View
+              style={{
+                height: 1,
+                width: "80%",
+                backgroundColor: "#818080ff",
+                marginVertical: 12,
+              }}
+            />
+            <Text style={styles.featureBoxTitle}>
+              {t("pages.index.features.box2_title")}
+            </Text>
+            <Text style={styles.featureBoxDescription}>
+              {t("pages.index.features.box2_description")}
+            </Text>
           </View>
           <View style={styles.featureBox}>
             <Image
-              source={require('@/assets/images/feature-3.png')}
+              source={require("@/assets/images/new_transparent_icon_2.png")}
               style={styles.featureImage}
             />
-            <Text style={styles.featureBoxTitle}>{t("pages.index.features.box3_title")}</Text>
-            <Text style={styles.featureBoxDescription}>{t("pages.index.features.box3_description")}</Text>
+            <View
+              style={{
+                height: 1,
+                width: "80%",
+                backgroundColor: "#818080ff",
+                marginVertical: 12,
+              }}
+            />
+            <Text style={styles.featureBoxTitle}>
+              {t("pages.index.features.box3_title")}
+            </Text>
+            <Text style={styles.featureBoxDescription}>
+              {t("pages.index.features.box3_description")}
+            </Text>
           </View>
         </View>
       </View>
@@ -78,14 +116,14 @@ const styles = StyleSheet.create({
   },
   content: {
     height: 800,
-    width: '100%',
-    flexDirection: 'row',
-    position: 'relative',
-    justifyContent: 'flex-start',
+    width: "100%",
+    flexDirection: "row",
+    position: "relative",
+    justifyContent: "flex-start",
   },
   videoContainer: {
     flex: 1,
-    height: '100%',
+    height: "100%",
     margin: 0,
     padding: 0,
   },
@@ -94,69 +132,70 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: "rgba(0,0,0,0.5)",
     zIndex: 2,
   },
   textOverlay: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     zIndex: 3,
   },
   title: {
     fontSize: 64,
     fontWeight: "bold",
-    textAlign: 'center',
-    color: 'white',
+    textAlign: "center",
+    color: "white",
   },
   subtitle: {
     fontSize: 24,
-    textAlign: 'center',
-    color: 'white',
+    textAlign: "center",
+    color: "white",
   },
   featuresSection: {
     paddingVertical: 40,
     paddingHorizontal: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   featuresTitle: {
     fontSize: 32,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 24,
   },
   featuresContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
   },
   featureBox: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     padding: 16,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#818080ff",
     borderRadius: 8,
     marginHorizontal: 8,
   },
   featureImage: {
-    width: 150,
-    height: 150,
+    width: 200,
+    height: 200,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    resizeMode: "contain",
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.25,
+    // shadowRadius: 3.84,
     elevation: 5,
   },
   featureBoxTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 8,
   },
   featureBoxDescription: {
     fontSize: 14,
-    textAlign: 'center',
-    color: '#666',
+    textAlign: "center",
+    color: "#666",
   },
 });

@@ -47,10 +47,10 @@ export default function Footer() {
       <View style={[styles.topSection, isMobile && styles.topSectionMobile]}>
         <View style={styles.logoContainer}>
           <Image
-            source={require("@/assets/images/Gemini_Generated_Image_yci72qyci72qyci7.png")}
+            source={require("@/assets/images/symbol.png")}
             style={styles.logo}
           />
-          <Text style={styles.companyName}>JobAI</Text>
+          <Text style={styles.companyName}>JAI(JobAI)</Text>
         </View>
 
         <View
@@ -127,13 +127,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logo: {
-    width: 24,
-    height: 24,
-    marginRight: 8,
+    width: 70,
+    height: 70,
+    marginRight: 6,
   },
   companyName: {
     color: "#fff",
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
   },
   rightSection: {
