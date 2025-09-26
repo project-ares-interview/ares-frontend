@@ -147,9 +147,11 @@ export const useInterview = () => {
     const wsScheme = WS_URL.startsWith('wss') ? 'wss' : 'ws';
     const host = WS_URL.replace(/^(wss?:\/\/)/, '');
 
-    sockets.current.results = new WebSocket(`${wsScheme}://${host}/ws/interview/results/${sessionId}/`);
-    sockets.current.audio = new WebSocket(`${wsScheme}://${host}/ws/interview/audio/${sessionId}/`);
-    sockets.current.video = new WebSocket(`${wsScheme}://${host}/ws/interview/video/${sessionId}/`);
+    sockets.current.results = new WebSocket(`wss://small.guide/ws/interview/results/${sessionId}/`);
+    sockets.current.audio = new WebSocket(`wss://small.guide/ws/interview/audio/${sessionId}/`);
+    sockets.current.video = new WebSocket(
+      `wss://small.guide/ws/interview/video/${sessionId}/`,
+    );
 
     sockets.current.results.onmessage = handleSocketEvent;
     

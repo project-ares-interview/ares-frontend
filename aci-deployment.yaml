@@ -1,0 +1,43 @@
+
+apiVersion: '2023-05-01'
+location: koreacentral
+name: {NAME}
+properties:
+  containers:
+  - name: ares-frontend
+    properties:
+      image: {DNS_NAME}.azurecr.io/ares-frontend:staging-v1.7
+      ports:
+      - port: 80
+        protocol: TCP
+      resources:
+        requests:
+          cpu: 2
+          memoryInGB: 8
+  - name: ares-backend
+    properties:
+      image: {DNS_NAME}.azurecr.io/ares-backend:staging-v1.6
+      resources:
+        requests:
+          cpu: 2
+          memoryInGB: 8
+      environmentVariables:
+      - name: 'DOMAIN_NAME'
+        value: '{DOMAIN_NAMES}'
+      - name: 'DJANGO_ALLOWED_HOSTS'
+        value: '{DOMAIN_NAMES},localhost'
+      - name: 'DOTENV_PRIVATE_KEY_STAGING'
+        secureValue: '{DOTENV_PRIVATE_KEY}'
+  osType: Linux
+  restartPolicy: Always
+  ipAddress:
+    type: Public
+    ports:
+    - port: 80
+      protocol: TCP
+    dnsNameLabel: ares-app-5f0ac1e7
+  imageRegistryCredentials:
+  - server: {DNS_NAME}.azurecr.io
+    username: {USERNAME}
+    password: '{PASSWORD}'
+type: Microsoft.ContainerInstance/containerGroups
